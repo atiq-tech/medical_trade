@@ -16,20 +16,29 @@ class TestReceiptScreen extends StatefulWidget {
 
 class _TestReceiptScreenState extends State<TestReceiptScreen> {
   Color getColor(Set<WidgetState> states) {
-    return Colors.blue.shade200;
+    return Colors.green.shade100;
   }
 
   Color getColors(Set<WidgetState> states) {
     return Colors.white;
   }
-  final _testIDController = TextEditingController();
-  final _departmentController = TextEditingController();
+  final _patientController = TextEditingController();
+  final _nameController = TextEditingController();
+  final _mobileController = TextEditingController();
   final _testNameController = TextEditingController();
   final _roomNoController = TextEditingController();
   final _priceController = TextEditingController();
   final _dayController = TextEditingController();
   final _hourController = TextEditingController();
   final _minuteController = TextEditingController();
+  final _othersController = TextEditingController();
+  final _refferedController = TextEditingController();
+  final _addressController = TextEditingController();
+  final _vatPercentageController = TextEditingController();
+  final _vatController = TextEditingController();
+  final _discountParcentageController = TextEditingController();
+  final _discountController = TextEditingController();
+  final _paidController = TextEditingController();
   
   // SharedPreferences? sharedPreferences;
   // Future<void> _initializeData() async {
@@ -48,7 +57,7 @@ class _TestReceiptScreenState extends State<TestReceiptScreen> {
   String? userEmployeeId = "";
   String userName = "";
   String userType = "";
-String? firstPickedDate;
+  String? firstPickedDate;
   var backEndFirstDate;
   var backEndSecondtDate;
 
@@ -72,8 +81,37 @@ String? firstPickedDate;
       });
     }
   }
-  double subtotal = 0.0;
 
+  final TextEditingController _dateController = TextEditingController();
+  final TextEditingController _timeController = TextEditingController();
+
+  Future<void> _pickDate() async {
+    DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2020),
+      lastDate: DateTime(2100),
+    );
+    if (picked != null) {
+      setState(() {
+        _dateController.text = DateFormat('yyyy-MM-dd').format(picked);
+      });
+    }
+  }
+
+  Future<void> _pickTime() async {
+    TimeOfDay? picked = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
+    if (picked != null) {
+      final now = DateTime.now();
+      final dt = DateTime(now.year, now.month, now.day, picked.hour, picked.minute);
+      setState(() {
+        _timeController.text = DateFormat('HH:mm').format(dt);
+      });
+    }
+  }
    List<AddToCartModel> addToCartList = [];
   @override
   void initState() {
@@ -120,6 +158,96 @@ String? firstPickedDate;
     }
   }
 
+double subTotal = 0.0;
+double totalAmount = 0.0;
+double dueAmount = 0.0;
+
+// Flags to avoid loop
+bool _isVatPercentChanging = false;
+bool _isVatAmountChanging = false;
+bool _isDiscountPercentChanging = false;
+bool _isDiscountAmountChanging = false;
+
+void _calculateTotals() {
+  double vatPercentage = double.tryParse(_vatPercentageController.text) ?? 0;
+  double discountPercentage = double.tryParse(_discountParcentageController.text) ?? 0;
+  double others = double.tryParse(_othersController.text) ?? 0;
+  double paid = double.tryParse(_paidController.text) ?? 0;
+
+  double vatAmount = subTotal * vatPercentage / 100;
+  double discountAmount = subTotal * discountPercentage / 100;
+
+  // Update VAT
+  if (!_isVatAmountChanging) {
+    _isVatPercentChanging = true;
+    _vatController.text = vatAmount.toStringAsFixed(2);
+    _isVatPercentChanging = false;
+  }
+
+  // Update Discount
+  if (!_isDiscountAmountChanging) {
+    _isDiscountPercentChanging = true;
+    _discountController.text = discountAmount.toStringAsFixed(2);
+    _isDiscountPercentChanging = false;
+  }
+
+  totalAmount = (subTotal + vatAmount + others) - discountAmount;
+  dueAmount = totalAmount - paid;
+
+  setState(() {});
+}
+
+void _calculateSubTotal() {
+  double total = 0.0;
+  for (var item in addToCartList) {
+    double price = double.tryParse(item.price ?? "0") ?? 0.0;
+    total += price;
+  }
+  setState(() {
+    subTotal = total;
+  });
+}
+
+// VAT & Discount listeners
+void _onVatPercentageChanged(String value) {
+  if (_isVatPercentChanging) return;
+
+  _calculateTotals();
+}
+
+void _onVatAmountChanged(String value) {
+  if (_isVatAmountChanging) return;
+
+  _isVatAmountChanging = true;
+
+  double vatAmount = double.tryParse(value) ?? 0;
+  double percentage = subTotal == 0 ? 0 : (vatAmount / subTotal) * 100;
+  _vatPercentageController.text = percentage.toStringAsFixed(2);
+
+  _calculateTotals();
+  _isVatAmountChanging = false;
+}
+
+void _onDiscountPercentageChanged(String value) {
+  if (_isDiscountPercentChanging) return;
+
+  _calculateTotals();
+}
+
+void _onDiscountAmountChanged(String value) {
+  if (_isDiscountAmountChanging) return;
+
+  _isDiscountAmountChanging = true;
+
+  double discountAmount = double.tryParse(value) ?? 0;
+  double percentage = subTotal == 0 ? 0 : (discountAmount / subTotal) * 100;
+  _discountParcentageController.text = percentage.toStringAsFixed(2);
+
+  _calculateTotals();
+  _isDiscountAmountChanging = false;
+}
+
+
     void _addToCart() {
     if (_dateController.text.isEmpty ||
         _timeController.text.isEmpty ||
@@ -134,35 +262,45 @@ String? firstPickedDate;
 
     setState(() {
       addToCartList.add(AddToCartModel(
-        productId: _dateController.text,
-        name: _timeController.text,
-        code: _testNameController.text,
-        categoryId: _roomNoController.text,
-        categoryName: _priceController.text, 
-        salesRate: '', 
-        purchaseRate: '', 
-        colorId: '',
-        color: '', 
-        sizeId: '', 
-        size: '', 
-        quantity: '', 
-        discount: '', 
-        vat: '', 
-        discountAmount: '', 
-        total: '', 
-        note: '', isService: '', isConvert: '', convertQty: '', convertName: '', unitName: '', pcsQty: '', unitQty: '',
+        deliveryDate: _dateController.text,
+        deliveryTime: _timeController.text,
+        testName: _testNameController.text,
+        roomNo: _roomNoController.text,
+        price: _priceController.text, 
       ));
-  // deliveryDate: _dateController.text,
-  //       deliveryTime: _timeController.text,
-  //       testName: _testNameController.text,
-  //       roomNo: _roomNoController.text,
-  //       price: _priceController.text,
 
       _dateController.clear();
       _timeController.clear();
       _testNameController.clear();
       _roomNoController.clear();
       _priceController.clear();
+    });
+    _calculateSubTotal();
+  }
+
+  void allClear() {
+    _patientController.clear();
+    _nameController.clear();
+    _mobileController.clear();
+    _testNameController.clear();
+    _roomNoController.clear();
+    _priceController.clear();
+    _dayController.clear();
+    _hourController.clear();
+    _minuteController.clear();
+    _othersController.clear();
+    _refferedController.clear();
+    _addressController.clear();
+    _vatPercentageController.clear();
+    _vatController.clear();
+    _discountParcentageController.clear();
+    _discountController.clear();
+    _paidController.clear();
+    setState(() {
+      addToCartList.clear();
+      subTotal = 0.0;
+      totalAmount = 0.0;
+      dueAmount = 0.0;
     });
   }
 
@@ -247,35 +385,35 @@ String? firstPickedDate;
                     ]),
                     CommonTextFieldRow(
                       label: "Patient",
-                      controller: _testIDController,
+                      controller: _patientController,
                       hintText: "Select Patient",
                     ),
 
                     SizedBox(height: 4.0.h),
                     CommonTextFieldRow(
                       label: "Name",
-                      controller: _departmentController,
+                      controller: _nameController,
                       hintText: "Enter Name",
                     ),
 
                     SizedBox(height: 4.0.h),
                     CommonTextFieldRow(
                       label: "Mobile",
-                      controller: _testNameController,
+                      controller: _mobileController,
                       hintText: "Enter Mobile",
                     ),
 
                     SizedBox(height: 4.0.h),
                     CommonTextFieldRow(
                       label: "Referred by",
-                      controller: _priceController,
+                      controller: _refferedController,
                       hintText: "Atiqur Rahman Atiq",
                     ),
                     
                     SizedBox(height: 4.0.h),
                     CommonTextFieldRow(
                       label: "Address",
-                      controller: _roomNoController,
+                      controller: _addressController,
                       hintText: "Enter Address",
                       maxLines: 2,
                     ),
@@ -364,6 +502,7 @@ String? firstPickedDate;
                       label: "Room No",
                       controller: _roomNoController,
                       hintText: "Enter Room No",
+                      keyboardType: TextInputType.number,
                     ),
 
                     SizedBox(height: 4.0.h),
@@ -371,6 +510,7 @@ String? firstPickedDate;
                       label: "Price",
                       controller: _priceController,
                       hintText: "0",
+                      keyboardType: TextInputType.number,
                     ),
                     SizedBox(height: 4.0.h),
                    Align(
@@ -410,7 +550,7 @@ String? firstPickedDate;
               height: addToCartList.isEmpty ? 40
               : addToCartList.length == 1 ? 65 : 40 + (addToCartList.length * 22.0),
               width: double.infinity,
-              padding: EdgeInsets.only(top: 5.h, bottom: 10.h),
+              padding: EdgeInsets.only(left: 10.w, top: 5.h, bottom: 10.h, right: 10.w),
               child: SizedBox(
                 width: double.infinity,
                 height: double.infinity,
@@ -421,9 +561,9 @@ String? firstPickedDate;
                     child: DataTable(
                       headingRowHeight: 18.h,
                       dataRowHeight: 18.h,
-                      headingRowColor: MaterialStateColor.resolveWith((states) => const Color.fromARGB(255, 1, 129, 143)),
+                      headingRowColor: MaterialStateColor.resolveWith((states) => const Color.fromARGB(255, 1, 114, 26)),
                       showCheckboxColumn: false,
-                      border: TableBorder.all(color: const Color.fromARGB(255, 164, 217, 219), width: 1),
+                      border: TableBorder.all(color: const Color.fromARGB(255, 110, 143, 145), width: 1),
                       columns: const [
                         DataColumn(label: Expanded(child: Center(child: Text('SL.',style: AllTextStyle.tableHeadTextStyle)))),
                         DataColumn(label: Expanded(child: Center(child: Text('Test Name',style: AllTextStyle.tableHeadTextStyle)))),
@@ -438,10 +578,10 @@ String? firstPickedDate;
                           color: index % 2 == 0? MaterialStateProperty.resolveWith(getColor): MaterialStateProperty.resolveWith(getColors),
                           cells: <DataCell>[
                             DataCell(Center(child: Text("${index + 1}"))),
-                            DataCell(Center(child: Text(addToCartList[index].productId!,style: TextStyle(fontSize: 11.sp)))),
-                            DataCell(Center(child: Text(addToCartList[index].code!,style: TextStyle(fontSize: 11.sp)))),
-                            DataCell(Center(child: Text(addToCartList[index].categoryId!,style: TextStyle(fontSize: 11.sp)))),
-                            DataCell(Center(child: Text("${addToCartList[index].productId!} ${addToCartList[index].name!}",style: TextStyle(fontSize: 11.sp)))),
+                            DataCell(Center(child: Text(addToCartList[index].testName!,style: TextStyle(fontSize: 11.sp)))),
+                            DataCell(Center(child: Text(addToCartList[index].roomNo!,style: TextStyle(fontSize: 11.sp)))),
+                            DataCell(Center(child: Text(addToCartList[index].price!,style: TextStyle(fontSize: 11.sp)))),
+                            DataCell(Center(child: Text("${addToCartList[index].deliveryDate!} ${addToCartList[index].deliveryTime!}",style: TextStyle(fontSize: 11.sp)))),
                             DataCell(
                               Center(
                                 child: GestureDetector(
@@ -449,6 +589,7 @@ String? firstPickedDate;
                                     setState(() {
                                       addToCartList.removeAt(index);
                                     });
+                                     _calculateSubTotal();
                                   },
                                   child: Icon(Icons.delete,size: 16.r, color: AppColors.appColor),
                                 ),
@@ -494,7 +635,7 @@ String? firstPickedDate;
                                 height: 25.0.h,
                                 padding: EdgeInsets.all(4.0.r),
                                 decoration:ContDecoration.contDecoration,
-                                child: Text(double.parse("$subtotal").toStringAsFixed(0), style: AllTextStyle.textValueStyle,
+                                child: Text(double.parse("$subTotal").toStringAsFixed(0), style: AllTextStyle.textValueStyle,
                                 ),
                               )),
                         ],
@@ -513,10 +654,9 @@ String? firstPickedDate;
                               margin: EdgeInsets.only(left: 3.w, right: 5.w,top: 5.h),
                               child: TextField(
                                 style: AllTextStyle.textValueStyle,
-                                controller: _priceController,
-                                // controller: _vatPercentageController,
+                                controller: _vatPercentageController,
                                 onChanged: (value) {
-                                  
+                                  _onVatPercentageChanged(value);
                                 },
                                 keyboardType: TextInputType.number,
                                 decoration: InputDecoration(
@@ -543,11 +683,10 @@ String? firstPickedDate;
                               margin: EdgeInsets.only(top: 4.0.h),
                               child: TextField(
                                 style: AllTextStyle.textValueStyle,
-                                controller: _testNameController,
-                                // controller: _VatController,
+                                controller: _vatController,
                                 keyboardType: TextInputType.number,
                                 onChanged: (value) {
-                              
+                                  _onVatAmountChanged(value);
                                 },
                                 decoration: InputDecoration(
                                     contentPadding: EdgeInsets.only(left: 6.w),
@@ -577,9 +716,9 @@ String? firstPickedDate;
                               margin: EdgeInsets.only(left: 3.w, right: 5.w),
                               child: TextField(
                                 style: AllTextStyle.textValueStyle,
-                                controller: _roomNoController,
+                                controller: _discountParcentageController,
                                 onChanged: (value) {
-                                
+                                  _onDiscountPercentageChanged(value);
                                 },
                                 keyboardType: TextInputType.phone,
                                 decoration: InputDecoration(contentPadding: EdgeInsets.only(left: 3.w),
@@ -593,8 +732,6 @@ String? firstPickedDate;
                               ),
                             ),
                           ),
-
-                          ///dis Amount
                           SizedBox(width: 4.w),
                           Text("%", style: AllTextStyle.textFieldHeadStyle),
                           SizedBox(width: 8.w),
@@ -604,10 +741,10 @@ String? firstPickedDate;
                               height: 25.0.h,
                               child: TextField(
                                 style: AllTextStyle.textValueStyle,
-                                controller: _hourController,
-                                //controller: _DiscountController,
+                                controller: _discountController,
                                 keyboardType: TextInputType.number,
                                 onChanged: (value) {
+                                  _onDiscountAmountChanged(value);
                                 },
                                 decoration: InputDecoration(
                                     contentPadding: EdgeInsets.only(left: 6.w),
@@ -634,8 +771,9 @@ String? firstPickedDate;
                               margin: EdgeInsets.only(top: 4.h, bottom: 4.h),
                               child: TextField(
                                 style: AllTextStyle.textValueStyle,
-                                controller: _departmentController,
+                                controller: _othersController,
                                 onChanged: (value) {
+                                  _calculateTotals();
                                 },
                                 keyboardType: TextInputType.number,
                                 decoration: InputDecoration(
@@ -664,7 +802,7 @@ String? firstPickedDate;
                             height: 25.0.h,
                             padding: EdgeInsets.only(left: 4.h, right: 4.h, top: 3.h),
                             decoration:ContDecoration.contDecoration,
-                            child: Text("0",style: AllTextStyle.textValueStyle,
+                            child: Text("$totalAmount",style: AllTextStyle.textValueStyle,
                             ),
                           )),
                         ],
@@ -679,8 +817,9 @@ String? firstPickedDate;
                               height: 25.0.h,
                               margin: EdgeInsets.only(bottom: 4.h),
                               child: TextField(style: AllTextStyle.textValueStyle,
-                                controller: _hourController,
+                                controller: _paidController,
                                 onChanged: (value) {
+                                  _calculateTotals();
                                 },
                                 keyboardType: TextInputType.number,
                                 decoration: InputDecoration(
@@ -709,7 +848,7 @@ String? firstPickedDate;
                                 height: 25.0.h,
                                 padding: EdgeInsets.only(left: 5.w, right: 5.w, top: 4.h),
                                 decoration:ContDecoration.contDecoration,
-                                child: Text("0",style:AllTextStyle.textValueStyle),
+                                child: Text("$dueAmount",style:AllTextStyle.textValueStyle),
                               )),
                           SizedBox(width: 4.w),
                           Expanded(
@@ -734,7 +873,9 @@ String? firstPickedDate;
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           GestureDetector(
-                            onTap: () {},
+                            onTap: () {
+                              allClear();
+                            },
                             child: Card(
                               elevation: 5.0,
                               child: Container(
@@ -772,6 +913,7 @@ String? firstPickedDate;
                       )
                     ]),
                   ),
+                
                 ],
               ),
             ),
@@ -783,46 +925,16 @@ String? firstPickedDate;
   }
   void emptyMethod() {
   setState(() {
-    _testIDController.text = "";
+    _patientController.text = "";
+    _mobileController.text = "";
     _testNameController.text = "";
     _roomNoController.text = "";
     _priceController.text = "";
     _dayController.text = "";
-    _departmentController.text = "";
+    _nameController.text = "";
     _hourController.text = "";
     _minuteController.text = "";
   });
 }
 bool customerEntryBtnClk = false;
-
-  final TextEditingController _dateController = TextEditingController();
-  final TextEditingController _timeController = TextEditingController();
-
-  Future<void> _pickDate() async {
-    DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(2020),
-      lastDate: DateTime(2100),
-    );
-    if (picked != null) {
-      setState(() {
-        _dateController.text = DateFormat('yyyy-MM-dd').format(picked);
-      });
-    }
-  }
-
-  Future<void> _pickTime() async {
-    TimeOfDay? picked = await showTimePicker(
-      context: context,
-      initialTime: TimeOfDay.now(),
-    );
-    if (picked != null) {
-      final now = DateTime.now();
-      final dt = DateTime(now.year, now.month, now.day, picked.hour, picked.minute);
-      setState(() {
-        _timeController.text = DateFormat('HH:mm').format(dt);
-      });
-    }
-  }
 }

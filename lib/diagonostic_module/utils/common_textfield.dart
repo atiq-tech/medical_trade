@@ -6,14 +6,16 @@ class CommonTextFieldRow extends StatelessWidget {
   final String label;
   final TextEditingController controller;
   final String hintText;
-  final int maxLines; // ✅ Added
+  final int maxLines;
+  final TextInputType keyboardType; 
 
   const CommonTextFieldRow({
     super.key,
     required this.label,
     required this.controller,
     required this.hintText,
-    this.maxLines = 1, // ✅ Default 1 line
+    this.maxLines = 1,
+    this.keyboardType = TextInputType.text,
   });
 
   @override
@@ -21,7 +23,7 @@ class CommonTextFieldRow extends StatelessWidget {
     return Row(
       crossAxisAlignment: maxLines > 1
           ? CrossAxisAlignment.start
-          : CrossAxisAlignment.center, // ✅ Proper alignment for multiline
+          : CrossAxisAlignment.center,
       children: [
         Expanded(
           flex: 6,
@@ -37,13 +39,13 @@ class CommonTextFieldRow extends StatelessWidget {
         Expanded(
           flex: 16,
           child: SizedBox(
-            // ✅ Height depends on number of lines
             height: (25.0.h * maxLines).clamp(25.0.h, 100.0.h),
             width: MediaQuery.of(context).size.width / 2,
             child: TextField(
-              maxLines: maxLines, // ✅ Use maxLines
-              style: AllTextStyle.dropDownlistStyle,
               controller: controller,
+              maxLines: maxLines,
+              keyboardType: keyboardType, // ✅ Used here
+              style: AllTextStyle.dropDownlistStyle,
               decoration: InputDecoration(
                 hintText: hintText,
                 hintStyle: AllTextStyle.textValueStyle,
@@ -61,4 +63,3 @@ class CommonTextFieldRow extends StatelessWidget {
     );
   }
 }
-
