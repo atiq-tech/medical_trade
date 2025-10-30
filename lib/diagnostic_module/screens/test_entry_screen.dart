@@ -1,8 +1,8 @@
 library;
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:medical_trade/diagonostic_module/utils/all_textstyle.dart';
-import 'package:medical_trade/diagonostic_module/utils/common_textfield.dart';
+import 'package:medical_trade/diagnostic_module/utils/all_textstyle.dart';
+import 'package:medical_trade/diagnostic_module/utils/common_textfield.dart';
 import 'package:medical_trade/utilities/color_manager.dart';
 class TestEntryScreen extends StatefulWidget {
   const TestEntryScreen({super.key,});

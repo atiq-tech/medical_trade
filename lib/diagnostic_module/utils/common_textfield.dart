@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:medical_trade/diagonostic_module/utils/all_textstyle.dart';
+import 'package:medical_trade/diagnostic_module/utils/all_textstyle.dart';
 
 class CommonTextFieldRow extends StatelessWidget {
   final String label;

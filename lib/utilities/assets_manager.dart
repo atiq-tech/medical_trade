@@ -44,4 +44,10 @@ class DiagnosticModule {
   static const String testReceipt = "$imagePath/treceipt.png";
   static const String appointment = "$imagePath/appoint.png";
   static const String appointmentList = "$imagePath/appointlist.png";
+
+  static const String testReceiptList = "$imagePath/trlist.png";
+  static const String cashTransaction = "$imagePath/ctrans.png";
+  static const String bankTransaction = "$imagePath/btrans.png";
+  static const String supplierPay = "$imagePath/spply.png";
+  static const String patientPay = "$imagePath/pppay.png";
 }

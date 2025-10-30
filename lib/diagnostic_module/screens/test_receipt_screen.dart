@@ -2,11 +2,11 @@ library;
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
-import 'package:medical_trade/diagonostic_module/models/add_cart_model.dart';
-import 'package:medical_trade/diagonostic_module/utils/all_textstyle.dart';
-import 'package:medical_trade/diagonostic_module/utils/app_colors.dart';
-import 'package:medical_trade/diagonostic_module/utils/common_textfield.dart';
-import 'package:medical_trade/diagonostic_module/utils/utils.dart';
+import 'package:medical_trade/diagnostic_module/models/add_cart_model.dart';
+import 'package:medical_trade/diagnostic_module/utils/all_textstyle.dart';
+import 'package:medical_trade/diagnostic_module/utils/app_colors.dart';
+import 'package:medical_trade/diagnostic_module/utils/common_textfield.dart';
+import 'package:medical_trade/diagnostic_module/utils/utils.dart';
 import 'package:medical_trade/utilities/color_manager.dart';
 class TestReceiptScreen extends StatefulWidget {
   const TestReceiptScreen({super.key,});
