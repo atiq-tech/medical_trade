@@ -6,6 +6,8 @@ import 'package:medical_trade/diagnostic_module/screens/bank_transaction_entry_s
 import 'package:medical_trade/diagnostic_module/screens/cash_transaction_entry_screen.dart';
 import 'package:medical_trade/diagnostic_module/screens/doctor_entry_screen.dart';
 import 'package:medical_trade/diagnostic_module/screens/patient_entry_screen.dart';
+import 'package:medical_trade/diagnostic_module/screens/patient_payment_entry_screen.dart';
+import 'package:medical_trade/diagnostic_module/screens/supplier_payment_entry_screen.dart';
 import 'package:medical_trade/diagnostic_module/screens/test_entry_screen.dart';
 import 'package:medical_trade/diagnostic_module/screens/test_receipt_list_screen.dart';
 import 'package:medical_trade/diagnostic_module/screens/test_receipt_screen.dart';
@@ -102,7 +104,7 @@ class DiagnosticModuleScreen extends StatelessWidget {
           itemCount: items.length,
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 3,
-            crossAxisSpacing: 10,
+            crossAxisSpacing: 8,
             mainAxisSpacing: 6,
             childAspectRatio: 1.3,
           ),
@@ -110,9 +112,7 @@ class DiagnosticModuleScreen extends StatelessWidget {
             final item = items[index];
             return GestureDetector(
               onTap: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Navigating to')),
-                );
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Navigating to')),);
                item['title']=="Patient Entry" ? Navigator.push(context,MaterialPageRoute(builder: (_) => PatientEntryScreen()))
                :item['title']=="Test Entry" ? Navigator.push(context,MaterialPageRoute(builder: (_) => TestEntryScreen()))
                :item['title']=="Appointment Entry" ?Navigator.push(context,MaterialPageRoute(builder: (_) => AppointmentEntryScreen())) 
@@ -121,7 +121,9 @@ class DiagnosticModuleScreen extends StatelessWidget {
                :item['title']=="Test Receipt List" ?Navigator.push(context,MaterialPageRoute(builder: (_) => TestReceiptListScreen()))
                :item['title']=="Cash Transaction" ?Navigator.push(context,MaterialPageRoute(builder: (_) => CashTransactionEntryScreen()))
                :item['title']=="Bank Transaction" ?Navigator.push(context,MaterialPageRoute(builder: (_) => BankTransactionEntryScreen()))
-               : Navigator.push(context,MaterialPageRoute(builder: (_) => DoctorEntryScreen()));
+               :item['title']=="Supplier Payment" ?Navigator.push(context,MaterialPageRoute(builder: (_) => SupplierPaymentEntryScreen()))
+               :item['title']=="Doctor Entry" ?Navigator.push(context,MaterialPageRoute(builder: (_) => DoctorEntryScreen()))
+               : Navigator.push(context,MaterialPageRoute(builder: (_) => PatientPaymentEntryScreen()));
               },
               child: Card(
                 elevation: 6,
@@ -155,13 +157,16 @@ class DiagnosticModuleScreen extends StatelessWidget {
                         ),
                       ),
                       SizedBox(height: 2.h),
-                      Text(
-                        item['title'] as String,
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 11.sp,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.black87,
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 5.w),
+                        child: Text(
+                          item['title'] as String,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 11.sp,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black87,
+                          ),
                         ),
                       ),
                     ],

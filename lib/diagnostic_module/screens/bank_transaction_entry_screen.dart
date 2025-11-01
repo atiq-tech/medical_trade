@@ -364,15 +364,13 @@ class _BankTransactionEntryScreenState extends State<BankTransactionEntryScreen>
                                   child: TextFormField(
                                     enabled: false,
                                     decoration: InputDecoration(
-                                      contentPadding: const EdgeInsets.only(
-                                        left: 5,
-                                      ),
-                                      suffixIcon: const Padding(
-                                        padding: EdgeInsets.only(left: 20.0),
+                                      contentPadding: EdgeInsets.only(left: 5.w),
+                                      suffixIcon: Padding(
+                                        padding: EdgeInsets.only(left: 20.r),
                                         child: Icon(
                                           Icons.calendar_month,
                                           color: Colors.black87,
-                                          size: 16,
+                                          size: 16.r,
                                         ),
                                       ),
                                       border: const OutlineInputBorder(
@@ -439,7 +437,7 @@ class _BankTransactionEntryScreenState extends State<BankTransactionEntryScreen>
                             Expanded(
                               flex: 11,
                               child: Container(
-                                height: 30.0,
+                                height: 25.h,
                                 width: MediaQuery.of(context).size.width / 2,
                                 decoration: ContDecoration.contDecoration,
                                 // child: TypeAheadField<BankAccountModel>(
@@ -543,7 +541,7 @@ class _BankTransactionEntryScreenState extends State<BankTransactionEntryScreen>
                             ),
                           ],
                         ),
-                        const SizedBox(height: 4.0),
+                        SizedBox(height: 4.h),
                         Row(
                           children: [
                             Expanded(
@@ -555,41 +553,41 @@ class _BankTransactionEntryScreenState extends State<BankTransactionEntryScreen>
                             ),
                             const Expanded(flex: 1, child: Text(":")),
                             Expanded(
-                        flex: 11,
-                        child: CompositedTransformTarget(
-                          link: _layerLink,
-                          child: GestureDetector(
+                              flex: 11,
+                              child: CompositedTransformTarget(
+                                link: _layerLink,
+                                child: GestureDetector(
+                                onTap: _toggleDropdown,
+                                child: Container(
+                                key: _key,
+                                padding: EdgeInsets.symmetric(horizontal: 6.w),
+                                height: 25.h,
+                                decoration: ContDecoration.contDecoration,
+                              child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                            Text(
+                          _transactionType!,
+                          style: TextStyle(fontSize: 13.sp),
+                        ),
+                        GestureDetector(
                           onTap: _toggleDropdown,
-                          child: Container(
-                          key: _key,
-                          padding: const EdgeInsets.symmetric(horizontal: 6),
-                          height: 30,
-                           decoration: ContDecoration.contDecoration,
-                         child: Row(
-                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                       children: [
-                       Text(
-                    _transactionType!,
-                    style: const TextStyle(fontSize: 13),
-                  ),
-                  GestureDetector(
-                    onTap: _toggleDropdown,
-                    child: Icon(
-                      color: Colors.grey.shade700,
-                      _isDropdownOpen
-                          ? Icons.arrow_drop_up
-                          : Icons.arrow_drop_down,
+                          child: Icon(
+                            color: Colors.grey.shade700,
+                            _isDropdownOpen
+                                ? Icons.arrow_drop_up
+                                : Icons.arrow_drop_down,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
                     ),
                   ),
-                ],
-              ),
-            ),
-          ),
-        ),
-       ),
                           ],
                         ),
-                        const SizedBox(height: 4.0),
+                        SizedBox(height: 4.h),
                         Row(
                           children: [
                             Expanded(
@@ -603,32 +601,27 @@ class _BankTransactionEntryScreenState extends State<BankTransactionEntryScreen>
                             Expanded(
                               flex: 11,
                               child: SizedBox(
-                                height: 30.0,
+                                height: 25.h,
                                 width: MediaQuery.of(context).size.width / 2,
                                 child: TextField(
-                                  style: const TextStyle(fontSize: 13),
+                                  style: TextStyle(fontSize: 13.sp),
                                   controller: _amountController,
                                   keyboardType: TextInputType.number,
                                   decoration: InputDecoration(
-                                    contentPadding: const EdgeInsets.symmetric(
-                                      vertical: 5.0,
-                                      horizontal: 5.0,
-                                    ),
+                                    contentPadding: EdgeInsets.symmetric(vertical: 5.h,horizontal: 5.w),
                                     hintText: "0",
                                     filled: true,
                                     fillColor: Colors.white,
                                     border: InputBorder.none,
-                                    focusedBorder:
-                                        TextFieldInputBorder.focusEnabledBorder,
-                                    enabledBorder:
-                                        TextFieldInputBorder.focusEnabledBorder,
+                                    focusedBorder: TextFieldInputBorder.focusEnabledBorder,
+                                    enabledBorder: TextFieldInputBorder.focusEnabledBorder,
                                   ),
                                 ),
                               ),
                             ),
                           ],
                         ),
-                        const SizedBox(height: 4.0),
+                        SizedBox(height: 4.h),
                         Row(
                           children: [
                             Expanded(
@@ -642,16 +635,13 @@ class _BankTransactionEntryScreenState extends State<BankTransactionEntryScreen>
                             Expanded(
                               flex: 11,
                               child: SizedBox(
-                                height: 30.0,
+                                height: 25.h,
                                 width: MediaQuery.of(context).size.width / 2,
                                 child: TextField(
-                                  style: const TextStyle(fontSize: 13),
+                                  style: TextStyle(fontSize: 13.sp),
                                   controller: _noteController,
                                   decoration: InputDecoration(
-                                    contentPadding: const EdgeInsets.symmetric(
-                                      vertical: 5.0,
-                                      horizontal: 5.0,
-                                    ),
+                                    contentPadding: EdgeInsets.symmetric(vertical: 5.h,horizontal: 5.w),
                                     hintText: "Note here",
                                     filled: true,
                                     fillColor: Colors.white,
@@ -666,7 +656,7 @@ class _BankTransactionEntryScreenState extends State<BankTransactionEntryScreen>
                         ),
                       ///=====customer loading hide 
                       ///HiddenItemsLoading(controller: quantityController,focusNode: quantityFocusNode),
-                        const SizedBox(height: 5.0),
+                        SizedBox(height: 5.h),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [

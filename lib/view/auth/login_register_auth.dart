@@ -148,34 +148,34 @@ class _LoginViewState extends State<LoginView> {
                     FadeInUp(
                       duration: const Duration(milliseconds: 1300),
                       child: _isLogin
-                          ? Center(
-                              child: Column(
-                                children: [
-                                  Padding(
-                                    padding: EdgeInsets.only(top: 10.h),
-                                    child: Text("Medical Trade",
-                                        style: FontManager.subheading.copyWith(
-                                          color: const Color.fromARGB(
-                                              255, 236, 73, 73),
-                                          fontSize: 24.sp,
-                                        )),
-                                  ),
-                                  Padding(
-                                    padding: EdgeInsets.only(top: 20.h),
-                                    child: Text("Sign In From",
-                                        style: FontManager.subheading.copyWith(
-                                          color: Colors.white,
-                                          fontSize: 18.sp,
-                                        )),
-                                  )
-                                ],
-                              ),
-                            )
-                          : Text("Create an Account",
-                              style: FontManager.subheading.copyWith(
-                                color: Colors.black,
-                                fontSize: 18.sp,
-                              )),
+                      ? Center(
+                      child: Column(
+                        children: [
+                          Padding(
+                            padding: EdgeInsets.only(top: 10.h),
+                            child: Text("Medical Trade",
+                                style: FontManager.subheading.copyWith(
+                                  color: const Color.fromARGB(
+                                      255, 236, 73, 73),
+                                  fontSize: 24.sp,
+                                )),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.only(top: 20.h),
+                            child: Text("Sign In From",
+                                style: FontManager.subheading.copyWith(
+                                  color: Colors.white,
+                                  fontSize: 18.sp,
+                                )),
+                          )
+                        ],
+                      ),
+                    )
+                  : Text("Create an Account",
+                      style: FontManager.subheading.copyWith(
+                        color: Colors.black,
+                        fontSize: 18.sp,
+                      )),
                     ),
                   ],
                 ),
@@ -184,16 +184,16 @@ class _LoginViewState extends State<LoginView> {
               Row(
                 children: [
                   _isLogin
-                      ? Expanded(
-                          child: FadeInUp(
-                              duration: const Duration(milliseconds: 1300),
-                              child: const _LoginWidgets()),
-                        )
-                      : Expanded(
-                          child: FadeInUp(
-                              duration: const Duration(milliseconds: 1300),
-                              child: const _RegisterWidgets()),
-                        ),
+                  ? Expanded(
+                      child: FadeInUp(
+                          duration: const Duration(milliseconds: 1300),
+                          child: const _LoginWidgets()),
+                    )
+                  : Expanded(
+                      child: FadeInUp(
+                        duration: const Duration(milliseconds: 1300),
+                        child: const _RegisterWidgets()),
+                  ),
                 ],
               ),
             ],

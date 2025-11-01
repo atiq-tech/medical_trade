@@ -75,8 +75,7 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider(create: (_) => EngineeringSupportProvider()),
         ChangeNotifierProvider(create: (_) => ClientWallProductBuyProvider()),
         ChangeNotifierProvider(create: (_) => GetClientPostProvider()),
-        ChangeNotifierProvider(
-            create: (_) => GetEngineerSupportProductProvider()),
+        ChangeNotifierProvider(create: (_) => GetEngineerSupportProductProvider()),
         ChangeNotifierProvider(create: (_) => GetSalesOldMachineProvider()),
       ],
       child: ScreenUtilInit(
@@ -90,10 +89,10 @@ class _MyAppState extends State<MyApp> {
             useMaterial3: true,
           ),
           onGenerateRoute: Routes.generateRoute,
-          initialRoute: RoutesName.myWallPost,
-          // initialRoute: GetStorage().read('loginToken') != null
-          //     ? RoutesName.myWallPost
-          //     : RoutesName.splash,
+          //initialRoute: RoutesName.myWallPost,
+          initialRoute: GetStorage().read('loginToken') != null
+              ? RoutesName.myWallPost
+              : RoutesName.splash,
         ),
       ),
     );

@@ -56,21 +56,14 @@ class CustomContainer extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Image.asset(
-                    iconPath,
-                    height: 45.h, // Icon size
-                    width: 45.w,
-                  ),
-                  SizedBox(
-                    height: 10.h, // Space between icon and text
-                  ),
-                  Text(
-                    text,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                        color: textColor,
-                        fontSize: 16.sp, // Text size
-                        fontWeight: FontWeight.w500),
+                  Image.asset(iconPath,height: 35.h, width: 35.w),
+                  Padding(
+                    padding: const EdgeInsets.all(5.0),
+                    child: Text(
+                      text,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: textColor,fontSize: 15.sp,fontWeight: FontWeight.w500),
+                    ),
                   ),
                 ],
               ),
