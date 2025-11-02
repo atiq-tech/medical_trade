@@ -5,7 +5,9 @@ import 'package:medical_trade/diagnostic_module/screens/appointment_list_screen.
 import 'package:medical_trade/diagnostic_module/screens/bank_transaction_entry_screen.dart';
 import 'package:medical_trade/diagnostic_module/screens/cash_transaction_entry_screen.dart';
 import 'package:medical_trade/diagnostic_module/screens/doctor_entry_screen.dart';
+import 'package:medical_trade/diagnostic_module/screens/doctor_list_screen.dart';
 import 'package:medical_trade/diagnostic_module/screens/patient_entry_screen.dart';
+import 'package:medical_trade/diagnostic_module/screens/patient_list_screen.dart';
 import 'package:medical_trade/diagnostic_module/screens/patient_payment_entry_screen.dart';
 import 'package:medical_trade/diagnostic_module/screens/supplier_payment_entry_screen.dart';
 import 'package:medical_trade/diagnostic_module/screens/test_entry_screen.dart';
@@ -114,6 +116,7 @@ class DiagnosticModuleScreen extends StatelessWidget {
               onTap: () {
                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Navigating to')),);
                item['title']=="Patient Entry" ? Navigator.push(context,MaterialPageRoute(builder: (_) => PatientEntryScreen()))
+               :item['title']=="Patient List" ? Navigator.push(context,MaterialPageRoute(builder: (_) => PatientListScreen()))
                :item['title']=="Test Entry" ? Navigator.push(context,MaterialPageRoute(builder: (_) => TestEntryScreen()))
                :item['title']=="Appointment Entry" ?Navigator.push(context,MaterialPageRoute(builder: (_) => AppointmentEntryScreen())) 
                :item['title']=="Appointment List" ?Navigator.push(context,MaterialPageRoute(builder: (_) => AppointmentListScreen()))
@@ -123,10 +126,11 @@ class DiagnosticModuleScreen extends StatelessWidget {
                :item['title']=="Bank Transaction" ?Navigator.push(context,MaterialPageRoute(builder: (_) => BankTransactionEntryScreen()))
                :item['title']=="Supplier Payment" ?Navigator.push(context,MaterialPageRoute(builder: (_) => SupplierPaymentEntryScreen()))
                :item['title']=="Doctor Entry" ?Navigator.push(context,MaterialPageRoute(builder: (_) => DoctorEntryScreen()))
+               :item['title']=="Doctor List" ?Navigator.push(context,MaterialPageRoute(builder: (_) => DoctorListScreen()))
                : Navigator.push(context,MaterialPageRoute(builder: (_) => PatientPaymentEntryScreen()));
               },
               child: Card(
-                elevation: 6,
+                elevation: 4,
                 child: Container(
                   decoration: BoxDecoration(
                     color: (item['color'] as Color).withOpacity(0.3),

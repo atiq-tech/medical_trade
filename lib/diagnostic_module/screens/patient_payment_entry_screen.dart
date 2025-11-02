@@ -54,109 +54,109 @@ class _PatientPaymentEntryScreenState extends State<PatientPaymentEntryScreen> {
     }
   }
   bool _isDropdownOpen = false;
-  String? getTransactionType;
-  String? _transactionType = 'Payment';
-  final List<String> _transactionTypeList = [
-    'Receive',
-    'Payment',
-  ];
+  // String? getTransactionType;
+  // String? _transactionType = 'Payment';
+  // final List<String> _transactionTypeList = [
+  //   'Receive',
+  //   'Payment',
+  // ];
 
-  final LayerLink _trTypeLayerLink = LayerLink();
-  OverlayEntry? _trTypeOverlayEntry;
+  // final LayerLink _trTypeLayerLink = LayerLink();
+  // OverlayEntry? _trTypeOverlayEntry;
 
-  final GlobalKey _trkey = GlobalKey();
-  Size _trTypeDropdownSize = Size.zero;
+  // final GlobalKey _trkey = GlobalKey();
+  // Size _trTypeDropdownSize = Size.zero;
 
-  void _getTrTypeDropdownSize(Duration _) {
-    final RenderBox renderBox = _trkey.currentContext?.findRenderObject() as RenderBox;
-    _trTypeDropdownSize = renderBox.size;
-  }
+  // void _getTrTypeDropdownSize(Duration _) {
+  //   final RenderBox renderBox = _trkey.currentContext?.findRenderObject() as RenderBox;
+  //   _trTypeDropdownSize = renderBox.size;
+  // }
 
-  void _toggleTrTypeDropdown() {
-    if (_isDropdownOpen) {
-      _removeTrTypeDropdown();
-    } else {
-      _showTrTypeDropdown();
-    }
-  }
+  // void _toggleTrTypeDropdown() {
+  //   if (_isDropdownOpen) {
+  //     _removeTrTypeDropdown();
+  //   } else {
+  //     _showTrTypeDropdown();
+  //   }
+  // }
 
-  void _showTrTypeDropdown() {
-    _trTypeOverlayEntry = _createTrTypeOverlayEntry();
-    Overlay.of(context).insert(_trTypeOverlayEntry!);
-    setState(() {
-      _isDropdownOpen = true;
-    });
-  }
+  // void _showTrTypeDropdown() {
+  //   _trTypeOverlayEntry = _createTrTypeOverlayEntry();
+  //   Overlay.of(context).insert(_trTypeOverlayEntry!);
+  //   setState(() {
+  //     _isDropdownOpen = true;
+  //   });
+  // }
 
-  void _removeTrTypeDropdown() {
-    _trTypeOverlayEntry?.remove();
-    _trTypeOverlayEntry = null;
-    setState(() {
-      _isDropdownOpen = false;
-    });
-  }
+  // void _removeTrTypeDropdown() {
+  //   _trTypeOverlayEntry?.remove();
+  //   _trTypeOverlayEntry = null;
+  //   setState(() {
+  //     _isDropdownOpen = false;
+  //   });
+  // }
 
-  OverlayEntry _createTrTypeOverlayEntry() {
-    return OverlayEntry(
-      builder: (context) => GestureDetector(
-        onTap: _removeTrTypeDropdown,
-        behavior: HitTestBehavior.translucent,
-        child: Stack(
-          children: [
-            Positioned(
-              width: _trTypeDropdownSize.width,
-              child: CompositedTransformFollower(
-                link: _trTypeLayerLink,
-                showWhenUnlinked: false,
-                offset: Offset(0.0, _trTypeDropdownSize.height + 2),
-                child: Material(
-                  elevation: 9.0,
-                  color: Colors.blue.shade50,
-                  borderRadius: BorderRadius.circular(5.r),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: _transactionTypeList.asMap().entries.map((entry) {
-                      final index = entry.key;
-                      final type = entry.value;
-                      return InkWell(
-                        onTap: () {
-                          _onSelectedTRType(type);
-                          _removeTrTypeDropdown();
-                        },
-                        child: Column(
-                          children: [
-                            Container(
-                              width: double.infinity,
-                              padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
-                              child: Text(type, style: TextStyle(fontSize: 13.sp)),
-                            ),
-                            if (index != _transactionTypeList.length - 1)
-                              Divider(height: 1.h, thickness: 0.8, color: Colors.indigo.shade400),
-                          ],
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  // OverlayEntry _createTrTypeOverlayEntry() {
+  //   return OverlayEntry(
+  //     builder: (context) => GestureDetector(
+  //       onTap: _removeTrTypeDropdown,
+  //       behavior: HitTestBehavior.translucent,
+  //       child: Stack(
+  //         children: [
+  //           Positioned(
+  //             width: _trTypeDropdownSize.width,
+  //             child: CompositedTransformFollower(
+  //               link: _trTypeLayerLink,
+  //               showWhenUnlinked: false,
+  //               offset: Offset(0.0, _trTypeDropdownSize.height + 2),
+  //               child: Material(
+  //                 elevation: 9.0,
+  //                 color: Colors.blue.shade50,
+  //                 borderRadius: BorderRadius.circular(5.r),
+  //                 child: Column(
+  //                   mainAxisSize: MainAxisSize.min,
+  //                   children: _transactionTypeList.asMap().entries.map((entry) {
+  //                     final index = entry.key;
+  //                     final type = entry.value;
+  //                     return InkWell(
+  //                       onTap: () {
+  //                         _onSelectedTRType(type);
+  //                         _removeTrTypeDropdown();
+  //                       },
+  //                       child: Column(
+  //                         children: [
+  //                           Container(
+  //                             width: double.infinity,
+  //                             padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
+  //                             child: Text(type, style: TextStyle(fontSize: 13.sp)),
+  //                           ),
+  //                           if (index != _transactionTypeList.length - 1)
+  //                             Divider(height: 1.h, thickness: 0.8, color: Colors.indigo.shade400),
+  //                         ],
+  //                       ),
+  //                     );
+  //                   }).toList(),
+  //                 ),
+  //               ),
+  //             ),
+  //           ),
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
 
-  void _onSelectedTRType(String selectedValue) {
-       setState(() {
-          _transactionType = selectedValue;
-          if (selectedValue == "Receive") {
-            getTransactionType = "CR";
-          }
-          if (selectedValue == "Payment") {
-            getTransactionType = "CP";
-          }
-    });
-  }
+  // void _onSelectedTRType(String selectedValue) {
+  //      setState(() {
+  //         _transactionType = selectedValue;
+  //         if (selectedValue == "Receive") {
+  //           getTransactionType = "CR";
+  //         }
+  //         if (selectedValue == "Payment") {
+  //           getTransactionType = "CP";
+  //         }
+  //   });
+  // }
 
   bool isBankListClicked = false;
   String? getPaymentType;
@@ -295,12 +295,12 @@ final LayerLink _pTypeLayerLink = LayerLink();
   
   @override
   void initState() {
-    WidgetsBinding.instance.addPostFrameCallback(_getTrTypeDropdownSize);
+    //WidgetsBinding.instance.addPostFrameCallback(_getTrTypeDropdownSize);
     WidgetsBinding.instance.addPostFrameCallback(_getPTypeDropdownSize);
     // _initializeData();
     firstPickedDate = Utils.formatFrontEndDate(DateTime.now());
     backEndFirstDate = Utils.formatBackEndDate(DateTime.now());
-    getTransactionType = 'CP';
+    //getTransactionType = 'CP';
     getPaymentType = "cash";
     // SupplierPaymentProvider.isSupplierPaymentLoading = true;
     // Provider.of<SupplierPaymentProvider>(context,listen: false).supplierPaymentList = [];
@@ -399,27 +399,30 @@ final LayerLink _pTypeLayerLink = LayerLink();
                                         margin: EdgeInsets.only(top: 3.h,bottom: 3.h),
                                         height: 25.h,
                                         decoration: ContDecoration.contDecoration,
-                                        // child: role == "Superadmin" || role == "admin" ? GestureDetector(
-                                        //   onTap: (() {
-                                        //     _firstSelectedDate();
-                                        //     FocusScope.of(context).requestFocus(quantityFocusNode);
-                                        //   }),
-                                        //   child: TextFormField(
-                                        //     enabled: false,
-                                        //     decoration: InputDecoration(contentPadding: EdgeInsets.only(left: 5.w),
-                                        //         suffixIcon: Padding(padding: EdgeInsets.only(left: 20.w),
-                                        //           child: Icon(Icons.calendar_month, color: Colors.black87, size: 16.r)),
-                                        //         border: const OutlineInputBorder(borderSide: BorderSide.none),
-                                        //         hintText: firstPickedDate, hintStyle:AllTextStyle.dropDownlistStyle
-                                        //     ),
-                                        //     validator: (value) {
-                                        //       if (value == null || value.isEmpty) {
-                                        //         return null;
-                                        //       }
-                                        //       return null;
-                                        //     },
-                                        //   ),
-                                        // ):GestureDetector(
+                                        child: 
+                                        //role == "Superadmin" || role == "admin" ? 
+                                        GestureDetector(
+                                          onTap: (() {
+                                            _firstSelectedDate();
+                                            FocusScope.of(context).requestFocus(quantityFocusNode);
+                                          }),
+                                          child: TextFormField(
+                                            enabled: false,
+                                            decoration: InputDecoration(contentPadding: EdgeInsets.only(left: 5.w),
+                                                suffixIcon: Padding(padding: EdgeInsets.only(left: 20.w),
+                                                  child: Icon(Icons.calendar_month, color: Colors.black87, size: 16.r)),
+                                                border: const OutlineInputBorder(borderSide: BorderSide.none),
+                                                hintText: firstPickedDate, hintStyle:AllTextStyle.dropDownlistStyle
+                                            ),
+                                            validator: (value) {
+                                              if (value == null || value.isEmpty) {
+                                                return null;
+                                              }
+                                              return null;
+                                            },
+                                          ),
+                                        )
+                                        // :GestureDetector(
                                         //   onTap: (() {
                                         //     // _firstSelectedDate();
                                         //     // FocusScope.of(context).requestFocus(quantityFocusNode);

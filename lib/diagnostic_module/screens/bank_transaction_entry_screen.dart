@@ -320,7 +320,7 @@ class _BankTransactionEntryScreenState extends State<BankTransactionEntryScreen>
                     width: double.infinity,
                     padding: EdgeInsets.all(4.r),
                     decoration: BoxDecoration(
-                      color: Colors.blue.shade100,
+                      color: Colors.green.shade100,
                       borderRadius: BorderRadius.circular(10.r),
                       border: Border.all(
                         color: Color.fromARGB(255, 7, 25, 180),

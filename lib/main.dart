@@ -89,10 +89,10 @@ class _MyAppState extends State<MyApp> {
             useMaterial3: true,
           ),
           onGenerateRoute: Routes.generateRoute,
-          //initialRoute: RoutesName.myWallPost,
-          initialRoute: GetStorage().read('loginToken') != null
-              ? RoutesName.myWallPost
-              : RoutesName.splash,
+          initialRoute: RoutesName.myWallPost,
+          // initialRoute: GetStorage().read('loginToken') != null
+          //     ? RoutesName.myWallPost
+          //     : RoutesName.splash,
         ),
       ),
     );

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:medical_trade/diagnostic_module/utils/all_textstyle.dart';
 import 'package:medical_trade/diagnostic_module/utils/utils.dart';
 import 'package:medical_trade/utilities/color_manager.dart';
@@ -127,7 +128,7 @@ class _TestReceiptListScreenState extends State<TestReceiptListScreen> {
                 child: Material(
                   elevation: 9.0,
                   color: Colors.blue.shade50,
-                  borderRadius: BorderRadius.circular(5.0),
+                  borderRadius: BorderRadius.circular(5.r),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: _searchTypeList.asMap().entries.map((entry) {
@@ -142,11 +143,11 @@ class _TestReceiptListScreenState extends State<TestReceiptListScreen> {
                           children: [
                             Container(
                               width: double.infinity,
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                              child: Text(type, style: TextStyle(fontSize: 13)),
+                              padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
+                              child: Text(type, style: TextStyle(fontSize: 13.sp)),
                             ),
                             if (index != _searchTypeList.length - 1)
-                              Divider(height: 1, thickness: 0.8, color: Colors.indigo.shade400),
+                              Divider(height: 1.h, thickness: 0.8, color: Colors.indigo.shade400),
                           ],
                         ),
                       );
@@ -223,10 +224,10 @@ class _TestReceiptListScreenState extends State<TestReceiptListScreen> {
       ),
       title: Text(
         "Test Receipt List",
-        style: const TextStyle(
+        style: TextStyle(
           color: Colors.black,
           fontWeight: FontWeight.w500,
-          fontSize: 18,
+          fontSize: 18.sp,
         ),
       ),
       centerTitle: true,
@@ -234,15 +235,15 @@ class _TestReceiptListScreenState extends State<TestReceiptListScreen> {
       body: Column(
         children: [
           Container(
-            padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 8.0),
+            padding: EdgeInsets.only(left: 8.w, right: 8.w, top: 8.h),
             child: Container(
-              padding: const EdgeInsets.only(left: 4.0, right: 4.0,bottom: 4.0),
+              padding: EdgeInsets.only(left: 4.w, right: 4.w,bottom: 4.h),
               decoration: BoxDecoration(
                 color: Colors.green.shade100,
-                borderRadius: BorderRadius.circular(10.0),
+                borderRadius: BorderRadius.circular(10.r),
                 border: Border.all(
                  color: const Color.fromARGB(255, 7, 125, 180),
-                 width: 1.0),
+                 width: 1.w),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.grey.withOpacity(0.6),
@@ -267,15 +268,14 @@ class _TestReceiptListScreenState extends State<TestReceiptListScreen> {
                         onTap: _toggleDropdown,
                         child: Container(
                         key: _key,
-                        padding: const EdgeInsets.symmetric(horizontal: 6),
-                        margin: const EdgeInsets.symmetric(vertical: 4),
-                        height: 30,decoration: ContDecoration.contDecoration,
+                        padding: EdgeInsets.symmetric(horizontal: 6.w),
+                        margin: EdgeInsets.symmetric(vertical: 4.h),
+                        height: 25.h,decoration: ContDecoration.contDecoration,
                        child: Row(
                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                           _searchType,
-                               style: const TextStyle(fontSize: 13),
+                           _searchType,style: TextStyle(fontSize: 13.sp),
                         ),
                               GestureDetector(
                               onTap: _toggleDropdown,
@@ -305,8 +305,7 @@ class _TestReceiptListScreenState extends State<TestReceiptListScreen> {
                               Expanded(
                                 flex: 9,
                                 child: Container(
-                                 margin: const EdgeInsets.only(bottom: 2),
-                                  height: 30,
+                                  height: 25.h,
                                   decoration: ContDecoration.contDecoration,
                             //       child: TypeAheadField<CustomerModel>(
                             //      controller: customerController,
@@ -360,7 +359,7 @@ class _TestReceiptListScreenState extends State<TestReceiptListScreen> {
                             //       });
                             //    },
                             //  ),
-                              
+
                                 ),
                               ),
                             ],
@@ -369,16 +368,16 @@ class _TestReceiptListScreenState extends State<TestReceiptListScreen> {
                       )
                       : Container(),
                        SizedBox(
-                        height: 40,
+                        height: 35.h,
                         width: double.infinity,
                         child: Row(
                           children: [
                             Expanded(
                               flex: 1,
                               child: Container(
-                                margin: const EdgeInsets.only(right: 5,bottom: 5),
-                                height: 30,
-                                padding: const EdgeInsets.all(5.0),
+                                margin: EdgeInsets.only(right: 5.w),
+                                height: 25.h,
+                                padding: EdgeInsets.all(5.r),
                                 decoration:ContDecoration.contDecoration,
                                 child: GestureDetector(
                                   onTap: (() {
@@ -387,11 +386,11 @@ class _TestReceiptListScreenState extends State<TestReceiptListScreen> {
                                   child: TextFormField(
                                     style: AllTextStyle.dateFormatStyle,
                                     enabled: false,
-                                    decoration: InputDecoration(contentPadding: const EdgeInsets.only(left: 5),
+                                    decoration: InputDecoration(contentPadding: EdgeInsets.only(left: 5.w),
                                       filled: true,
-                                      suffixIcon: const Padding(
-                                        padding: EdgeInsets.only(left: 25),
-                                        child: Icon(Icons.calendar_month, color: Color.fromARGB(221, 22, 51, 95), size: 16),
+                                      suffixIcon: Padding(
+                                        padding: EdgeInsets.only(left: 25.w),
+                                        child: Icon(Icons.calendar_month, color: Color.fromARGB(221, 22, 51, 95), size: 16.r),
                                       ),
                                       border: const OutlineInputBorder(borderSide: BorderSide.none),
                                       hintText: firstPickedDate ,
@@ -411,9 +410,9 @@ class _TestReceiptListScreenState extends State<TestReceiptListScreen> {
                             Expanded(
                               flex: 1,
                               child: Container(
-                                margin: const EdgeInsets.only(left: 5, bottom: 5),
-                                height: 30,
-                                padding: const EdgeInsets.all(5.0),
+                                margin: EdgeInsets.only(left: 5.w),
+                                height: 25.h,
+                                padding: EdgeInsets.all(5.r),
                                 decoration:ContDecoration.contDecoration,
                                 child: GestureDetector(
                                   onTap: (() {
@@ -422,11 +421,11 @@ class _TestReceiptListScreenState extends State<TestReceiptListScreen> {
                                   child: TextFormField(
                                     style: AllTextStyle.dateFormatStyle,
                                     enabled: false,
-                                    decoration: InputDecoration(contentPadding: const EdgeInsets.only(left: 5),
+                                    decoration: InputDecoration(contentPadding: EdgeInsets.only(left: 5.w),
                                       filled: true,
-                                      suffixIcon: const Padding(
-                                        padding: EdgeInsets.only(left: 25),
-                                        child: Icon(Icons.calendar_month, color: Color.fromARGB(221, 22, 51, 95), size: 16,),
+                                      suffixIcon: Padding(
+                                        padding: EdgeInsets.only(left: 25.w),
+                                        child: Icon(Icons.calendar_month, color: Color.fromARGB(221, 22, 51, 95), size: 16.r),
                                       ),
                                       border: const OutlineInputBorder(borderSide: BorderSide.none),
                                       hintText: secondPickedDate,
@@ -448,7 +447,7 @@ class _TestReceiptListScreenState extends State<TestReceiptListScreen> {
                       Align(
                       alignment: Alignment.bottomRight,
                        child: Container(
-                       padding: const EdgeInsets.all(1.0),
+                       padding: EdgeInsets.all(1.r),
                         child: InkWell(
                         onTap: () {
                         setState(() {
@@ -465,16 +464,16 @@ class _TestReceiptListScreenState extends State<TestReceiptListScreen> {
                       // );
                     },
                     child: Container(
-                      height: 30.0,
-                      width: 125.0,
+                      height: 25.h,
+                      width: 100.w,
                       decoration: BoxDecoration(
                         color: const Color.fromARGB(255, 4, 113, 185),
-                        borderRadius: BorderRadius.circular(5.0),
+                        borderRadius: BorderRadius.circular(5.r),
                         boxShadow: [
                           BoxShadow(
                             color: Colors.grey.withOpacity(0.6),
-                            spreadRadius: 2,
-                            blurRadius: 5,
+                            spreadRadius: 2.r,
+                            blurRadius: 5.r,
                             offset: const Offset(0, 3),
                           ),
                         ],

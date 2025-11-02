@@ -89,41 +89,43 @@ class _MyWallPostViewState extends State<MyWallPostView> {
             child: Stack(clipBehavior: Clip.none, children: [
               Row(
                 children: [
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        width: 35.w,
-                        height: 35.h,
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.black, width: 1.w),
-                          borderRadius: BorderRadius.circular(45.r),
-                          image: DecorationImage(
-                            image: userImageName != null
-                                ? NetworkImage(
-                                    'https://soft.madicaltrade.com/uploads/customers/$userImageName')
-                                : const AssetImage(ImageAssets.person)
-                                    as ImageProvider,
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ),
-                      SizedBox(
-                        width: 100.w,
-                        child: Center(
-                          child: Text(
-                            userName ?? "Unknown User",
-                            maxLines: 1,
-                            style: TextStyle(
-                              fontSize: 11.sp,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
+                  SingleChildScrollView(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          width: 32.w,
+                          height: 32.h,
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.black, width: 1.w),
+                            borderRadius: BorderRadius.circular(45.r),
+                            image: DecorationImage(
+                              image: userImageName != null
+                                  ? NetworkImage(
+                                      'https://soft.madicaltrade.com/uploads/customers/$userImageName')
+                                  : const AssetImage(ImageAssets.person)
+                                      as ImageProvider,
+                              fit: BoxFit.cover,
                             ),
-                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
-                      ),
-                    ],
+                        SizedBox(
+                          width: 100.w,
+                          child: Center(
+                            child: Text(
+                              userName ?? "Unknown User",
+                              maxLines: 1,
+                              style: TextStyle(
+                                fontSize: 11.sp,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                   InkWell(
                     onTap: () {

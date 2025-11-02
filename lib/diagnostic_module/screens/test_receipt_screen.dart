@@ -15,11 +15,11 @@ class TestReceiptScreen extends StatefulWidget {
 }
 
 class _TestReceiptScreenState extends State<TestReceiptScreen> {
-  Color getColor(Set<WidgetState> states) {
-    return Colors.green.shade100;
+  Color getColors(Set<WidgetState> states) {
+    return Colors.deepPurple.shade100;
   }
 
-  Color getColors(Set<WidgetState> states) {
+  Color getColor(Set<WidgetState> states) {
     return Colors.white;
   }
   final _patientController = TextEditingController();
@@ -112,7 +112,7 @@ class _TestReceiptScreenState extends State<TestReceiptScreen> {
       });
     }
   }
-   List<AddToCartModel> addToCartList = [];
+  List<AddToCartModel> addToCartList = [];
   @override
   void initState() {
     firstPickedDate = Utils.formatFrontEndDate(DateTime.now());
@@ -335,7 +335,7 @@ void _onDiscountAmountChanged(String value) {
                 width: double.infinity,
                 padding: EdgeInsets.only(left: 5.0.w,right: 5.0.w,top: 5.0.h),
                 decoration: BoxDecoration(
-                  color: Color.fromARGB(255, 221, 231, 221),
+                  color: Color.fromARGB(255, 186, 185, 245),
                   borderRadius: BorderRadius.circular(10.0.r),
                   border: Border.all(color: const Color.fromARGB(255, 2, 196, 163), width: 1.0.w),
                   boxShadow: [
@@ -428,7 +428,7 @@ void _onDiscountAmountChanged(String value) {
                 width: double.infinity,
                 padding: EdgeInsets.only(left: 5.0.w,right: 5.0.w,top: 5.0.h),
                 decoration: BoxDecoration(
-                  color: Color.fromARGB(255, 221, 231, 221),
+                  color: Color.fromARGB(255, 186, 185, 245),
                   borderRadius: BorderRadius.circular(10.0.r),
                   border: Border.all(color: const Color.fromARGB(255, 2, 196, 163), width: 1.0.w),
                   boxShadow: [
@@ -518,10 +518,10 @@ void _onDiscountAmountChanged(String value) {
                     child: InkWell(
                       onTap: _addToCart,
                       child: Container(
-                        height: 35,
-                        width: 100,
+                        height: 28.h,
+                        width: 100.w,
                         decoration: BoxDecoration(
-                          color: Colors.green,
+                          color: const Color.fromARGB(255, 70, 54, 141),
                           borderRadius: BorderRadius.circular(5),
                           boxShadow: [
                             BoxShadow(
@@ -534,14 +534,14 @@ void _onDiscountAmountChanged(String value) {
                         ),
                         child: const Center(
                           child: Text(
-                            "ADD",
+                            "Add",
                             style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                           ),
                         ),
                       ),
                     ),
                   ),
-                  const SizedBox(height: 20),
+                   SizedBox(height: 4.h),
                  ],
                 ),
               ),
@@ -561,7 +561,7 @@ void _onDiscountAmountChanged(String value) {
                     child: DataTable(
                       headingRowHeight: 18.h,
                       dataRowHeight: 18.h,
-                      headingRowColor: MaterialStateColor.resolveWith((states) => const Color.fromARGB(255, 1, 114, 26)),
+                      headingRowColor: MaterialStateColor.resolveWith((states) => const Color.fromARGB(255, 70, 54, 141)),
                       showCheckboxColumn: false,
                       border: TableBorder.all(color: const Color.fromARGB(255, 110, 143, 145), width: 1),
                       columns: const [
@@ -607,7 +607,7 @@ void _onDiscountAmountChanged(String value) {
               width: double.infinity,
               margin: EdgeInsets.only(top: 10.h, left: 10.0.w, right: 10.0.w, bottom: 5.h),
               decoration: BoxDecoration(
-                color: Color.fromARGB(255, 221, 231, 221),
+                color: Color.fromARGB(255, 186, 185, 245),
                 borderRadius: BorderRadius.circular(10.0.r),
                 border: Border.all(color: const Color.fromARGB(255, 2, 196, 163), width: 1.0.w),
                 boxShadow: [
@@ -747,13 +747,13 @@ void _onDiscountAmountChanged(String value) {
                                   _onDiscountAmountChanged(value);
                                 },
                                 decoration: InputDecoration(
-                                    contentPadding: EdgeInsets.only(left: 6.w),
-                                    hintText: "0",
-                                    filled: true,
-                                    fillColor: Colors.white,
-                                    border: InputBorder.none,
-                                    focusedBorder:TextFieldInputBorder.focusEnabledBorder,
-                                    enabledBorder:TextFieldInputBorder.focusEnabledBorder
+                                  contentPadding: EdgeInsets.only(left: 6.w),
+                                  hintText: "0",
+                                  filled: true,
+                                  fillColor: Colors.white,
+                                  border: InputBorder.none,
+                                  focusedBorder:TextFieldInputBorder.focusEnabledBorder,
+                                  enabledBorder:TextFieldInputBorder.focusEnabledBorder
                                 ),
                               ),
                             ),
@@ -777,13 +777,13 @@ void _onDiscountAmountChanged(String value) {
                                 },
                                 keyboardType: TextInputType.number,
                                 decoration: InputDecoration(
-                                    contentPadding: EdgeInsets.only(top: 5.h, left: 3.w),
-                                    hintText: "0",
-                                    filled: true,
-                                    fillColor: Colors.white,
-                                    border: InputBorder.none,
-                                    focusedBorder:TextFieldInputBorder.focusEnabledBorder,
-                                    enabledBorder:TextFieldInputBorder.focusEnabledBorder
+                                  contentPadding: EdgeInsets.only(top: 5.h, left: 3.w),
+                                  hintText: "0",
+                                  filled: true,
+                                  fillColor: Colors.white,
+                                  border: InputBorder.none,
+                                  focusedBorder:TextFieldInputBorder.focusEnabledBorder,
+                                  enabledBorder:TextFieldInputBorder.focusEnabledBorder
                                 ),
                               ),
                             ),
@@ -823,14 +823,14 @@ void _onDiscountAmountChanged(String value) {
                                 },
                                 keyboardType: TextInputType.number,
                                 decoration: InputDecoration(
-                                    contentPadding: EdgeInsets.symmetric(vertical: 5.h, horizontal: 2.w),
-                                    hintText: "0",
-                                    hintStyle: TextStyle(fontSize: 13.5.sp,fontWeight: FontWeight.w400,color: Colors.grey.shade600),
-                                    filled: true,
-                                    fillColor: Colors.white,
-                                    border: InputBorder.none,
-                                    focusedBorder:TextFieldInputBorder.focusEnabledBorder,
-                                    enabledBorder:TextFieldInputBorder.focusEnabledBorder
+                                  contentPadding: EdgeInsets.symmetric(vertical: 5.h, horizontal: 2.w),
+                                  hintText: "0",
+                                  hintStyle: TextStyle(fontSize: 13.5.sp,fontWeight: FontWeight.w400,color: Colors.grey.shade600),
+                                  filled: true,
+                                  fillColor: Colors.white,
+                                  border: InputBorder.none,
+                                  focusedBorder:TextFieldInputBorder.focusEnabledBorder,
+                                  enabledBorder:TextFieldInputBorder.focusEnabledBorder
                                 ),
                               ),
                             ),
@@ -890,7 +890,7 @@ void _onDiscountAmountChanged(String value) {
                               ),
                             ),
                           ),
-                          const SizedBox(width: 10),
+                          SizedBox(width: 10.w),
                           GestureDetector(
                             onTap: () {
                            
