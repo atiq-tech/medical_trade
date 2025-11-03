@@ -22,10 +22,7 @@ import 'package:provider/provider.dart';
 
 class LoginView extends StatefulWidget {
   final bool isLogin;
-  const LoginView({
-    super.key,
-    required this.isLogin,
-  });
+  const LoginView({super.key,required this.isLogin});
 
   @override
   State<LoginView> createState() => _LoginViewState();
@@ -53,8 +50,7 @@ class _LoginViewState extends State<LoginView> {
         height: double.infinity.h,
         decoration: BoxDecoration(
           color: _isLogin ? Colors.transparent : const Color(0xFFEDF3E2),
-          image: !_isLogin
-              ? null
+          image: !_isLogin ? null
               : DecorationImage(
                   image: const AssetImage('assets/icons/background5.jpg'),
                   fit: BoxFit.fill,
@@ -1252,7 +1248,6 @@ class _LoginWidgetsState extends State<_LoginWidgets> {
 
                       // Proceed with login if both fields are filled
                       bool success = await loginProvider.login(username, password);
-
                       if (success) {
                         CustomToast.show(
                           // ignore: use_build_context_synchronously
@@ -1261,11 +1256,8 @@ class _LoginWidgetsState extends State<_LoginWidgets> {
                           isSuccess: true,
                         );
 
-                        Navigator.pushAndRemoveUntil(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const MyWallPostView(),
-                          ),
+                        Navigator.pushAndRemoveUntil(context,
+                          MaterialPageRoute(builder: (context) => const MyWallPostView()),
                           (Route<dynamic> route) => false,
                         );
                       }

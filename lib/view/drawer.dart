@@ -45,10 +45,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
 
     return Drawer(
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.only(
-          topRight: Radius.circular(AppSize.s50.r),
-          bottomRight: Radius.circular(AppSize.s50.r),
-        ),
+        borderRadius: BorderRadius.only(topRight: Radius.circular(AppSize.s50.r),bottomRight: Radius.circular(AppSize.s50.r)),
       ),
       child: Container(
         color: Colors.white,
@@ -64,8 +61,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
                   children: [
                     CircleAvatar(
                       backgroundColor: Colors.white,
-                      backgroundImage:
-                          const AssetImage("assets/icons/medical.png"),
+                      backgroundImage:const AssetImage("assets/icons/medical.png"),
                       radius: 35.r,
                     ),
                     SizedBoxManager.width12(),
@@ -73,21 +69,11 @@ class _CustomDrawerState extends State<CustomDrawer> {
                       padding: EdgeInsets.only(top: 55.h),
                       child: Column(
                         children: [
-                          Text(
-                            "Medical Trade",
-                            style: TextStyle(
-                              fontSize: 18.sp,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
+                          Text("Medical Trade",style: TextStyle(fontSize: 18.sp,fontWeight: FontWeight.bold)),
                           Text(
                             userName ?? "Unknown User",
                             maxLines: 1,
-                            style: TextStyle(
-                              fontSize: 12.sp,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
-                            ),
+                            style: TextStyle(fontSize: 12.sp,fontWeight: FontWeight.bold,color: Colors.black),
                             overflow: TextOverflow.ellipsis,
                           )
                         ],
@@ -97,10 +83,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
                 ),
               ),
             ),
-            Divider(
-              color: Colors.grey,
-              height: 0.5.h,
-            ),
+            Divider(color: Colors.grey,height: 0.5.h),
             InkWell(
               onTap: () => Navigator.pushNamed(context, RoutesName.home),
               child: SizedBox(
@@ -112,25 +95,15 @@ class _CustomDrawerState extends State<CustomDrawer> {
                     children: [
                       Icon(Icons.home, size: 16.sp, color: Colors.black),
                       SizedBoxManager.width24(),
-                      Text(
-                        "My Page",
-                        style: TextStyle(
-                          fontSize: 14.sp,
-                          color: Colors.black,
-                        ),
-                      ),
+                      Text("My Page",style: TextStyle(fontSize: 14.sp,color: Colors.black)),
                       const Spacer(),
-                      Icon(Icons.arrow_forward,
-                          size: 16.sp, color: Colors.black),
+                      Icon(Icons.arrow_forward,size: 16.sp, color: Colors.black),
                     ],
                   ),
                 ),
               ),
             ),
-            Divider(
-              color: Colors.grey,
-              height: 0.5.h,
-            ),
+            Divider(color: Colors.grey,height: 0.5.h),
             InkWell(
               onTap: () => Navigator.pushNamed(context, RoutesName.newMachine),
               child: SizedBox(
@@ -140,28 +113,17 @@ class _CustomDrawerState extends State<CustomDrawer> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      Icon(Icons.medical_information,
-                          size: 16.sp, color: Colors.black),
+                      Icon(Icons.medical_information,size: 16.sp, color: Colors.black),
                       SizedBoxManager.width24(),
-                      Text(
-                        "New Machine",
-                        style: TextStyle(
-                          fontSize: 14.sp,
-                          color: Colors.black,
-                        ),
-                      ),
+                      Text("New Machine",style: TextStyle(fontSize: 14.sp, color: Colors.black)),
                       const Spacer(),
-                      Icon(Icons.arrow_forward,
-                          size: 16.sp, color: Colors.black),
+                      Icon(Icons.arrow_forward,size: 16.sp, color: Colors.black),
                     ],
                   ),
                 ),
               ),
             ),
-            Divider(
-              color: Colors.grey,
-              height: 0.5.h,
-            ),
+            Divider(color: Colors.grey,height: 0.5.h),
             InkWell(
               onTap: () => Navigator.pushNamed(context, RoutesName.oldMachine),
               child: SizedBox(
@@ -173,25 +135,15 @@ class _CustomDrawerState extends State<CustomDrawer> {
                     children: [
                       Icon(Icons.history, size: 16.sp, color: Colors.black),
                       SizedBoxManager.width24(),
-                      Text(
-                        "Old Machine",
-                        style: TextStyle(
-                          fontSize: 14.sp,
-                          color: Colors.black,
-                        ),
-                      ),
+                      Text("Old Machine",style: TextStyle(fontSize: 14.sp,color: Colors.black)),
                       const Spacer(),
-                      Icon(Icons.arrow_forward,
-                          size: 16.sp, color: Colors.black),
+                      Icon(Icons.arrow_forward,size: 16.sp, color: Colors.black),
                     ],
                   ),
                 ),
               ),
             ),
-            Divider(
-              color: Colors.grey,
-              height: 0.5.h,
-            ),
+            Divider(color: Colors.grey,height: 0.5.h),
             InkWell(
               onTap: _toggleByReagentModule,
               child: SizedBox(
@@ -203,21 +155,9 @@ class _CustomDrawerState extends State<CustomDrawer> {
                     children: [
                       Icon(Icons.support, size: 16.sp, color: Colors.black),
                       SizedBoxManager.width24(),
-                      Text(
-                        "Buy Reagent",
-                        style: TextStyle(
-                          fontSize: 14.sp,
-                          color: Colors.black,
-                        ),
-                      ),
+                      Text("Buy Reagent",style: TextStyle(fontSize: 14.sp,color: Colors.black)),
                       const Spacer(),
-                      Icon(
-                        _isByReagentExpanded
-                            ? Icons.arrow_drop_up
-                            : Icons.arrow_drop_down,
-                        size: 24.sp,
-                        color: Colors.black,
-                      ),
+                      Icon(_isByReagentExpanded ? Icons.arrow_drop_up : Icons.arrow_drop_down,size: 24.sp,color: Colors.black),
                     ],
                   ),
                 ),
@@ -233,36 +173,21 @@ class _CustomDrawerState extends State<CustomDrawer> {
               ] else ...[
                 for (var category in categoryProvider
                     .getFilteredCategories(["4", "5", "6", "7"])) ...[
-                  Divider(
-                    color: Colors.grey,
-                    height: 0.5.h,
-                  ),
+                  Divider(color: Colors.grey,height: 0.5.h),
                   CustomDrawerSubitem(
                     onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => ByReagentCategoryView(item: category),
-                        ),
-                      );
+                      Navigator.push(context,MaterialPageRoute(builder: (_) => ByReagentCategoryView(item: category)));
                     },
                     color: const Color(0xFFBACCDF).withOpacity(0.6),
                     title: category.productCategoryName,
                   ),
-                  Divider(
-                    color: Colors.grey,
-                    height: 0.5.h,
-                  ),
+                  Divider(color: Colors.grey,height: 0.5.h),
                 ],
               ],
             ],
-            Divider(
-              color: Colors.grey,
-              height: 0.5.h,
-            ),
+            Divider(color: Colors.grey,height: 0.5.h),
             InkWell(
-              onTap: () =>
-                  Navigator.pushNamed(context, RoutesName.engineeringSupport),
+              onTap: () => Navigator.pushNamed(context, RoutesName.engineeringSupport),
               child: SizedBox(
                 height: AppSize.s35.h,
                 child: Padding(
@@ -272,28 +197,17 @@ class _CustomDrawerState extends State<CustomDrawer> {
                     children: [
                       Icon(Icons.build, size: 16.sp, color: Colors.black),
                       SizedBoxManager.width24(),
-                      Text(
-                        "Engineering Support",
-                        style: TextStyle(
-                          fontSize: 14.sp,
-                          color: Colors.black,
-                        ),
-                      ),
+                      Text("Engineering Support",style: TextStyle(fontSize: 14.sp, color: Colors.black)),
                       const Spacer(),
-                      Icon(Icons.arrow_forward,
-                          size: 16.sp, color: Colors.black),
+                      Icon(Icons.arrow_forward,size: 16.sp, color: Colors.black),
                     ],
                   ),
                 ),
               ),
             ),
-            Divider(
-              color: Colors.black,
-              height: 0.5.h,
-            ),
+            Divider(color: Colors.black,height: 0.5.h),
             InkWell(
-              onTap: () =>
-                  Navigator.pushNamed(context, RoutesName.allAccessories),
+              onTap: () =>Navigator.pushNamed(context, RoutesName.allAccessories),
               child: SizedBox(
                 height: AppSize.s35.h,
                 child: Padding(
@@ -303,25 +217,15 @@ class _CustomDrawerState extends State<CustomDrawer> {
                     children: [
                       Icon(Icons.category, size: 16.sp, color: Colors.black),
                       SizedBoxManager.width24(),
-                      Text(
-                        "All Accessories",
-                        style: TextStyle(
-                          fontSize: 14.sp,
-                          color: Colors.black,
-                        ),
-                      ),
+                      Text("All Accessories",style: TextStyle(fontSize: 14.sp,color: Colors.black)),
                       const Spacer(),
-                      Icon(Icons.arrow_forward,
-                          size: 16.sp, color: Colors.black),
+                      Icon(Icons.arrow_forward,size: 16.sp, color: Colors.black),
                     ],
                   ),
                 ),
               ),
             ),
-            Divider(
-              color: Colors.grey,
-              height: 0.5.h,
-            ),
+            Divider(color: Colors.grey,height: 0.5.h),
             InkWell(
               onTap: () => Navigator.pushNamed(context, RoutesName.others),
               child: SizedBox(
@@ -331,31 +235,19 @@ class _CustomDrawerState extends State<CustomDrawer> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      Icon(Icons.devices_other,
-                          size: 16.sp, color: Colors.black),
+                      Icon(Icons.devices_other,size: 16.sp, color: Colors.black),
                       SizedBoxManager.width24(),
-                      Text(
-                        "Dental Equipment",
-                        style: TextStyle(
-                          fontSize: 14.sp,
-                          color: Colors.black,
-                        ),
-                      ),
+                      Text("Dental Equipment",style: TextStyle(fontSize: 14.sp,color: Colors.black)),
                       const Spacer(),
-                      Icon(Icons.arrow_forward,
-                          size: 16.sp, color: Colors.black),
+                      Icon(Icons.arrow_forward,size: 16.sp, color: Colors.black),
                     ],
                   ),
                 ),
               ),
             ),
-            Divider(
-              color: Colors.grey,
-              height: 0.5.h,
-            ),
+            Divider(color: Colors.grey,height: 0.5.h),
             InkWell(
-              onTap: () =>
-                  Navigator.pushNamed(context, RoutesName.salesOldMachine),
+              onTap: () => Navigator.pushNamed(context, RoutesName.salesOldMachine),
               child: SizedBox(
                 height: AppSize.s35.h,
                 child: Padding(
@@ -363,37 +255,21 @@ class _CustomDrawerState extends State<CustomDrawer> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      Icon(Icons.monetization_on,
-                          size: 16.sp, color: Colors.black),
+                      Icon(Icons.monetization_on,size: 16.sp, color: Colors.black),
                       SizedBoxManager.width24(),
-                      Text(
-                        "Sales Old Machine",
-                        style: TextStyle(
-                          fontSize: 14.sp,
-                          color: Colors.black,
-                        ),
-                      ),
+                      Text("Sales Old Machine",style: TextStyle(fontSize: 14.sp,color: Colors.black)),
                       const Spacer(),
-                      Icon(Icons.arrow_forward,
-                          size: 16.sp, color: Colors.black),
+                      Icon(Icons.arrow_forward,size: 16.sp, color: Colors.black),
                     ],
                   ),
                 ),
               ),
             ),
-            Divider(
-              color: Colors.grey,
-              height: 0.5.h,
-            ),
+            Divider(color: Colors.grey,height: 0.5.h),
             InkWell(
               onTap: () {
                 context.read<LoginAuthProvider>().logout();
-                Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const LoginView(isLogin: true),
-                  ),
-                  (Route<dynamic> route) => false, // Remove all previous routes
+                Navigator.pushAndRemoveUntil(context,MaterialPageRoute(builder: (context) => const LoginView(isLogin: true)),(Route<dynamic> route) => false, // Remove all previous routes
                 );
               },
               child: SizedBox(
@@ -404,22 +280,14 @@ class _CustomDrawerState extends State<CustomDrawer> {
                     children: [
                       Icon(Icons.logout, size: 16.sp, color: Colors.black),
                       SizedBoxManager.width24(),
-                      Text(
-                        "Log Out",
-                        style: TextStyle(
-                          fontSize: 14.sp,
-                          color: Colors.black,
-                        ),
+                      Text("Log Out",style: TextStyle(fontSize: 14.sp,color: Colors.black),
                       ),
                     ],
                   ),
                 ),
               ),
             ),
-            Divider(
-              color: Colors.grey,
-              height: 0.5.h,
-            ),
+            Divider(color: Colors.grey,height: 0.5.h),
           ],
         ),
       ),

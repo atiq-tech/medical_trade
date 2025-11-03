@@ -22,8 +22,7 @@ class SalesYourOldMachineView extends StatefulWidget {
   const SalesYourOldMachineView({super.key});
 
   @override
-  State<SalesYourOldMachineView> createState() =>
-      _SalesYourOldMachineViewState();
+  State<SalesYourOldMachineView> createState() => _SalesYourOldMachineViewState();
 }
 
 class _SalesYourOldMachineViewState extends State<SalesYourOldMachineView> {
@@ -33,10 +32,8 @@ class _SalesYourOldMachineViewState extends State<SalesYourOldMachineView> {
   final TextEditingController _conditionController = TextEditingController();
   final TextEditingController _originController = TextEditingController();
   final TextEditingController _upazilaController = TextEditingController();
-  final TextEditingController _machineDetailsController =
-      TextEditingController();
-  final TextEditingController _contactNumberController =
-      TextEditingController();
+  final TextEditingController _machineDetailsController = TextEditingController();
+  final TextEditingController _contactNumberController = TextEditingController();
   final TextEditingController _districtController = TextEditingController();
   final TextEditingController _divisionController = TextEditingController();
   Map<String, String> divisionNameMap = {};
@@ -64,10 +61,8 @@ class _SalesYourOldMachineViewState extends State<SalesYourOldMachineView> {
     super.initState();
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final districtProvider =
-          Provider.of<DistrictProvider>(context, listen: false);
-      final divisionProvider =
-          Provider.of<DivisionProvider>(context, listen: false);
+      final districtProvider = Provider.of<DistrictProvider>(context, listen: false);
+      final divisionProvider = Provider.of<DivisionProvider>(context, listen: false);
 
       // Fetch data
       await Future.wait([
@@ -79,14 +74,12 @@ class _SalesYourOldMachineViewState extends State<SalesYourOldMachineView> {
       // Update divisionsNameMap after fetching divisons
       setState(() {
         divisionNameMap = Map.fromEntries(divisionProvider.divisions.map(
-            (division) =>
-                MapEntry(division.divisionSlNo, division.divisionName)));
+            (division) =>MapEntry(division.divisionSlNo, division.divisionName)));
       });
       // Update districtsNameMap after fetching districts
       setState(() {
         districtsNameMap = Map.fromEntries(districtProvider.districts.map(
-            (district) =>
-                MapEntry(district.districtSlNo, district.districtName)));
+            (district) => MapEntry(district.districtSlNo, district.districtName)));
       });
     });
   }
@@ -117,11 +110,9 @@ class _SalesYourOldMachineViewState extends State<SalesYourOldMachineView> {
                 child: Container(
                   width: double.infinity.w,
                   decoration: BoxDecoration(
-                    border: Border.all(
-                        color: const Color(0xFF2F6E9E), width: 0.5.w),
+                    border: Border.all(color: const Color(0xFF2F6E9E), width: 0.5.w),
                     color: const Color.fromARGB(255, 173, 209, 174),
-                    borderRadius:
-                        BorderRadius.all(Radius.circular(AppSize.s12.r)),
+                    borderRadius: BorderRadius.all(Radius.circular(AppSize.s12.r)),
                     boxShadow: [
                       BoxShadow(
                         color: Colors.grey.withOpacity(0.25),
@@ -132,8 +123,7 @@ class _SalesYourOldMachineViewState extends State<SalesYourOldMachineView> {
                     ],
                   ),
                   child: Padding(
-                      padding: EdgeInsets.only(
-                          left: 8.w, right: 8.w, top: 12.h, bottom: 4.h),
+                      padding: EdgeInsets.only(left: 8.w, right: 8.w, top: 12.h, bottom: 4.h),
                       child: Column(children: [
                         Padding(
                           padding: EdgeInsets.only(top: 12.h, bottom: 10.h),
@@ -194,7 +184,8 @@ class _SalesYourOldMachineViewState extends State<SalesYourOldMachineView> {
                             ),
                           ),
                         ),
-                        Padding(
+                        ///====my contribute
+                       _imagesList.isEmpty ? SizedBox() : Padding(
                           padding: EdgeInsets.symmetric(horizontal: 12.w),
                           child: SizedBox(
                             height: 80.h,
@@ -209,8 +200,7 @@ class _SalesYourOldMachineViewState extends State<SalesYourOldMachineView> {
                                   child: Stack(
                                     children: [
                                       ClipRRect(
-                                        borderRadius:
-                                            BorderRadius.circular(5.r),
+                                        borderRadius: BorderRadius.circular(5.r),
                                         child: Image.file(
                                           file, // Use the images from the list
                                           height: 80.h,
@@ -255,9 +245,7 @@ class _SalesYourOldMachineViewState extends State<SalesYourOldMachineView> {
                         ),
                         //end image path
 
-                        SizedBox(
-                          height: 10.h,
-                        ),
+                        SizedBox(height: 10.h),
                         CustomTextfromfieldSalesOldMachine(
                           controller: _machineNameController,
                           hintText: "Enter Machine Name",
