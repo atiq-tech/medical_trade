@@ -274,11 +274,9 @@ class _TestEntryScreenState extends State<TestEntryScreen> {
                       //   Utils.showTopSnackBar(context, "Account No. field is required");
                       //   return;
                       // }
-
                       // setState(() {
                       //   customerEntryBtnClk = true;
                       // });
-
                       // var result = await customerEntry(context);
                       // if (result == "true") {
                       //   Provider.of<CustomerListProvider>(context, listen: false).getCustomerList("", "", "");

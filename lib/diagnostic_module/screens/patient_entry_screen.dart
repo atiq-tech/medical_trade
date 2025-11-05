@@ -228,7 +228,6 @@ class _PatientEntryScreenState extends State<PatientEntryScreen> {
                     onTap: () async {
                       // Utils.closeKeyBoard(context);
                       // print("Tapped Save");
-
                       // if (_customerNameController.text == '') {
                       //   Utils.showTopSnackBar(context, "Customer name is required");
                       //   return;
@@ -261,11 +260,9 @@ class _PatientEntryScreenState extends State<PatientEntryScreen> {
                       //   Utils.showTopSnackBar(context, "Account No. field is required");
                       //   return;
                       // }
-
                       // setState(() {
                       //   customerEntryBtnClk = true;
                       // });
-
                       // var result = await customerEntry(context);
                       // if (result == "true") {
                       //   Provider.of<CustomerListProvider>(context, listen: false).getCustomerList("", "", "");
