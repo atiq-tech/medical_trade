@@ -1,223 +1,375 @@
+class WallPostResponse {
+  bool? success;
+  String? message;
+  List<WallPostModel>? data;
+
+  WallPostResponse({this.success, this.message, this.data});
+
+  WallPostResponse.fromJson(Map<String, dynamic> json) {
+    success = json['success'];
+    message = json['message'];
+    if (json['data'] != null) {
+      data = <WallPostModel>[];
+      json['data'].forEach((v) {
+        data!.add(WallPostModel.fromJson(v));
+      });
+    }
+  }
+
+  Map<String, dynamic> toJson() {
+    final map = <String, dynamic>{};
+    map['success'] = success;
+    map['message'] = message;
+    if (data != null) {
+      map['data'] = data!.map((v) => v.toJson()).toList();
+    }
+    return map;
+  }
+}
+
 class WallPostModel {
-  String? wallSlNo;
-  String? wallCode;
+  int? id;
+  String? wallPostId;
   String? title;
   String? price;
   String? model;
   String? condition;
   String? origin;
+  String? division;
+  List<int>? areaId;
+  String? upazilla;
   String? mobile;
-  String? description;
-  String? divisionId;
-  String? districtId;
-  String? upazila;
-  String? image;
   String? validityDate;
-  String? status;
-  String? addBy;
-  String? addTime;
-  String? updateBy;
-  String? updateTime;
-  String? wallBranchid;
-  List<Wallgallery>? wallgallery;
-  List<Divisions>? divisions;
-  List<Districts>? districts;
+  String? description;
+  String? image;
+  int? createdBy;
+  int? updatedBy;
+  String? ipAddress;
+  int? branchId;
+  String? createdAt;
+  String? updatedAt;
+  dynamic deletedAt;
 
-  WallPostModel(
-      {this.wallSlNo,
-      this.wallCode,
-      this.title,
-      this.price,
-      this.model,
-      this.condition,
-      this.origin,
-      this.mobile,
-      this.description,
-      this.divisionId,
-      this.districtId,
-      this.upazila,
-      this.image,
-      this.validityDate,
-      this.status,
-      this.addBy,
-      this.addTime,
-      this.updateBy,
-      this.updateTime,
-      this.wallBranchid,
-      this.wallgallery,
-      this.divisions,
-      this.districts});
+  WallPostModel({
+    this.id,
+    this.wallPostId,
+    this.title,
+    this.price,
+    this.model,
+    this.condition,
+    this.origin,
+    this.division,
+    this.areaId,
+    this.upazilla,
+    this.mobile,
+    this.validityDate,
+    this.description,
+    this.image,
+    this.createdBy,
+    this.updatedBy,
+    this.ipAddress,
+    this.branchId,
+    this.createdAt,
+    this.updatedAt,
+    this.deletedAt,
+  });
 
   WallPostModel.fromJson(Map<String, dynamic> json) {
-    wallSlNo = json['Wall_SlNo'];
-    wallCode = json['Wall_Code'];
+    id = json['id'];
+    wallPostId = json['wall_post_id'];
     title = json['title'];
-    price = json['Price'];
-    model = json['Model'];
+    price = json['price'];
+    model = json['model'];
     condition = json['condition'];
     origin = json['origin'];
+    division = json['division'];
+    areaId = json['area_id'] != null ? List<int>.from(json['area_id']) : [];
+    upazilla = json['upazilla'];
     mobile = json['mobile'];
-    description = json['description'];
-    divisionId = json['division_id'];
-    districtId = json['district_id'];
-    upazila = json['upazila'];
-    image = json['image'];
     validityDate = json['validity_date'];
-    status = json['status'];
-    addBy = json['AddBy'];
-    addTime = json['AddTime'];
-    updateBy = json['UpdateBy'];
-    updateTime = json['UpdateTime'];
-    wallBranchid = json['Wall_branchid'];
-    if (json['wallgallery'] != null) {
-      wallgallery = <Wallgallery>[];
-      json['wallgallery'].forEach((v) {
-        wallgallery!.add(new Wallgallery.fromJson(v));
-      });
-    }
-    if (json['divisions'] != null) {
-      divisions = <Divisions>[];
-      json['divisions'].forEach((v) {
-        divisions!.add(new Divisions.fromJson(v));
-      });
-    }
-    if (json['districts'] != null) {
-      districts = <Districts>[];
-      json['districts'].forEach((v) {
-        districts!.add(new Districts.fromJson(v));
-      });
-    }
+    description = json['description'];
+    image = json['image'];
+    createdBy = json['created_by'];
+    updatedBy = json['updated_by'];
+    ipAddress = json['ip_address'];
+    branchId = json['branch_id'];
+    deletedAt = json['deleted_at'];
+    createdAt = json['created_at'];
+    updatedAt = json['updated_at'];
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['Wall_SlNo'] = this.wallSlNo;
-    data['Wall_Code'] = this.wallCode;
-    data['title'] = this.title;
-    data['Price'] = this.price;
-    data['Model'] = this.model;
-    data['condition'] = this.condition;
-    data['origin'] = this.origin;
-    data['mobile'] = this.mobile;
-    data['description'] = this.description;
-    data['division_id'] = this.divisionId;
-    data['district_id'] = this.districtId;
-    data['upazila'] = this.upazila;
-    data['image'] = this.image;
-    data['validity_date'] = this.validityDate;
-    data['status'] = this.status;
-    data['AddBy'] = this.addBy;
-    data['AddTime'] = this.addTime;
-    data['UpdateBy'] = this.updateBy;
-    data['UpdateTime'] = this.updateTime;
-    data['Wall_branchid'] = this.wallBranchid;
-    if (this.wallgallery != null) {
-      data['wallgallery'] = this.wallgallery!.map((v) => v.toJson()).toList();
-    }
-    if (this.divisions != null) {
-      data['divisions'] = this.divisions!.map((v) => v.toJson()).toList();
-    }
-    if (this.districts != null) {
-      data['districts'] = this.districts!.map((v) => v.toJson()).toList();
-    }
-    return data;
+    final map = <String, dynamic>{};
+    map['id'] = id;
+    map['wall_post_id'] = wallPostId;
+    map['title'] = title;
+    map['price'] = price;
+    map['model'] = model;
+    map['condition'] = condition;
+    map['origin'] = origin;
+    map['division'] = division;
+    map['area_id'] = areaId;
+    map['upazilla'] = upazilla;
+    map['mobile'] = mobile;
+    map['validity_date'] = validityDate;
+    map['description'] = description;
+    map['image'] = image;
+    map['created_by'] = createdBy;
+    map['updated_by'] = updatedBy;
+    map['ip_address'] = ipAddress;
+    map['branch_id'] = branchId;
+    map['deleted_at'] = deletedAt;
+    map['created_at'] = createdAt;
+    map['updated_at'] = updatedAt;
+    return map;
   }
 }
 
-class Wallgallery {
-  String? wallPostImage;
 
-  Wallgallery({this.wallPostImage});
 
-  Wallgallery.fromJson(Map<String, dynamic> json) {
-    wallPostImage = json['WallPost_Image'];
-  }
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['WallPost_Image'] = this.wallPostImage;
-    return data;
-  }
-}
 
-class Divisions {
-  String? divisionSlNo;
-  String? divisionName;
-  String? status;
-  String? addBy;
-  String? addTime;
-  Null? updateBy;
-  Null? updateTime;
 
-  Divisions(
-      {this.divisionSlNo,
-      this.divisionName,
-      this.status,
-      this.addBy,
-      this.addTime,
-      this.updateBy,
-      this.updateTime});
 
-  Divisions.fromJson(Map<String, dynamic> json) {
-    divisionSlNo = json['Division_SlNo'];
-    divisionName = json['Division_Name'];
-    status = json['status'];
-    addBy = json['AddBy'];
-    addTime = json['AddTime'];
-    updateBy = json['UpdateBy'];
-    updateTime = json['UpdateTime'];
-  }
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['Division_SlNo'] = this.divisionSlNo;
-    data['Division_Name'] = this.divisionName;
-    data['status'] = this.status;
-    data['AddBy'] = this.addBy;
-    data['AddTime'] = this.addTime;
-    data['UpdateBy'] = this.updateBy;
-    data['UpdateTime'] = this.updateTime;
-    return data;
-  }
-}
 
-class Districts {
-  String? districtSlNo;
-  String? districtName;
-  String? status;
-  Null? addBy;
-  Null? addTime;
-  Null? updateBy;
-  Null? updateTime;
 
-  Districts(
-      {this.districtSlNo,
-      this.districtName,
-      this.status,
-      this.addBy,
-      this.addTime,
-      this.updateBy,
-      this.updateTime});
 
-  Districts.fromJson(Map<String, dynamic> json) {
-    districtSlNo = json['District_SlNo'];
-    districtName = json['District_Name'];
-    status = json['status'];
-    addBy = json['AddBy'];
-    addTime = json['AddTime'];
-    updateBy = json['UpdateBy'];
-    updateTime = json['UpdateTime'];
-  }
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['District_SlNo'] = this.districtSlNo;
-    data['District_Name'] = this.districtName;
-    data['status'] = this.status;
-    data['AddBy'] = this.addBy;
-    data['AddTime'] = this.addTime;
-    data['UpdateBy'] = this.updateBy;
-    data['UpdateTime'] = this.updateTime;
-    return data;
-  }
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// class WallPostModel {
+//   String? wallSlNo;
+//   String? wallCode;
+//   String? title;
+//   String? price;
+//   String? model;
+//   String? condition;
+//   String? origin;
+//   String? mobile;
+//   String? description;
+//   String? divisionId;
+//   String? districtId;
+//   String? upazila;
+//   String? image;
+//   String? validityDate;
+//   String? status;
+//   String? addBy;
+//   String? addTime;
+//   String? updateBy;
+//   String? updateTime;
+//   String? wallBranchid;
+//   List<Wallgallery>? wallgallery;
+//   List<Divisions>? divisions;
+//   List<Districts>? districts;
+
+//   WallPostModel(
+//       {this.wallSlNo,
+//       this.wallCode,
+//       this.title,
+//       this.price,
+//       this.model,
+//       this.condition,
+//       this.origin,
+//       this.mobile,
+//       this.description,
+//       this.divisionId,
+//       this.districtId,
+//       this.upazila,
+//       this.image,
+//       this.validityDate,
+//       this.status,
+//       this.addBy,
+//       this.addTime,
+//       this.updateBy,
+//       this.updateTime,
+//       this.wallBranchid,
+//       this.wallgallery,
+//       this.divisions,
+//       this.districts});
+
+//   WallPostModel.fromJson(Map<String, dynamic> json) {
+//     wallSlNo = json['Wall_SlNo'];
+//     wallCode = json['Wall_Code'];
+//     title = json['title'];
+//     price = json['Price'];
+//     model = json['Model'];
+//     condition = json['condition'];
+//     origin = json['origin'];
+//     mobile = json['mobile'];
+//     description = json['description'];
+//     divisionId = json['division_id'];
+//     districtId = json['district_id'];
+//     upazila = json['upazila'];
+//     image = json['image'];
+//     validityDate = json['validity_date'];
+//     status = json['status'];
+//     addBy = json['AddBy'];
+//     addTime = json['AddTime'];
+//     updateBy = json['UpdateBy'];
+//     updateTime = json['UpdateTime'];
+//     wallBranchid = json['Wall_branchid'];
+//     if (json['wallgallery'] != null) {
+//       wallgallery = <Wallgallery>[];
+//       json['wallgallery'].forEach((v) {
+//         wallgallery!.add(new Wallgallery.fromJson(v));
+//       });
+//     }
+//     if (json['divisions'] != null) {
+//       divisions = <Divisions>[];
+//       json['divisions'].forEach((v) {
+//         divisions!.add(new Divisions.fromJson(v));
+//       });
+//     }
+//     if (json['districts'] != null) {
+//       districts = <Districts>[];
+//       json['districts'].forEach((v) {
+//         districts!.add(new Districts.fromJson(v));
+//       });
+//     }
+//   }
+
+//   Map<String, dynamic> toJson() {
+//     final Map<String, dynamic> data = new Map<String, dynamic>();
+//     data['Wall_SlNo'] = this.wallSlNo;
+//     data['Wall_Code'] = this.wallCode;
+//     data['title'] = this.title;
+//     data['Price'] = this.price;
+//     data['Model'] = this.model;
+//     data['condition'] = this.condition;
+//     data['origin'] = this.origin;
+//     data['mobile'] = this.mobile;
+//     data['description'] = this.description;
+//     data['division_id'] = this.divisionId;
+//     data['district_id'] = this.districtId;
+//     data['upazila'] = this.upazila;
+//     data['image'] = this.image;
+//     data['validity_date'] = this.validityDate;
+//     data['status'] = this.status;
+//     data['AddBy'] = this.addBy;
+//     data['AddTime'] = this.addTime;
+//     data['UpdateBy'] = this.updateBy;
+//     data['UpdateTime'] = this.updateTime;
+//     data['Wall_branchid'] = this.wallBranchid;
+//     if (this.wallgallery != null) {
+//       data['wallgallery'] = this.wallgallery!.map((v) => v.toJson()).toList();
+//     }
+//     if (this.divisions != null) {
+//       data['divisions'] = this.divisions!.map((v) => v.toJson()).toList();
+//     }
+//     if (this.districts != null) {
+//       data['districts'] = this.districts!.map((v) => v.toJson()).toList();
+//     }
+//     return data;
+//   }
+// }
+
+// class Wallgallery {
+//   String? wallPostImage;
+
+//   Wallgallery({this.wallPostImage});
+
+//   Wallgallery.fromJson(Map<String, dynamic> json) {
+//     wallPostImage = json['WallPost_Image'];
+//   }
+
+//   Map<String, dynamic> toJson() {
+//     final Map<String, dynamic> data = new Map<String, dynamic>();
+//     data['WallPost_Image'] = this.wallPostImage;
+//     return data;
+//   }
+// }
+
+// class Divisions {
+//   String? divisionSlNo;
+//   String? divisionName;
+//   String? status;
+//   String? addBy;
+//   String? addTime;
+//   Null? updateBy;
+//   Null? updateTime;
+
+//   Divisions(
+//       {this.divisionSlNo,
+//       this.divisionName,
+//       this.status,
+//       this.addBy,
+//       this.addTime,
+//       this.updateBy,
+//       this.updateTime});
+
+//   Divisions.fromJson(Map<String, dynamic> json) {
+//     divisionSlNo = json['Division_SlNo'];
+//     divisionName = json['Division_Name'];
+//     status = json['status'];
+//     addBy = json['AddBy'];
+//     addTime = json['AddTime'];
+//     updateBy = json['UpdateBy'];
+//     updateTime = json['UpdateTime'];
+//   }
+
+//   Map<String, dynamic> toJson() {
+//     final Map<String, dynamic> data = new Map<String, dynamic>();
+//     data['Division_SlNo'] = this.divisionSlNo;
+//     data['Division_Name'] = this.divisionName;
+//     data['status'] = this.status;
+//     data['AddBy'] = this.addBy;
+//     data['AddTime'] = this.addTime;
+//     data['UpdateBy'] = this.updateBy;
+//     data['UpdateTime'] = this.updateTime;
+//     return data;
+//   }
+// }
+
+// class Districts {
+//   String? districtSlNo;
+//   String? districtName;
+//   String? status;
+//   Null? addBy;
+//   Null? addTime;
+//   Null? updateBy;
+//   Null? updateTime;
+
+//   Districts(
+//       {this.districtSlNo,
+//       this.districtName,
+//       this.status,
+//       this.addBy,
+//       this.addTime,
+//       this.updateBy,
+//       this.updateTime});
+
+//   Districts.fromJson(Map<String, dynamic> json) {
+//     districtSlNo = json['District_SlNo'];
+//     districtName = json['District_Name'];
+//     status = json['status'];
+//     addBy = json['AddBy'];
+//     addTime = json['AddTime'];
+//     updateBy = json['UpdateBy'];
+//     updateTime = json['UpdateTime'];
+//   }
+
+//   Map<String, dynamic> toJson() {
+//     final Map<String, dynamic> data = new Map<String, dynamic>();
+//     data['District_SlNo'] = this.districtSlNo;
+//     data['District_Name'] = this.districtName;
+//     data['status'] = this.status;
+//     data['AddBy'] = this.addBy;
+//     data['AddTime'] = this.addTime;
+//     data['UpdateBy'] = this.updateBy;
+//     data['UpdateTime'] = this.updateTime;
+//     return data;
+//   }
+// }

@@ -37,7 +37,7 @@ class _AllAccessoriesDetailsViewState extends State<AllAccessoriesDetailsView> {
     final contactProvider = Provider.of<ContactProvider>(context);
 
     // Fetch the contact data if it hasn't been loaded yet
-    if (contactProvider.contactModel == null && !contactProvider.isLoading) {
+    if (contactProvider.companyProfile == null && !contactProvider.isLoading) {
       contactProvider.fetchContact();
     }
     print(widget.item.image);
@@ -383,11 +383,11 @@ class _AllAccessoriesDetailsViewState extends State<AllAccessoriesDetailsView> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Padding(
+                             Padding(
                               padding: EdgeInsets.only(
                                   left: 12.w, top: 8.h, bottom: 8.h),
                               child: Text(
-                                contactProvider.contactModel?.contactNumberone
+                                contactProvider.companyProfile?.data?.name
                                         ?.toString() ??
                                     "",
                                 style: FontManager.headline.copyWith(
@@ -397,21 +397,21 @@ class _AllAccessoriesDetailsViewState extends State<AllAccessoriesDetailsView> {
                                 ),
                               ),
                             ),
-                            InkWell(
-                              onTap: () => _launchPhone(contactProvider
-                                      .contactModel?.contactNumberone
-                                      ?.toString() ??
-                                  ""),
-                              child: Padding(
-                                padding:
-                                    EdgeInsets.only(left: 12.w, right: 12.w),
-                                child: Icon(
-                                  Icons.call,
-                                  size: 22.sp,
-                                  color: Colors.green,
-                                ),
-                              ),
-                            ),
+                            // InkWell(
+                            //   onTap: () => _launchPhone(contactProvider
+                            //           .contactModel?.contactNumberone
+                            //           ?.toString() ??
+                            //       ""),
+                            //   child: Padding(
+                            //     padding:
+                            //         EdgeInsets.only(left: 12.w, right: 12.w),
+                            //     child: Icon(
+                            //       Icons.call,
+                            //       size: 22.sp,
+                            //       color: Colors.green,
+                            //     ),
+                            //   ),
+                            // ),
                           ],
                         ),
                       ),
@@ -436,11 +436,11 @@ class _AllAccessoriesDetailsViewState extends State<AllAccessoriesDetailsView> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Padding(
+                             Padding(
                               padding: EdgeInsets.only(
                                   left: 12.w, top: 8.h, bottom: 8.h),
                               child: Text(
-                                contactProvider.contactModel?.contactNumbertwo
+                                contactProvider.companyProfile?.data?.name
                                         ?.toString() ??
                                     "",
                                 style: FontManager.headline.copyWith(
@@ -450,21 +450,21 @@ class _AllAccessoriesDetailsViewState extends State<AllAccessoriesDetailsView> {
                                 ),
                               ),
                             ),
-                            InkWell(
-                              onTap: () => _launchPhone(contactProvider
-                                      .contactModel?.contactNumbertwo
-                                      ?.toString() ??
-                                  ""),
-                              child: Padding(
-                                padding:
-                                    EdgeInsets.only(left: 12.w, right: 12.w),
-                                child: Icon(
-                                  Icons.call,
-                                  size: 22.sp,
-                                  color: Colors.green,
-                                ),
-                              ),
-                            ),
+                            // InkWell(
+                            //   onTap: () => _launchPhone(contactProvider
+                            //           .contactModel?.contactNumbertwo
+                            //           ?.toString() ??
+                            //       ""),
+                            //   child: Padding(
+                            //     padding:
+                            //         EdgeInsets.only(left: 12.w, right: 12.w),
+                            //     child: Icon(
+                            //       Icons.call,
+                            //       size: 22.sp,
+                            //       color: Colors.green,
+                            //     ),
+                            //   ),
+                            // ),
                           ],
                         ),
                       ),
