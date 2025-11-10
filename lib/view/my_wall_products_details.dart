@@ -7,6 +7,7 @@ import 'package:medical_trade/controller/client_wall_product_buy_api.dart';
 import 'package:medical_trade/controller/contact_api.dart';
 import 'package:medical_trade/controller/slider_controller.dart';
 import 'package:medical_trade/model/wall_post_model.dart';
+import 'package:medical_trade/new_part/model/wall_post_new_model.dart';
 import 'package:medical_trade/utilities/color_manager.dart';
 import 'package:medical_trade/utilities/custom_appbar.dart';
 import 'package:medical_trade/utilities/custom_message.dart';
@@ -19,7 +20,8 @@ import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class MyWallProductsDetails extends StatefulWidget {
-  final WallPostModel item;
+  // final WallPostModel item;
+  final WallPostNewModel item;
   const MyWallProductsDetails({super.key, required this.item});
 
   @override
@@ -49,68 +51,67 @@ class _MyWallProductsDetailsState extends State<MyWallProductsDetails> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // GestureDetector(
-            //   onTap: () => _openZoomView(context),
-            //   child: CarouselSlider(
-            //     items: widget.item.wallgallery!.map((item) {
-            //       return Builder(
-            //         builder: (BuildContext context) {
-            //           return Image.network(
-            //             width: double.infinity.w,
-            //             'https://soft.madicaltrade.com/uploads/wall_gallery/${item.wallPostImage}',
-            //             fit: BoxFit.cover,
-            //             loadingBuilder: (context, child, loadingProgress) {
-            //               if (loadingProgress == null) {
-            //                 return child;
-            //               }
-            //               return Center(
-            //                 child: CircularProgressIndicator(
-            //                   value: loadingProgress.expectedTotalBytes != null
-            //                       ? loadingProgress.cumulativeBytesLoaded /
-            //                           loadingProgress.expectedTotalBytes!
-            //                       : null,
-            //                   strokeWidth: 2.0,
-            //                 ),
-            //               );
-            //             },
-            //             errorBuilder: (context, error, stackTrace) =>
-            //                 Icon(Icons.error),
-            //           );
-            //         },
-            //       );
-            //     }).toList(),
-            //     options: CarouselOptions(
-            //       autoPlay: false,
-            //       enlargeCenterPage: true,
-            //       // aspectRatio: 2.0,
-            //       viewportFraction: 1.0,
-            //       onPageChanged: (index, reason) {
-            //         Provider.of<AppProvider>(context, listen: false)
-            //             .setCarouselIndex(index);
-            //       },
-            //     ),
-            //   ),
-            // ),
-            // Consumer<AppProvider>(builder: (context, provider, _) {
-            //   return Row(
-            //     mainAxisAlignment: MainAxisAlignment.center,
-            //     children: widget.item.wallgallery!.map((url) {
-            //       int index = widget.item.wallgallery!.indexOf(url);
-            //       return Container(
-            //         width: 8,
-            //         height: 8,
-            //         margin:
-            //             EdgeInsets.symmetric(vertical: 10.h, horizontal: 3.w),
-            //         decoration: BoxDecoration(
-            //           shape: BoxShape.circle,
-            //           color: provider.carouselIndex == index
-            //               ? const Color.fromRGBO(0, 0, 0, 0.9)
-            //               : const Color.fromRGBO(0, 0, 0, 0.4),
-            //         ),
-            //       );
-            //     }).toList(),
-            //   );
-            // }),
+            GestureDetector(
+              onTap: () => _openZoomView(context),
+              child: CarouselSlider(
+                items: widget.item.images!.map((imagePath) {
+                  return Builder(
+                    builder: (BuildContext context) {
+                      return Image.network(
+                        'https://app.medicaltradeltd.com/$imagePath',
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) return child;
+
+                          return Center(
+                            child: CircularProgressIndicator(
+                              value: loadingProgress.expectedTotalBytes != null
+                                  ? loadingProgress.cumulativeBytesLoaded /
+                                      loadingProgress.expectedTotalBytes!
+                                  : null,
+                              strokeWidth: 2.0,
+                            ),
+                          );
+                        },
+                        errorBuilder: (context, error, stackTrace) =>
+                            Icon(Icons.error),
+                      );
+                    },
+                  );
+                }).toList(),
+                options: CarouselOptions(
+                  autoPlay: false,
+                  enlargeCenterPage: true,
+                  viewportFraction: 1.0,
+                  onPageChanged: (index, reason) {
+                    Provider.of<AppProvider>(context, listen: false)
+                        .setCarouselIndex(index);
+                  },
+                ),
+              ),
+            ),
+            Consumer<AppProvider>(
+              builder: (context, provider, _) {
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: widget.item.images!.asMap().entries.map((entry) {
+                    int index = entry.key;
+                    return Container(
+                      width: 8,
+                      height: 8,
+                      margin: EdgeInsets.symmetric(vertical: 10.h, horizontal: 3.w),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: provider.carouselIndex == index
+                            ? const Color.fromRGBO(0, 0, 0, 0.9)
+                            : const Color.fromRGBO(0, 0, 0, 0.4),
+                      ),
+                    );
+                  }).toList(),
+                );
+              },
+            ),
             SizedBox(height: 12.h),
             Padding(
               padding: EdgeInsets.all(16.0.r),
@@ -128,7 +129,7 @@ class _MyWallProductsDetailsState extends State<MyWallProductsDetails> {
                               MaterialPageRoute(
                                 builder: (context) => ImageZoomScreen(
                                   imageUrl:
-                                      'https://soft.madicaltrade.com/uploads/wallposts/${widget.item.image}',
+                                      'https://app.medicaltradeltd.com/${widget.item.image}',
                                 ),
                               ),
                             );
@@ -142,7 +143,7 @@ class _MyWallProductsDetailsState extends State<MyWallProductsDetails> {
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(8.r),
                               child: Image.network(
-                                'https://soft.madicaltrade.com/uploads/wallposts/${widget.item.image}',
+                                'https://app.medicaltradeltd.com/${widget.item.image}',
                                 fit: BoxFit.cover,
                                 loadingBuilder: (BuildContext context,
                                     Widget child,
@@ -155,13 +156,9 @@ class _MyWallProductsDetailsState extends State<MyWallProductsDetails> {
                                       width: 24.w,
                                       height: 24.h,
                                       child: CircularProgressIndicator(
-                                        value: loadingProgress
-                                                    .expectedTotalBytes !=
-                                                null
-                                            ? loadingProgress
-                                                    .cumulativeBytesLoaded /
-                                                loadingProgress
-                                                    .expectedTotalBytes!
+                                        value: loadingProgress.expectedTotalBytes != null
+                                            ? loadingProgress.cumulativeBytesLoaded /
+                                                loadingProgress.expectedTotalBytes!
                                             : null,
                                         strokeWidth: 2.0,
                                       ),
@@ -208,88 +205,97 @@ class _MyWallProductsDetailsState extends State<MyWallProductsDetails> {
                               SizedBox(
                                 height: 4.h,
                               ),
-                              Row(
-                                children: [
-                                  Text(
-                                    "Condition :",
-                                    textAlign: TextAlign.start,
-                                    style: FontManager.headline.copyWith(
-                                      color: Colors.black,
-                                      fontSize: 14.sp,
-                                      fontWeight: FontWeight.w600,
+                              SingleChildScrollView(
+                                scrollDirection: Axis.horizontal,
+                                child: Row(
+                                  children: [
+                                    Text(
+                                      "Condition :",
+                                      textAlign: TextAlign.start,
+                                      style: FontManager.headline.copyWith(
+                                        color: Colors.black,
+                                        fontSize: 14.sp,
+                                        fontWeight: FontWeight.w600,
+                                      ),
                                     ),
-                                  ),
-                                  SizedBox(
-                                    width: 4.w,
-                                  ),
-                                  Text(
-                                    widget.item.condition.toString(),
-                                    textAlign: TextAlign.start,
-                                    style: FontManager.headline.copyWith(
-                                      color: Colors.green,
-                                      fontSize: 14.sp,
-                                      fontWeight: FontWeight.w600,
+                                    SizedBox(
+                                      width: 4.w,
                                     ),
-                                  ),
-                                ],
+                                    Text(
+                                      widget.item.condition.toString(),
+                                      textAlign: TextAlign.start,
+                                      style: FontManager.headline.copyWith(
+                                        color: Colors.green,
+                                        fontSize: 14.sp,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
                               SizedBox(
                                 height: 4.h,
                               ),
-                              Row(
-                                children: [
-                                  Text(
-                                    "Model :",
-                                    textAlign: TextAlign.start,
-                                    style: FontManager.headline.copyWith(
-                                      color: Colors.black,
-                                      fontSize: 14.sp,
-                                      fontWeight: FontWeight.w600,
+                              SingleChildScrollView(
+                                scrollDirection: Axis.horizontal,
+                                child: Row(
+                                  children: [
+                                    Text(
+                                      "Model :",
+                                      textAlign: TextAlign.start,
+                                      style: FontManager.headline.copyWith(
+                                        color: Colors.black,
+                                        fontSize: 14.sp,
+                                        fontWeight: FontWeight.w600,
+                                      ),
                                     ),
-                                  ),
-                                  SizedBox(
-                                    width: 4.w,
-                                  ),
-                                  Text(
-                                    widget.item.model.toString(),
-                                    textAlign: TextAlign.start,
-                                    style: FontManager.headline.copyWith(
-                                      color: Colors.green,
-                                      fontSize: 14.sp,
-                                      fontWeight: FontWeight.w600,
+                                    SizedBox(
+                                      width: 4.w,
                                     ),
-                                    overflow: TextOverflow.ellipsis,
-                                    maxLines: 2,
-                                  ),
-                                ],
+                                    Text(
+                                      widget.item.model.toString(),
+                                      textAlign: TextAlign.start,
+                                      style: FontManager.headline.copyWith(
+                                        color: Colors.green,
+                                        fontSize: 14.sp,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                      maxLines: 2,
+                                    ),
+                                  ],
+                                ),
                               ),
                               SizedBox(
                                 height: 4.h,
                               ),
-                              Row(
-                                children: [
-                                  Text(
-                                    "Origin :",
-                                    textAlign: TextAlign.start,
-                                    style: FontManager.headline.copyWith(
-                                      color: Colors.black,
-                                      fontSize: 14.sp,
-                                      fontWeight: FontWeight.w600,
+                              SingleChildScrollView(
+                                scrollDirection: Axis.horizontal,
+                                child: Row(
+                                  children: [
+                                    Text(
+                                      "Origin :",
+                                      textAlign: TextAlign.start,
+                                      style: FontManager.headline.copyWith(
+                                        color: Colors.black,
+                                        fontSize: 14.sp,
+                                        fontWeight: FontWeight.w600,
+                                      ),
                                     ),
-                                  ),
-                                  SizedBox(
-                                    width: 4.w,
-                                  ),
-                                  Text(
-                                    widget.item.origin.toString(),
-                                    textAlign: TextAlign.start,
-                                    style: FontManager.headline.copyWith(
-                                      color: Colors.green,
-                                      fontSize: 14.sp,
-                                      fontWeight: FontWeight.w600,
+                                    SizedBox(
+                                      width: 4.w,
                                     ),
-                                  ),
-                                ],
+                                    Text(
+                                      widget.item.origin.toString(),
+                                      textAlign: TextAlign.start,
+                                      style: FontManager.headline.copyWith(
+                                        color: Colors.green,
+                                        fontSize: 14.sp,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
                               SizedBox(
                                 height: 4.h,
@@ -300,57 +306,53 @@ class _MyWallProductsDetailsState extends State<MyWallProductsDetails> {
                       )
                     ],
                   ),
-                  // SizedBox(height: 16.h),
+                 SizedBox(height: 16.h),
 
                   // // Constrain ListView.builder height here
-                  // SizedBox(
-                  //   height: 80.h,
-                  //   child: ListView.builder(
-                  //     scrollDirection: Axis.horizontal,
-                  //     itemCount: widget.item.wallgallery?.length,
-                  //     itemBuilder: (context, index) {
-                  //       String? imageUrl =
-                  //           widget.item.wallgallery?[index].wallPostImage;
-                  //       print(imageUrl);
-                  //       return Padding(
-                  //         padding: EdgeInsets.only(right: 10.w),
-                  //         child: ClipRRect(
-                  //           borderRadius: BorderRadius.circular(5.r),
-                  //           child: Image.network(
-                  //             'https://soft.madicaltrade.com/uploads/wall_gallery/${imageUrl}',
-                  //             height: 30.h,
-                  //             width: 80.w,
-                  //             fit: BoxFit.cover,
-                  //             loadingBuilder: (BuildContext context, Widget child,
-                  //                 ImageChunkEvent? loadingProgress) {
-                  //               if (loadingProgress == null) {
-                  //                 return child;
-                  //               }
-                  //               return Center(
-                  //                 child: SizedBox(
-                  //                   width: 24.w,
-                  //                   height: 24.h,
-                  //                   child: CircularProgressIndicator(
-                  //                     value: loadingProgress.expectedTotalBytes !=
-                  //                             null
-                  //                         ? loadingProgress
-                  //                                 .cumulativeBytesLoaded /
-                  //                             loadingProgress.expectedTotalBytes!
-                  //                         : null,
-                  //                     strokeWidth: 2.0,
-                  //                   ),
-                  //                 ),
-                  //               );
-                  //             },
-                  //             errorBuilder: (context, error, stackTrace) =>
-                  //                 Icon(Icons.error),
-                  //           ),
-                  //         ),
-                  //       );
-                  //     },
-                  //   ),
-                  // ),
-                  SizedBox(height: 16.h),
+                //  SizedBox(
+                //   height: 80.h,
+                //   child: ListView.builder(
+                //     scrollDirection: Axis.horizontal,
+                //     itemCount: widget.item.images?.length ?? 0,
+                //     itemBuilder: (context, index) {
+                //       String? imagePath = widget.item.images?[index];
+
+                //       return Padding(
+                //         padding: EdgeInsets.only(right: 10.w),
+                //         child: ClipRRect(
+                //           borderRadius: BorderRadius.circular(5.r),
+                //           child: Image.network(
+                //             'https://app.medicaltradeltd.com/$imagePath',
+                //             height: 30.h,
+                //             width: 80.w,
+                //             fit: BoxFit.cover,
+                //             loadingBuilder: (BuildContext context, Widget child,
+                //                 ImageChunkEvent? loadingProgress) {
+                //               if (loadingProgress == null) return child;
+
+                //               return Center(
+                //                 child: SizedBox(
+                //                   width: 24.w,
+                //                   height: 24.h,
+                //                   child: CircularProgressIndicator(
+                //                     value: loadingProgress.expectedTotalBytes != null
+                //                         ? loadingProgress.cumulativeBytesLoaded /
+                //                             loadingProgress.expectedTotalBytes!
+                //                         : null,
+                //                     strokeWidth: 2.0,
+                //                   ),
+                //                 ),
+                //               );
+                //             },
+                //             errorBuilder: (context, error, stackTrace) => Icon(Icons.error),
+                //           ),
+                //         ),
+                //       );
+                //     },
+                //   ),
+                // ),
+
+                //   SizedBox(height: 16.h),
                   Text(
                     "Description",
                     style: FontManager.headline.copyWith(
@@ -416,21 +418,21 @@ class _MyWallProductsDetailsState extends State<MyWallProductsDetails> {
                                 ),
                               ),
                             ),
-                            // InkWell(
-                            //   onTap: () => _launchPhone(contactProvider
-                            //           .contactModel?.contactNumberone
-                            //           ?.toString() ??
-                            //       ""),
-                            //   child: Padding(
-                            //     padding:
-                            //         EdgeInsets.only(left: 12.w, right: 12.w),
-                            //     child: Icon(
-                            //       Icons.call,
-                            //       size: 22.sp,
-                            //       color: Colors.green,
-                            //     ),
-                            //   ),
-                            // ),
+                            InkWell(
+                              onTap: () => _launchPhone(contactProvider
+                                      .companyProfile?.data?.phone
+                                      ?.toString() ??
+                                  ""),
+                              child: Padding(
+                                padding:
+                                    EdgeInsets.only(left: 12.w, right: 12.w),
+                                child: Icon(
+                                  Icons.call,
+                                  size: 22.sp,
+                                  color: Colors.green,
+                                ),
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -469,21 +471,21 @@ class _MyWallProductsDetailsState extends State<MyWallProductsDetails> {
                                 ),
                               ),
                             ),
-                            // InkWell(
-                            //   onTap: () => _launchPhone(contactProvider
-                            //           .contactModel?.contactNumbertwo
-                            //           ?.toString() ??
-                            //       ""),
-                            //   child: Padding(
-                            //     padding:
-                            //         EdgeInsets.only(left: 12.w, right: 12.w),
-                            //     child: Icon(
-                            //       Icons.call,
-                            //       size: 22.sp,
-                            //       color: Colors.green,
-                            //     ),
-                            //   ),
-                            // ),
+                           InkWell(
+                              onTap: () => _launchPhone(contactProvider
+                                      .companyProfile?.data?.phone
+                                      ?.toString() ??
+                                  ""),
+                              child: Padding(
+                                padding:
+                                    EdgeInsets.only(left: 12.w, right: 12.w),
+                                child: Icon(
+                                  Icons.call,
+                                  size: 22.sp,
+                                  color: Colors.green,
+                                ),
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -545,87 +547,77 @@ class _MyWallProductsDetailsState extends State<MyWallProductsDetails> {
                                       ),
                                     ),
                                   ),
-                                  // Consumer<ClientWallProductBuyProvider>(
-                                  //   builder: (context, provider, child) {
-                                  //     return TextButton(
-                                  //       onPressed: provider.isLoading
-                                  //           ? null
-                                  //           : () {
-                                  //               // Show loading dialog
-                                  //               showDialog(
-                                  //                 context: context,
-                                  //                 barrierDismissible:
-                                  //                     false, // Prevent dismissing by tapping outside
-                                  //                 builder: (context) {
-                                  //                   return Center(
-                                  //                     child: SpinKitCircle(
-                                  //                       color: Colors.red,
-                                  //                       size: 50.0.sp,
-                                  //                     ),
-                                  //                   );
-                                  //                 },
-                                  //               );
+                                  Consumer<ClientWallProductBuyProvider>(
+                                    builder: (context, provider, child) {
+                                      return TextButton(
+                                        onPressed: provider.isLoading
+                                            ? null
+                                            : () {
+                                                // Show loading dialog
+                                                showDialog(
+                                                  context: context,
+                                                  barrierDismissible:
+                                                      false, // Prevent dismissing by tapping outside
+                                                  builder: (context) {
+                                                    return Center(
+                                                      child: SpinKitCircle(
+                                                        color: Colors.red,
+                                                        size: 50.0.sp,
+                                                      ),
+                                                    );
+                                                  },
+                                                );
 
-                                  //               provider
-                                  //                   .fetchClientCodeAndSendOrder(
-                                  //                 wallpostId: widget
-                                  //                     .item.wallSlNo
-                                  //                     .toString(),
-                                  //               )
-                                  //                   .then((_) {
-                                  //                 Navigator.pop(
-                                  //                     context); // Close loading dialog
-                                  //                 Navigator.pop(
-                                  //                     context); // Close order confirmation dialog
-                                  //                 if (provider.errorMessage ==
-                                  //                     null) {
-                                  //                   CustomToast.show(
-                                  //                     context: context,
-                                  //                     text:
-                                  //                         "Order completed successfully",
-                                  //                     isSuccess: true,
-                                  //                   );
-                                  //                 } else {
-                                  //                   CustomToast.show(
-                                  //                     context: context,
-                                  //                     text: provider
-                                  //                             .errorMessage ??
-                                  //                         "An error occurred",
-                                  //                     isSuccess: false,
-                                  //                   );
-                                  //                 }
-                                  //               }).catchError((error) {
-                                  //                 Navigator.pop(
-                                  //                     context); // Close loading dialog
-                                  //                 CustomToast.show(
-                                  //                   context: context,
-                                  //                   text: "Error: $error",
-                                  //                   isSuccess: false,
-                                  //                 );
-                                  //               });
-                                  //             },
-                                  //       child: Container(
-                                  //         height: 35.h,
-                                  //         width: 90.w,
-                                  //         decoration: BoxDecoration(
-                                  //           color: Colors.red,
-                                  //           borderRadius:
-                                  //               BorderRadius.circular(5.r),
-                                  //         ),
-                                  //         child: Center(
-                                  //           child: Text(
-                                  //             "Confirm Order",
-                                  //             style: TextStyle(
-                                  //               color: Colors.white,
-                                  //               fontSize: 12.sp,
-                                  //             ),
-                                  //           ),
-                                  //         ),
-                                  //       ),
-                                  //     );
-                                  //   },
-                                  // ),
-                               
+                                                provider.fetchClientCodeAndSendOrder(
+                                                  wallpostId: widget.item.id.toString(),
+                                                )
+                                                    .then((_) {
+                                                  Navigator.pop(context); // Close loading dialog
+                                                  Navigator.pop(context); // Close order confirmation dialog
+                                                  if (provider.errorMessage == null) {
+                                                    CustomToast.show(
+                                                      context: context,
+                                                      text:"Order completed successfully",
+                                                      isSuccess: true,
+                                                    );
+                                                  } else {
+                                                    CustomToast.show(
+                                                      context: context,
+                                                      text: provider.errorMessage ??
+                                                          "An error occurred",
+                                                      isSuccess: false,
+                                                    );
+                                                  }
+                                                }).catchError((error) {
+                                                  Navigator.pop(context); // Close loading dialog
+                                                  CustomToast.show(
+                                                    context: context,
+                                                    text: "Error: $error",
+                                                    isSuccess: false,
+                                                  );
+                                                });
+                                              },
+                                        child: Container(
+                                          height: 35.h,
+                                          width: 90.w,
+                                          decoration: BoxDecoration(
+                                            color: Colors.red,
+                                            borderRadius:
+                                                BorderRadius.circular(5.r),
+                                          ),
+                                          child: Center(
+                                            child: Text(
+                                              "Confirm Order",
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 12.sp,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  ),
                                 ],
                               ),
                             ],
@@ -688,29 +680,33 @@ class _MyWallProductsDetailsState extends State<MyWallProductsDetails> {
               ),
             ],
           ),
-          // body: PhotoViewGallery.builder(
-          //   itemCount: widget.item.wallgallery?.length ?? 0,
-          //   pageController: PageController(initialPage: _currentIndex),
-          //   onPageChanged: (index) => setState(() => _currentIndex = index),
-          //   builder: (context, index) {
-          //     return PhotoViewGalleryPageOptions(
-          //       imageProvider: NetworkImage(
-          //         'https://soft.madicaltrade.com/uploads/wall_gallery/${widget.item.wallgallery?[index].wallPostImage}',
-          //       ),
-          //       minScale: PhotoViewComputedScale.contained,
-          //       maxScale: PhotoViewComputedScale.covered * 2,
-          //       heroAttributes: PhotoViewHeroAttributes(tag: 'gallery_$index'),
-          //     );
-          //   },
-          //   loadingBuilder: (context, event) => Center(
-          //     child: CircularProgressIndicator(
-          //       value: event == null
-          //           ? null
-          //           : event.cumulativeBytesLoaded /
-          //               (event.expectedTotalBytes ?? 1),
-          //     ),
-          //   ),
-          // ),
+         body: PhotoViewGallery.builder(
+            itemCount: widget.item.images?.length ?? 0,
+            pageController: PageController(initialPage: _currentIndex),
+            onPageChanged: (index) => setState(() => _currentIndex = index),
+
+            builder: (context, index) {
+              String imagePath = widget.item.images![index];
+
+              return PhotoViewGalleryPageOptions(
+                imageProvider: NetworkImage(
+                  'https://app.medicaltradeltd.com/$imagePath',
+                ),
+                minScale: PhotoViewComputedScale.contained,
+                maxScale: PhotoViewComputedScale.covered * 2,
+                heroAttributes: PhotoViewHeroAttributes(tag: 'gallery_$index'),
+              );
+            },
+
+            loadingBuilder: (context, event) => Center(
+              child: CircularProgressIndicator(
+                value: event == null
+                    ? null
+                    : event.cumulativeBytesLoaded /
+                        (event.expectedTotalBytes ?? 1),
+              ),
+            ),
+          ),
         );
       },
     );

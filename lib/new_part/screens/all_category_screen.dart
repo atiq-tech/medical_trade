@@ -1,0 +1,176 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:medical_trade/diagnostic_module/utils/all_textstyle.dart';
+import 'package:medical_trade/diagnostic_module/utils/app_colors.dart';
+import 'package:medical_trade/diagnostic_module/utils/custom_loading.dart';
+import 'package:medical_trade/new_part/providers/category_provider.dart';
+import 'package:provider/provider.dart';
+
+class CategoryListScreen extends StatefulWidget {
+  const CategoryListScreen({super.key});
+
+  @override
+  State<CategoryListScreen> createState() => _CategoryListScreenState();
+}
+
+class _CategoryListScreenState extends State<CategoryListScreen> {
+  //SharedPreferences? sharedPreferences;
+  TextEditingController _searchController = TextEditingController();
+  List filteredCategories = [];
+
+  @override
+  void initState() {
+    super.initState();
+    CategoryProvider.isAllCategoriesLoading = true;
+    Provider.of<CategoryProvider>(context, listen: false).getCategories();
+  }
+
+  void filterSearchResults(List allCategoriesData) {
+    String query = _searchController.text.toLowerCase();
+    setState(() {
+      if (query.isEmpty) {
+        filteredCategories = allCategoriesData;
+      } else {
+        filteredCategories = allCategoriesData.where((category) {
+          return category.productCategoryName.toLowerCase().contains(query);
+        }).toList();
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final allCategoriesData = Provider.of<CategoryProvider>(context).allCategoriesList;
+
+    // initialize filtered list initially
+    if (filteredCategories.isEmpty && allCategoriesData.isNotEmpty) {
+      filteredCategories = allCategoriesData;
+    }
+
+    return Scaffold(
+      appBar: AppBar(centerTitle:true,title: Text("Category List"),),
+      body: CategoryProvider.isAllCategoriesLoading
+          ? Center(child: FancyNoDataDialog())
+          : Column(
+              children: [
+                Padding(
+                  padding: EdgeInsets.all(10.r),
+                  child: SizedBox(
+                    height: 35.h,
+                    child: TextField(
+                      controller: _searchController,
+                      onChanged: (value) {
+                        filterSearchResults(allCategoriesData);
+                      },
+                      decoration: InputDecoration(
+                        hintText: 'Search Category',
+                        hintStyle: AllTextStyle.textValueStyle,
+                        prefixIcon: Icon(Icons.search,size: 20.r),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8.r),
+                          borderSide: BorderSide(color: Colors.grey),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: filteredCategories.isNotEmpty
+                      ? Padding(
+                          padding: EdgeInsets.only(left: 8.w,right: 8.w),
+                          child: GridView.builder(
+                            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 3,
+                              childAspectRatio: 0.9,
+                              crossAxisSpacing: 10,
+                              mainAxisSpacing: 10,
+                            ),
+                            itemCount: filteredCategories.length,
+                            itemBuilder: (context, index) {
+                              final category = filteredCategories[index];
+                              return Card(
+                                elevation: 4,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Expanded(
+                                      flex: 3,
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.only(
+                                            topLeft: Radius.circular(5.r),
+                                            topRight: Radius.circular(5.r),
+                                          ),
+                                        ),
+                                        // child: ClipRRect(
+                                        //   borderRadius: BorderRadius.only(
+                                        //     topLeft: Radius.circular(5.r),
+                                        //     topRight: Radius.circular(5.r),
+                                        //   ),
+                                        //   child: Image.network(
+                                        //     "${category.name}",
+                                        //     fit: BoxFit.cover,
+                                        //     width: double.infinity,
+                                        //     height: double.infinity,
+                                        //     loadingBuilder: (context, child, loadingProgress) {
+                                        //       if (loadingProgress == null) {
+                                        //         return child;
+                                        //       }
+                                        //       return const Center(
+                                        //         child: CircularProgressIndicator(),
+                                        //       );
+                                        //     },
+                                        //     errorBuilder: (context, error, stackTrace) {
+                                        //       return Container(
+                                        //         decoration: BoxDecoration(
+                                        //           color: Colors.teal.shade100,
+                                        //           borderRadius: BorderRadius.only(
+                                        //             topLeft: Radius.circular(5.r),
+                                        //             topRight: Radius.circular(5.r),
+                                        //           ),
+                                        //           image: const DecorationImage(
+                                        //             image: AssetImage("images/bydyimg.png"),
+                                        //             fit: BoxFit.fill,
+                                        //           ),
+                                        //         ),
+                                        //       );
+                                        //     },
+                                        //   ),
+                                        // ),
+                                      ),
+                                    ),
+                                    Expanded(
+                                      flex: 1,
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          color: AppColors.primaryColor,
+                                          borderRadius: BorderRadius.only(
+                                            bottomLeft: Radius.circular(5.r),
+                                            bottomRight: Radius.circular(5.r),
+                                          ),
+                                        ),
+                                        child: Center(
+                                          child: Text(
+                                            category.name,
+                                            textAlign: TextAlign.center,
+                                            style: AllTextStyle.tableHeadTextStyle,
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          ),
+                        )
+                      : Center(child: Padding(padding: EdgeInsets.all(10.r),child: Text("No records found", style: AllTextStyle.nofoundTextStyle)),
+                  ),
+                ),
+              ],
+            ),
+    );
+  }
+}

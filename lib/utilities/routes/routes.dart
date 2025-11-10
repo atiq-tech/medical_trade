@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:medical_trade/new_part/screens/all_category_screen.dart';
 import 'package:medical_trade/utilities/routes/routes_name.dart';
 import 'package:medical_trade/view/all_accessories.dart';
 import 'package:medical_trade/view/auth/login_register_auth.dart';
@@ -69,6 +70,10 @@ class Routes {
       case RoutesName.salesOldMachine:
         return MaterialPageRoute(
             builder: (BuildContext context) => const SalesYourOldMachineView());
+
+      case RoutesName.categorylist:
+        return MaterialPageRoute(
+            builder: (BuildContext context) => const CategoryListScreen());
 
       // case RoutesName.diagnostic:
       //   return MaterialPageRoute(

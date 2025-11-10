@@ -2,6 +2,7 @@ library;
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:intl/intl.dart';
 import 'package:medical_trade/diagnostic_module/utils/all_textstyle.dart';
 import 'package:medical_trade/diagnostic_module/utils/common_textfield.dart';
 import 'package:medical_trade/diagnostic_module/utils/utils.dart';
@@ -23,15 +24,18 @@ class _DoctorEntryScreenState extends State<DoctorEntryScreen> {
   }
   final _doctorIDController = TextEditingController();
   final _doctorNameController = TextEditingController();
+  final _nameBanglaController = TextEditingController();
   final _mobileController = TextEditingController();
-  final _emailController = TextEditingController();
-  final _originController = TextEditingController();
+  final _remarkController = TextEditingController();
+  final _educationLevelController = TextEditingController();
+  final _eduLevelBanglaController = TextEditingController();
   final _addressController = TextEditingController();
   final _biographyController = TextEditingController();
-  final _specialistController = TextEditingController();
-  final _newFeesController = TextEditingController();
-  final _regularFeesController = TextEditingController();
+  final _feesController = TextEditingController();
+  final _commissionAmountController = TextEditingController();
+  final _commissionPercentController = TextEditingController();
   final _dayController = TextEditingController();
+  final _departmentController = TextEditingController();
   
 
   // SharedPreferences? sharedPreferences;
@@ -55,6 +59,33 @@ class _DoctorEntryScreenState extends State<DoctorEntryScreen> {
   String? userEmployeeId = "";
   String userName = "";
   String userType = "";
+
+TimeOfDay? startTime;
+TimeOfDay? endTime;
+
+String formatTime(TimeOfDay? time) {
+  if (time == null) return "--:--";
+  final now = DateTime.now();
+  final dt = DateTime(now.year, now.month, now.day, time.hour, time.minute);
+  return DateFormat("hh:mm a").format(dt);
+}
+
+Future<void> pickTime(bool isStart) async {
+  TimeOfDay? picked = await showTimePicker(
+    context: context,
+    initialTime: TimeOfDay.now(),
+  );
+
+  if (picked != null) {
+    setState(() {
+      if (isStart) {
+        startTime = picked;
+      } else {
+        endTime = picked;
+      }
+    });
+  }
+}
 
 
   String? firstPickedDate;
@@ -215,8 +246,20 @@ class _DoctorEntryScreenState extends State<DoctorEntryScreen> {
                     ),
                     SizedBox(height: 4.0.h),
                     CommonTextFieldRow(
+                      label: "Department",
+                      controller: _departmentController,
+                      hintText: "Select Department",
+                    ),
+                    SizedBox(height: 4.0.h),
+                    CommonTextFieldRow(
                       label: "Name",
                       controller: _doctorNameController,
+                      hintText: "Enter Doctor Name",
+                    ),
+                     SizedBox(height: 4.0.h),
+                    CommonTextFieldRow(
+                      label: "Name(Bangla)",
+                      controller: _nameBanglaController,
                       hintText: "Enter Doctor Name",
                     ),
                     SizedBox(height: 4.0.h),
@@ -227,33 +270,33 @@ class _DoctorEntryScreenState extends State<DoctorEntryScreen> {
                     ),
                     SizedBox(height: 4.0.h),
                     CommonTextFieldRow(
-                      label: "E-mail",
-                      controller: _emailController,
-                      hintText: "Enter E-mail Address",
+                      label: "Remark",
+                      controller: _remarkController,
+                      hintText: "Enter Remark",
                     ),
                     SizedBox(height: 4.0.h),
-                    Row(children: [
-                      Expanded(flex:6, child: Text("Date", style:AllTextStyle.textFieldHeadStyle)),
+                    Row(
+                     children: [
+                      Expanded(flex:6, child: Text("Slot(S/E)", style:AllTextStyle.textFieldHeadStyle)),
                       const Expanded(flex: 1, child: Text(":")),
                       Expanded(
-                        flex: 16,
+                        flex: 8,
                         child: Container(
                           height: 25.h,
                           margin: EdgeInsets.only(bottom: 4.h),
                           child: GestureDetector(
                             onTap: (() {
-                              //FocusScope.of(context).requestFocus(quantityFocusNode);
-                              _firstSelectedDate();
+                              pickTime(true);
                             }),
                             child: TextFormField(
                               enabled: false,
-                              decoration: InputDecoration(contentPadding: EdgeInsets.only(left: 5.w),
+                              decoration: InputDecoration(contentPadding: EdgeInsets.only(left: 0.w),
                                 filled: true,
                                 fillColor: Colors.white,
                                 suffixIcon: Padding(padding: EdgeInsets.only(left: 20.w),
-                                child: Icon(Icons.calendar_month, color: Colors.black87,size: 16.r)),
+                                child: Icon(Icons.alarm_on, color: Colors.black87,size: 16.r)),
                                 border: OutlineInputBorder(borderSide: BorderSide(color:  Colors.grey,width: 5.w)),
-                                hintText: firstPickedDate,
+                                hintText: startTime == null ? "Pick Start Time" : formatTime(startTime),
                                 hintStyle: AllTextStyle.dateFormatStyle
                               ),
                               validator: (value) {
@@ -266,13 +309,39 @@ class _DoctorEntryScreenState extends State<DoctorEntryScreen> {
                           ),
                         ),
                       ),
-                    ]),
-                    CommonTextFieldRow(
-                      label: "Origin",
-                      controller: _originController,
-                      hintText: "Enter Origin",
-                    ),
-                    SizedBox(height: 4.0.h),
+                      SizedBox(width:5.w),
+                      Expanded(
+                        flex: 8,
+                        child: Container(
+                          height: 25.h,
+                          margin: EdgeInsets.only(bottom: 4.h),
+                          child: GestureDetector(
+                            onTap: (() {
+                              pickTime(false);
+                            }),
+                            child: TextFormField(
+                              enabled: false,
+                              decoration: InputDecoration(contentPadding: EdgeInsets.only(left: 0.w),
+                                filled: true,
+                                fillColor: Colors.white,
+                                suffixIcon: Padding(padding: EdgeInsets.only(left: 20.w),
+                                child: Icon(Icons.alarm_on, color: Colors.black87,size: 16.r)),
+                                border: OutlineInputBorder(borderSide: BorderSide(color:  Colors.grey,width: 5.w)),
+                                hintText: endTime == null ? "Pick End Time" : formatTime(endTime),
+                                hintStyle: AllTextStyle.dateFormatStyle
+                              ),
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return null;
+                                }
+                                return null;
+                              },
+                            ),
+                          ),
+                        ),
+                      ),
+                     ],
+                   ),
                     CommonTextFieldRow(
                       label: "Address",
                       controller: _addressController,
@@ -280,51 +349,45 @@ class _DoctorEntryScreenState extends State<DoctorEntryScreen> {
                     ),
                     SizedBox(height: 4.0.h),
                     CommonTextFieldRow(
-                      label: "Biography",
-                      controller: _biographyController,
-                      hintText: "Enter Biography",
-                    ),
-                    SizedBox(height: 4.0.h),
-                    CommonTextFieldRow(
-                      label: "Specialist",
-                      controller: _specialistController,
-                      hintText: "Enter Specialist",
+                      label: "Fees",
+                      controller: _feesController,
+                      hintText: "0",
                     ),
                     SizedBox(height: 4.0.h),
                     Row(
                       children: [
-                        Expanded(flex: 6,child: Text("Fees ", style: AllTextStyle.textFieldHeadStyle)),
+                        Expanded(flex: 6,child: Text("Comm(%)", style: AllTextStyle.textFieldHeadStyle)),
                         const Expanded(flex: 1,child: Text(":")),
+                        Expanded(
+                          flex: 6,
+                          child: SizedBox(
+                            height: 25.0.h,
+                            child: TextField(
+                              controller: _commissionAmountController,
+                              style: AllTextStyle.dropDownlistStyle,
+                              decoration: InputDecoration(
+                                hintText: "0",
+                                hintStyle: AllTextStyle.textValueStyle,
+                                contentPadding: EdgeInsets.only(left: 5.w, top: 4.h),
+                                filled: true,
+                                fillColor: Colors.white,
+                                border: InputBorder.none,
+                                focusedBorder: TextFieldInputBorder.focusEnabledBorder,
+                                enabledBorder: TextFieldInputBorder.focusEnabledBorder,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const Expanded(flex: 3,child: Center(child: Text("(৳):"))),
                         Expanded(
                           flex: 7,
                           child: SizedBox(
                             height: 25.0.h,
                             child: TextField(
-                              controller: _newFeesController,
+                              controller: _commissionPercentController,
                               style: AllTextStyle.dropDownlistStyle,
                               decoration: InputDecoration(
-                                hintText: "New",
-                                hintStyle: AllTextStyle.textValueStyle,
-                                contentPadding: EdgeInsets.only(left: 5.w, top: 4.h),
-                                filled: true,
-                                fillColor: Colors.white,
-                                border: InputBorder.none,
-                                focusedBorder: TextFieldInputBorder.focusEnabledBorder,
-                                enabledBorder: TextFieldInputBorder.focusEnabledBorder,
-                              ),
-                            ),
-                          ),
-                        ),
-                        SizedBox(width: 10.w),
-                        Expanded(
-                          flex: 8,
-                          child: SizedBox(
-                            height: 25.0.h,
-                            child: TextField(
-                              controller: _regularFeesController,
-                              style: AllTextStyle.dropDownlistStyle,
-                              decoration: InputDecoration(
-                                hintText: "Regular",
+                                hintText: "0",
                                 hintStyle: AllTextStyle.textValueStyle,
                                 contentPadding: EdgeInsets.only(left: 5.w, top: 4.h),
                                 filled: true,
@@ -338,168 +401,183 @@ class _DoctorEntryScreenState extends State<DoctorEntryScreen> {
                         ),
                       ],
                     ),
+                    // SizedBox(height: 4.0.h),
+                    // Row(
+                    //   children: [
+                    //     Expanded(
+                    //       flex: 6,
+                    //       child: Text("Day", style: AllTextStyle.textFieldHeadStyle),
+                    //     ),
+                    //     const Expanded(flex: 1, child: Text(":")),
+                    //     Expanded(
+                    //       flex: 16,
+                    //       child: DropdownButtonHideUnderline(
+                    //         child: DropdownButton2<String>(
+                    //           isExpanded: true,
+                    //           hint: Text(
+                    //             _selectedDays.isEmpty ? 'Select days' : _selectedDays.join(','),
+                    //             style: TextStyle(
+                    //               fontSize: 12.sp,
+                    //               color: _selectedDays.isEmpty ? Colors.grey : const Color.fromARGB(221, 83, 83, 83),
+                    //             ),
+                    //           ),
+                    //           items: _allDays.map((day) {
+                    //               return DropdownMenuItem<String>(
+                    //                 value: day,
+                    //                 child: StatefulBuilder(
+                    //                   builder: (context, setStateCheckbox) {
+                    //                     final isSelected = _selectedDays.contains(day);
+                    //                     return GestureDetector(
+                    //                       onTap: () {
+                    //                         setState(() {
+                    //                           if (isSelected) {
+                    //                             _selectedDays.remove(day);
+                    //                           } else {
+                    //                             _selectedDays.add(day);
+                    //                           }
+                    //                           _dayController.text = _selectedDays.join(', ');
+                    //                         });
+                    //                         setStateCheckbox(() {});
+                    //                       },
+                    //                       child: Row(
+                    //                         children: [
+                    //                           SizedBox(
+                    //                             width: 20.w,
+                    //                             height: 20.h,
+                    //                             child: Checkbox(
+                    //                               value: isSelected,
+                    //                               onChanged: (checked) {
+                    //                                 setState(() {
+                    //                                   if (checked == true) {
+                    //                                     _selectedDays.add(day);
+                    //                                   } else {
+                    //                                     _selectedDays.remove(day);
+                    //                                   }
+                    //                                   _dayController.text = _selectedDays.join(', ');
+                    //                                 });
+                    //                                 setStateCheckbox(() {});
+                    //                               },
+                    //                               materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    //                               visualDensity: const VisualDensity(horizontal: -4, vertical: -4),
+                    //                               activeColor: const Color.fromARGB(255, 2, 123, 223),
+                    //                             ),
+                    //                           ),
+                    //                           const SizedBox(width: 4),
+                    //                           Text(
+                    //                             day,
+                    //                             style: TextStyle(fontSize: 12.sp),
+                    //                           ),
+                    //                         ],
+                    //                       ),
+                    //                     );
+                    //                   },
+                    //                 ),
+                    //               );
+                    //             }).toList(),      value: null,
+                    //           onChanged: (_) {},
+                    //           buttonStyleData: ButtonStyleData(
+                    //             height: 35.h,
+                    //             decoration: BoxDecoration(
+                    //               borderRadius: BorderRadius.circular(5.r),
+                    //               border: Border.all(color: Colors.grey),
+                    //               color: Colors.white,
+                    //             ),
+                    //           ),
+                    //           iconStyleData: IconStyleData(
+                    //             icon: const Icon(Icons.arrow_drop_down),
+                    //             iconSize: 24.r,
+                    //           ),
+                    //           dropdownStyleData: DropdownStyleData(
+                    //             maxHeight: 250.h,
+                    //             decoration: BoxDecoration(
+                    //               borderRadius: BorderRadius.circular(5.r),
+                    //               color: Colors.white,
+                    //             ),
+                    //           ),
+                    //           menuItemStyleData: MenuItemStyleData(
+                    //             height: 32.h,
+                    //             padding: EdgeInsets.symmetric(horizontal: 5.0),
+                    //           ),
+                    //         ),
+                    //       ),
+                    //     ),
+                    //   ],
+                    // ),
+                   
                     SizedBox(height: 4.0.h),
-                    Row(
-                      children: [
-                        Expanded(
-                          flex: 6,
-                          child: Text("Day", style: AllTextStyle.textFieldHeadStyle),
-                        ),
-                        const Expanded(flex: 1, child: Text(":")),
-                        Expanded(
-                          flex: 16,
-                          child: DropdownButtonHideUnderline(
-                            child: DropdownButton2<String>(
-                              isExpanded: true,
-                              hint: Text(
-                                _selectedDays.isEmpty ? 'Select days' : _selectedDays.join(','),
-                                style: TextStyle(
-                                  fontSize: 12.sp,
-                                  color: _selectedDays.isEmpty ? Colors.grey : const Color.fromARGB(221, 83, 83, 83),
-                                ),
-                              ),
-                              items: _allDays.map((day) {
-                                  return DropdownMenuItem<String>(
-                                    value: day,
-                                    child: StatefulBuilder(
-                                      builder: (context, setStateCheckbox) {
-                                        final isSelected = _selectedDays.contains(day);
-                                        return GestureDetector(
-                                          onTap: () {
-                                            setState(() {
-                                              if (isSelected) {
-                                                _selectedDays.remove(day);
-                                              } else {
-                                                _selectedDays.add(day);
-                                              }
-                                              _dayController.text = _selectedDays.join(', ');
-                                            });
-                                            setStateCheckbox(() {});
-                                          },
-                                          child: Row(
-                                            children: [
-                                              SizedBox(
-                                                width: 20.w,
-                                                height: 20.h,
-                                                child: Checkbox(
-                                                  value: isSelected,
-                                                  onChanged: (checked) {
-                                                    setState(() {
-                                                      if (checked == true) {
-                                                        _selectedDays.add(day);
-                                                      } else {
-                                                        _selectedDays.remove(day);
-                                                      }
-                                                      _dayController.text = _selectedDays.join(', ');
-                                                    });
-                                                    setStateCheckbox(() {});
-                                                  },
-                                                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                                  visualDensity: const VisualDensity(horizontal: -4, vertical: -4),
-                                                  activeColor: const Color.fromARGB(255, 2, 123, 223),
-                                                ),
-                                              ),
-                                              const SizedBox(width: 4),
-                                              Text(
-                                                day,
-                                                style: TextStyle(fontSize: 12.sp),
-                                              ),
-                                            ],
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                  );
-                                }).toList(),      value: null,
-                              onChanged: (_) {},
-                              buttonStyleData: ButtonStyleData(
-                                height: 35.h,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(5.r),
-                                  border: Border.all(color: Colors.grey),
-                                  color: Colors.white,
-                                ),
-                              ),
-                              iconStyleData: IconStyleData(
-                                icon: const Icon(Icons.arrow_drop_down),
-                                iconSize: 24.r,
-                              ),
-                              dropdownStyleData: DropdownStyleData(
-                                maxHeight: 250.h,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(5.r),
-                                  color: Colors.white,
-                                ),
-                              ),
-                              menuItemStyleData: MenuItemStyleData(
-                                height: 32.h,
-                                padding: EdgeInsets.symmetric(horizontal: 5.0),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 4.0.h),
-                    Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Text("Gender             :  ", style: AllTextStyle.textFieldHeadStyle),
-                      GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            customerType="male";
-                          });
-                        },
-                        child: Row(
-                          children: [
-                            Transform.scale(
-                              scale: 0.8,
-                              child: Radio(
-                                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                  visualDensity: const VisualDensity(horizontal: -4, vertical: -4),
-                                  fillColor:MaterialStateColor.resolveWith((states) => const Color.fromARGB(255, 5, 114, 165)),
-                                  value: "male",
-                                  groupValue: customerType,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      customerType = value.toString();
-                                 });
-                                  }),
-                            ),
-                            const Text("Male"),
-                          ],
-                        ),
-                      ),
-                      SizedBox(width: 10.w),
-                        GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            customerType="female";
-                            });
-                        },
-                        child: Row(
-                          children: [
-                            Transform.scale(
-                              scale: 0.8,
-                              child: Radio(
-                                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                  visualDensity: const VisualDensity(horizontal: -4, vertical: -4),
-                                  fillColor:MaterialStateColor.resolveWith((states) => const Color.fromARGB(255, 5, 114, 165)),
-                                  value: "female",
-                                  groupValue: customerType,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      customerType = value.toString();
-                                   });
-                                  }),
-                            ),
-                            const Text("Female"),
-                          ],
-                        ),
-                      ),
-                    ],
+                  //   Row(
+                  //   mainAxisAlignment: MainAxisAlignment.start,
+                  //   children: [
+                  //     Text("Gender             :  ", style: AllTextStyle.textFieldHeadStyle),
+                  //     GestureDetector(
+                  //       onTap: () {
+                  //         setState(() {
+                  //           customerType="male";
+                  //         });
+                  //       },
+                  //       child: Row(
+                  //         children: [
+                  //           Transform.scale(
+                  //             scale: 0.8,
+                  //             child: Radio(
+                  //                 materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  //                 visualDensity: const VisualDensity(horizontal: -4, vertical: -4),
+                  //                 fillColor:MaterialStateColor.resolveWith((states) => const Color.fromARGB(255, 5, 114, 165)),
+                  //                 value: "male",
+                  //                 groupValue: customerType,
+                  //                 onChanged: (value) {
+                  //                   setState(() {
+                  //                     customerType = value.toString();
+                  //                });
+                  //                 }),
+                  //           ),
+                  //           const Text("Male"),
+                  //         ],
+                  //       ),
+                  //     ),
+                  //     SizedBox(width: 10.w),
+                  //       GestureDetector(
+                  //       onTap: () {
+                  //         setState(() {
+                  //           customerType="female";
+                  //           });
+                  //       },
+                  //       child: Row(
+                  //         children: [
+                  //           Transform.scale(
+                  //             scale: 0.8,
+                  //             child: Radio(
+                  //                 materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  //                 visualDensity: const VisualDensity(horizontal: -4, vertical: -4),
+                  //                 fillColor:MaterialStateColor.resolveWith((states) => const Color.fromARGB(255, 5, 114, 165)),
+                  //                 value: "female",
+                  //                 groupValue: customerType,
+                  //                 onChanged: (value) {
+                  //                   setState(() {
+                  //                     customerType = value.toString();
+                  //                  });
+                  //                 }),
+                  //           ),
+                  //           const Text("Female"),
+                  //         ],
+                  //       ),
+                  //     ),
+                  //   ],
+                  // ),
+                  
+                  CommonTextFieldRow(
+                    label: "Edu.Level",
+                    controller: _educationLevelController,
+                    hintText: "Enter Education Level",
+                    maxLines: 2,
                   ),
+                  CommonTextFieldRow(
+                    label: "Edu(Bangla)",
+                    controller: _eduLevelBanglaController,
+                    hintText: "Enter Education Level",
+                    maxLines: 2,
+                  ),
+                  SizedBox(height: 4.0.h),
                   Align(
                   alignment: Alignment.bottomRight,
                   child: InkWell(
@@ -668,14 +746,15 @@ class _DoctorEntryScreenState extends State<DoctorEntryScreen> {
     _doctorIDController.text = "";
     _doctorNameController.text = "";
     _mobileController.text = "";
-    _emailController.text = "";
-    _originController.text = "";
+    _remarkController.text = "";
+     _educationLevelController.text = "";
+    _eduLevelBanglaController.text = "";
     _addressController.text = "";
     _biographyController.text = "";
-    _specialistController.text = "";
-    _newFeesController.text = "";
-    _regularFeesController.text = "";
-    _emailController.text = "";
+    _feesController.text = "";
+    _commissionAmountController.text = "";
+    _commissionPercentController.text = "";
+    _remarkController.text = "";
     regionId = "";
     territoriesId = "";
     employeeId = "";

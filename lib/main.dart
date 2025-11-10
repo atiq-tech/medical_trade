@@ -5,6 +5,9 @@ import 'package:medical_trade/controller/contact_api.dart';
 import 'package:medical_trade/controller/customer_product_buy_api.dart';
 import 'package:medical_trade/controller/slider_controller.dart';
 import 'package:medical_trade/controller/wall_post_api.dart';
+import 'package:medical_trade/new_part/providers/category_provider.dart';
+import 'package:medical_trade/new_part/providers/client_post_provider.dart';
+import 'package:medical_trade/new_part/providers/wall_postnew_provider.dart';
 import 'package:medical_trade/utilities/custom_error_message.dart';
 import 'package:medical_trade/controller/engineering_support_api.dart';
 import 'package:medical_trade/controller/engineering_support_post_api.dart';
@@ -77,6 +80,13 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider(create: (_) => GetClientPostProvider()),
         ChangeNotifierProvider(create: (_) => GetEngineerSupportProductProvider()),
         ChangeNotifierProvider(create: (_) => GetSalesOldMachineProvider()),
+        ///======new part
+        ChangeNotifierProvider<CategoryProvider>(create: (_) => CategoryProvider()),
+        ChangeNotifierProvider<NewClientPostProvider>(create: (_) => NewClientPostProvider()),
+        ChangeNotifierProvider<WallPostNewProvider>(create: (_) => WallPostNewProvider()),
+        
+        
+        
       ],
       child: ScreenUtilInit(
         designSize: const Size(360, 690),
@@ -89,6 +99,7 @@ class _MyAppState extends State<MyApp> {
             useMaterial3: true,
           ),
           onGenerateRoute: Routes.generateRoute,
+          //initialRoute: RoutesName.categorylist,
           initialRoute: RoutesName.myWallPost,
           // initialRoute: GetStorage().read('loginToken') != null
           //     ? RoutesName.myWallPost

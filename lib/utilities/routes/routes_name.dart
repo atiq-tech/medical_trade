@@ -43,4 +43,7 @@ class RoutesName {
   //home view routes name
   static const String diagnosticDetailsView = 'diagnostic_Details_view';
   //home view routes name
+  
+  static const String categorylist = 'categorylist';
+  //home view routes name
 }

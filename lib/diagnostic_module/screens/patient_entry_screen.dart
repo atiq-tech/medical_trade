@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:medical_trade/diagnostic_module/utils/all_textstyle.dart';
 import 'package:medical_trade/diagnostic_module/utils/common_textfield.dart';
+import 'package:medical_trade/diagnostic_module/utils/utils.dart';
 import 'package:medical_trade/utilities/color_manager.dart';
 class PatientEntryScreen extends StatefulWidget {
   const PatientEntryScreen({super.key,});
@@ -23,6 +24,8 @@ class _PatientEntryScreenState extends State<PatientEntryScreen> {
   final _mobileController = TextEditingController();
   final _ageController = TextEditingController();
   final _addressController = TextEditingController();
+  final _nidNoController = TextEditingController();
+  final _remarkController = TextEditingController();
   
   // SharedPreferences? sharedPreferences;
   // Future<void> _initializeData() async {
@@ -42,11 +45,38 @@ class _PatientEntryScreenState extends State<PatientEntryScreen> {
   String userName = "";
   String userType = "";
 
+String? firstPickedDate;
+  var backEndFirstDate;
+  var backEndSecondtDate;
+
+  var toDay = DateTime.now();
+  void _firstSelectedDate() async {
+    final selectedDate = await showDatePicker(
+        context: context,
+        initialDate: DateTime.now(),
+        firstDate: DateTime(1950),
+        lastDate: DateTime(2050));
+    if (selectedDate != null) {
+      setState(() {
+        firstPickedDate = Utils.formatFrontEndDate(selectedDate);
+        backEndFirstDate = Utils.formatBackEndDate(selectedDate);
+      });
+    }
+    else{
+      setState(() {
+        firstPickedDate = Utils.formatFrontEndDate(toDay);
+        backEndFirstDate = Utils.formatBackEndDate(toDay);
+      });
+    }
+  }
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     //_initializeData();
+    firstPickedDate = Utils.formatFrontEndDate(DateTime.now());
+    backEndFirstDate = Utils.formatBackEndDate(DateTime.now());
   }
 
   ScrollController mainScrollController = ScrollController();
@@ -158,6 +188,55 @@ class _PatientEntryScreenState extends State<PatientEntryScreen> {
 
                     SizedBox(height: 4.0.h),
                     CommonTextFieldRow(
+                      label: "NID No",
+                      controller: _nidNoController,
+                      hintText: "Enter NID Number",
+                    ),
+                    SizedBox(height: 4.0.h),
+                    Row(children: [
+                      Expanded(flex:6, child: Text("Date of Birth", style:AllTextStyle.textFieldHeadStyle)),
+                      const Expanded(flex: 1, child: Text(":")),
+                      Expanded(
+                        flex: 16,
+                        child: Container(
+                          height: 25.h,
+                          child: GestureDetector(
+                            onTap: (() {
+                              //FocusScope.of(context).requestFocus(quantityFocusNode);
+                              _firstSelectedDate();
+                            }),
+                            child: TextFormField(
+                              enabled: false,
+                              decoration: InputDecoration(contentPadding: EdgeInsets.only(left: 5.w),
+                                filled: true,
+                                fillColor: Colors.white,
+                                suffixIcon: Padding(padding: EdgeInsets.only(left: 20.w),
+                                child: Icon(Icons.calendar_month, color: Colors.black87,size: 16.r)),
+                                border: OutlineInputBorder(borderSide: BorderSide(color:  Colors.grey,width: 5.w)),
+                                hintText: firstPickedDate,
+                                hintStyle: AllTextStyle.dateFormatStyle
+                              ),
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return null;
+                                }
+                                return null;
+                              },
+                            ),
+                          ),
+                        ),
+                      ),
+                    ]),
+                   
+                    SizedBox(height: 4.0.h),
+                    CommonTextFieldRow(
+                      label: "Remark",
+                      controller: _remarkController,
+                      hintText: "Enter Remark",
+                    ),
+
+                    SizedBox(height: 4.0.h),
+                    CommonTextFieldRow(
                       label: "Address",
                       controller: _addressController,
                       hintText: "Enter Address",
@@ -193,7 +272,7 @@ class _PatientEntryScreenState extends State<PatientEntryScreen> {
                           ],
                         ),
                       ),
-                      SizedBox(width: 10.w),
+                      SizedBox(width: 8.w),
                         GestureDetector(
                         onTap: () {
                           setState(() {
@@ -217,6 +296,33 @@ class _PatientEntryScreenState extends State<PatientEntryScreen> {
                                   }),
                             ),
                             const Text("Female"),
+                          ],
+                        ),
+                      ),
+                      SizedBox(width: 8.w),
+                        GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            customerType="other";
+                            });
+                        },
+                        child: Row(
+                          children: [
+                            Transform.scale(
+                              scale: 0.8,
+                              child: Radio(
+                                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                  visualDensity: const VisualDensity(horizontal: -4, vertical: -4),
+                                  fillColor:MaterialStateColor.resolveWith((states) => const Color.fromARGB(255, 5, 114, 165)),
+                                  value: "other",
+                                  groupValue: customerType,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      customerType = value.toString();
+                                   });
+                                  }),
+                            ),
+                            const Text("Other"),
                           ],
                         ),
                       ),

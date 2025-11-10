@@ -3,17 +3,18 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:medical_trade/controller/contact_api.dart';
 import 'package:medical_trade/controller/wall_post_api.dart';
+import 'package:medical_trade/new_part/providers/wall_postnew_provider.dart';
 import 'package:medical_trade/utilities/assets_manager.dart';
 import 'package:medical_trade/utilities/color_manager.dart';
 import 'package:medical_trade/utilities/font_manager.dart';
 import 'package:medical_trade/utilities/zoom_screen.dart';
 import 'package:medical_trade/view/auth/login_register_auth.dart';
 import 'package:medical_trade/view/home_view.dart';
+import 'package:medical_trade/view/my_wall_products_details.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:medical_trade/utilities/values_manager.dart';
 import 'package:medical_trade/view/drawer.dart';
-import 'my_wall_products_details.dart';
 
 class MyWallPostView extends StatefulWidget {
   const MyWallPostView({super.key});
@@ -36,12 +37,16 @@ class _MyWallPostViewState extends State<MyWallPostView> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<WallPostApiProvider>(context, listen: false).fetchWallData();
       Provider.of<ContactProvider>(context, listen: false).fetchContact();
+
+      Provider.of<WallPostNewProvider>(context, listen: false).getWallPostNew();
     });
   }
 
   @override
   Widget build(BuildContext context) {
     final contactProvider = Provider.of<ContactProvider>(context);
+    final provider = Provider.of<WallPostNewProvider>(context);
+    final allWallPostData = provider.allWallPostNewList;
 
     // Fetch the contact data if it hasn't been loaded yet
     if (contactProvider.companyProfile == null && !contactProvider.isLoading) {
@@ -326,32 +331,20 @@ class _MyWallPostViewState extends State<MyWallPostView> {
         ],
       ),
       drawer: const CustomDrawer(),
-      body: Padding(
-        padding: EdgeInsets.only(
-          left: 8.w,
-          right: 12.w,
-          top: 8.h,
-        ),
-        child: Padding(
-          padding: EdgeInsets.only(right: 12.w, left: 12.w, bottom: 20.h),
-          child: Consumer<WallPostApiProvider>(
-              builder: (context, provider, child) {
-            if (provider.isLoading) {
-              return const Center(child: CircularProgressIndicator());
-            }
+      body: WallPostNewProvider.isWallPostNewLoading
+          ? const Center(child: CircularProgressIndicator())
 
-            if (provider.wallpostdata.isEmpty) {
-              return Center(
+          : allWallPostData.isEmpty ? Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(
+                     Icon(
                       Icons.shopping_bag_outlined,
                       size: 80.sp,
                       color: Colors.grey[400],
                     ),
-                    SizedBox(height: 16.h),
-                    Text(
+                     SizedBox(height: 16.h),
+                     Text(
                       "No products available",
                       style: TextStyle(
                         fontSize: 18.sp,
@@ -359,27 +352,24 @@ class _MyWallPostViewState extends State<MyWallPostView> {
                         fontWeight: FontWeight.w500,
                       ),
                     ),
-                    SizedBox(height: 8.h),
-                    Text(
+                     SizedBox(height: 8.h),
+                     Text(
                       "Check back later!",
                       style: TextStyle(
                         fontSize: 14.sp,
                         color: Colors.grey[500],
                       ),
                     ),
-                    SizedBox(height: 8.h),
+                     SizedBox(height: 8.h),
                     InkWell(
                       onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const HomeView()),
+                        Navigator.push(context,MaterialPageRoute(builder: (context) => const HomeView()),
                         );
                       },
                       child: Container(
-                        padding: EdgeInsets.symmetric(
+                        padding:  EdgeInsets.symmetric(
                             horizontal: 12.w, vertical: 8.h),
-                        decoration: BoxDecoration(
+                        decoration:  BoxDecoration(
                           color: Colors.blue,
                           borderRadius: BorderRadius.circular(8.r),
                           boxShadow: [
@@ -403,21 +393,22 @@ class _MyWallPostViewState extends State<MyWallPostView> {
                       ),
                     )
                   ],
-                ),
-              );
-            }
+                ))
 
-            return GridView.builder(
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 1,
-                crossAxisSpacing: 10.0.h,
-                mainAxisSpacing: 4.0.w,
-                childAspectRatio: 0.750,
-              ),
-              itemCount: provider.wallpostdata.length,
-              itemBuilder: (context, index) {
-                final product = provider.wallpostdata[index];
-                return Card(
+          : Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: GridView.builder(
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 1,
+                  crossAxisSpacing: 10.0.h,
+                  mainAxisSpacing: 4.0.w,
+                  childAspectRatio: 0.750,
+                ),
+                itemCount: allWallPostData.length,
+                itemBuilder: (context, index) {
+                final item = allWallPostData[index];
+
+                  return Card(
                   elevation: 7,
                   color: Colors.grey.shade200,
                   shape: RoundedRectangleBorder(
@@ -433,7 +424,7 @@ class _MyWallPostViewState extends State<MyWallPostView> {
                               MaterialPageRoute(
                                 builder: (context) => ImageZoomScreen(
                                   imageUrl:
-                                      'https://soft.madicaltrade.com/uploads/wallposts/${product.image}',
+                                      'https://app.medicaltradeltd.com/${item.image}',
                                 ),
                               ),
                             );
@@ -450,7 +441,7 @@ class _MyWallPostViewState extends State<MyWallPostView> {
                               borderRadius: BorderRadius.vertical(
                                   top: Radius.circular(10.r)),
                               child: Image.network(
-                                'https://soft.madicaltrade.com/uploads/wallposts/${product.image}',
+                                'https://app.medicaltradeltd.com/${item.image}',
                                 fit: BoxFit.cover,
                                 loadingBuilder: (BuildContext context,
                                     Widget child,
@@ -491,7 +482,7 @@ class _MyWallPostViewState extends State<MyWallPostView> {
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             Text(
-                              product.title.toString(),
+                              item.title.toString(),
                               style: TextStyle(
                                 fontSize: 14.sp,
                                 fontWeight: FontWeight.bold,
@@ -500,7 +491,7 @@ class _MyWallPostViewState extends State<MyWallPostView> {
                               overflow: TextOverflow.ellipsis,
                             ),
                             Text(
-                              "\$ ${product.wallPostId}",
+                              "\$ ${item.wallPostId}",
                               style: TextStyle(
                                 fontSize: 14.sp,
                                 fontWeight: FontWeight.w500,
@@ -516,7 +507,7 @@ class _MyWallPostViewState extends State<MyWallPostView> {
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) =>
-                                          MyWallProductsDetails(item: product),
+                                          MyWallProductsDetails(item: item),
                                     ),
                                   );
                                 },
@@ -549,11 +540,10 @@ class _MyWallPostViewState extends State<MyWallPostView> {
                     ],
                   ),
                 );
-              },
-            );
-          }),
-        ),
-      ),
+                },
+              ),
+            ),
+   
       bottomNavigationBar: Container(
         height: 45.h,
         color: ColorManager.black,
@@ -582,17 +572,6 @@ class _MyWallPostViewState extends State<MyWallPostView> {
                               fontWeight: FontWeight.bold),
                         ),
                       ),
-                      // GestureDetector(
-                      //   onTap: () => _launchPhone(
-                      //       contactProvider.contactModel!.hotlineTwo ?? ''),
-                      //   child: Text(
-                      //     contactProvider.contactModel!.hotlineTwo ?? '',
-                      //     style: FontManager.smallTextbottomnavigaton.copyWith(
-                      //         color: Colors.white,
-                      //         fontSize: 16.sp,
-                      //         fontWeight: FontWeight.bold),
-                      //   ),
-                      // ),
                     ],
                   )
                 : const SizedBox.shrink(),

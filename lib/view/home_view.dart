@@ -3,6 +3,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:medical_trade/controller/contact_api.dart';
 import 'package:medical_trade/diagnostic_module/screens/diagnostic_module_screen.dart';
+import 'package:medical_trade/new_part/screens/all_category_screen.dart';
+import 'package:medical_trade/new_part/screens/all_client_post_screen.dart';
+import 'package:medical_trade/new_part/screens/wallpostnew_screen.dart';
 import 'package:medical_trade/utilities/assets_manager.dart';
 import 'package:medical_trade/utilities/color_manager.dart';
 import 'package:medical_trade/utilities/custom_appbar.dart';
@@ -50,19 +53,23 @@ class _HomeViewState extends State<HomeView> {
         'title': 'New Machine',
         'color': ColorManager.homeContainerOne,
         'icon': ImageAssets.newMachine,
-        'page': const NewMachine(),
+        //'page': const NewMachine(),
+        'page': const CategoryListScreen(),
       },
       {
         'title': 'Old Machine',
         'color': const Color(0xFF0199A6),
         'icon': ImageAssets.oldMachine,
-        'page': const OldMachine(),
+        //'page': const OldMachine(),
+        'page': const ClientPostScreen(),
       },
       {
         'title': 'Buy Reagent',
         'color': ColorManager.homeContainerSix,
         'icon': ImageAssets.regalSupport,
-        'page': const ByReagent(),
+        //'page': const ByReagent(),
+        'page': const WallPostNewScreen(),
+        
       },
       {
         'title': 'Engineering Support',
