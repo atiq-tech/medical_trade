@@ -7,7 +7,8 @@ class CommonTextFieldRow extends StatelessWidget {
   final TextEditingController controller;
   final String hintText;
   final int maxLines;
-  final TextInputType keyboardType; 
+  final TextInputType keyboardType;
+  final Function(String)? onChanged;   // ✅ Added
 
   const CommonTextFieldRow({
     super.key,
@@ -16,6 +17,7 @@ class CommonTextFieldRow extends StatelessWidget {
     required this.hintText,
     this.maxLines = 1,
     this.keyboardType = TextInputType.text,
+    this.onChanged,   // ✅ Added
   });
 
   @override
@@ -44,8 +46,9 @@ class CommonTextFieldRow extends StatelessWidget {
             child: TextField(
               controller: controller,
               maxLines: maxLines,
-              keyboardType: keyboardType, // ✅ Used here
+              keyboardType: keyboardType,
               style: AllTextStyle.dropDownlistStyle,
+              onChanged: onChanged,   // ✅ Added here
               decoration: InputDecoration(
                 hintText: hintText,
                 hintStyle: AllTextStyle.textValueStyle,
@@ -63,3 +66,4 @@ class CommonTextFieldRow extends StatelessWidget {
     );
   }
 }
+

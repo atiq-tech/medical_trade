@@ -1,5 +1,4 @@
 library;
-import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
@@ -93,25 +92,6 @@ Future<void> pickTime(bool isStart) async {
   var backEndSecondtDate;
 
   var toDay = DateTime.now();
-  void _firstSelectedDate() async {
-    final selectedDate = await showDatePicker(
-        context: context,
-        initialDate: DateTime.now(),
-        firstDate: DateTime(1950),
-        lastDate: DateTime(2050));
-    if (selectedDate != null) {
-      setState(() {
-        firstPickedDate = Utils.formatFrontEndDate(selectedDate);
-        backEndFirstDate = Utils.formatBackEndDate(selectedDate);
-      });
-    }
-    else{
-      setState(() {
-        firstPickedDate = Utils.formatFrontEndDate(toDay);
-        backEndFirstDate = Utils.formatBackEndDate(toDay);
-      });
-    }
-  }
 
   final List<String> _allDays = [
     'Saturday',
@@ -123,6 +103,58 @@ Future<void> pickTime(bool isStart) async {
     'Friday'
   ];
   List<String> _selectedDays = [];
+
+  void _calculateCommission() {
+  double fees = double.tryParse(_feesController.text) ?? 0;
+  double percent = double.tryParse(_commissionPercentController.text) ?? 0;
+
+  // ✅ Percent empty হলে Amount ও clear
+  if (_commissionPercentController.text.isEmpty) {
+    _commissionAmountController.clear();
+    return;
+  }
+
+  if (fees > 0 && percent > 0) {
+    double amount = (fees * percent) / 100;
+    _commissionAmountController.text = amount.toStringAsFixed(2);
+  }
+}
+
+
+void _calculateCommissionFromPercent() {
+  double fees = double.tryParse(_feesController.text) ?? 0;
+  double percent = double.tryParse(_commissionPercentController.text) ?? 0;
+
+  // ✅ Percent clear হলে Amount clear
+  if (_commissionPercentController.text.isEmpty) {
+    _commissionAmountController.clear();
+    return;
+  }
+
+  if (fees > 0 && percent > 0) {
+    double amount = (fees * percent) / 100;
+    _commissionAmountController.text = amount.toStringAsFixed(2);
+  }
+}
+
+
+void _calculateCommissionFromAmount() {
+  double fees = double.tryParse(_feesController.text) ?? 0;
+  double amount = double.tryParse(_commissionAmountController.text) ?? 0;
+
+  // ✅ Amount clear হলে Percent clear
+  if (_commissionAmountController.text.isEmpty) {
+    _commissionPercentController.clear();
+    return;
+  }
+
+  if (fees > 0 && amount > 0) {
+    double percent = (amount / fees) * 100;
+    _commissionPercentController.text = percent.toStringAsFixed(2);
+  }
+}
+
+
 
    @override
   void initState() {
@@ -352,19 +384,26 @@ Future<void> pickTime(bool isStart) async {
                       label: "Fees",
                       controller: _feesController,
                       hintText: "0",
+                      onChanged: (value) {
+                        _calculateCommission();
+                      },
                     ),
                     SizedBox(height: 4.0.h),
                     Row(
                       children: [
-                        Expanded(flex: 6,child: Text("Comm(%)", style: AllTextStyle.textFieldHeadStyle)),
-                        const Expanded(flex: 1,child: Text(":")),
+                        Expanded(
+                          flex: 6,
+                          child: Text("Comm(%)", style: AllTextStyle.textFieldHeadStyle),
+                        ),
+                        const Expanded(flex: 1, child: Text(":")),
                         Expanded(
                           flex: 6,
                           child: SizedBox(
                             height: 25.0.h,
                             child: TextField(
-                              controller: _commissionAmountController,
+                              controller: _commissionPercentController,
                               style: AllTextStyle.dropDownlistStyle,
+                              keyboardType: TextInputType.number,
                               decoration: InputDecoration(
                                 hintText: "0",
                                 hintStyle: AllTextStyle.textValueStyle,
@@ -375,17 +414,21 @@ Future<void> pickTime(bool isStart) async {
                                 focusedBorder: TextFieldInputBorder.focusEnabledBorder,
                                 enabledBorder: TextFieldInputBorder.focusEnabledBorder,
                               ),
+                              onChanged: (value) {
+                                _calculateCommissionFromPercent();
+                              },
                             ),
                           ),
                         ),
-                        const Expanded(flex: 3,child: Center(child: Text("(৳):"))),
+                        const Expanded(flex: 3, child: Center(child: Text("(৳):"))),
                         Expanded(
                           flex: 7,
                           child: SizedBox(
                             height: 25.0.h,
                             child: TextField(
-                              controller: _commissionPercentController,
+                              controller: _commissionAmountController,
                               style: AllTextStyle.dropDownlistStyle,
+                              keyboardType: TextInputType.number,
                               decoration: InputDecoration(
                                 hintText: "0",
                                 hintStyle: AllTextStyle.textValueStyle,
@@ -396,11 +439,15 @@ Future<void> pickTime(bool isStart) async {
                                 focusedBorder: TextFieldInputBorder.focusEnabledBorder,
                                 enabledBorder: TextFieldInputBorder.focusEnabledBorder,
                               ),
+                              onChanged: (value) {
+                                _calculateCommissionFromAmount();
+                              },
                             ),
                           ),
                         ),
                       ],
                     ),
+
                     // SizedBox(height: 4.0.h),
                     // Row(
                     //   children: [
