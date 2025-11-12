@@ -4,13 +4,13 @@ import 'package:medical_trade/diagnostic_module/utils/all_textstyle.dart';
 import 'package:medical_trade/diagnostic_module/utils/utils.dart';
 import 'package:medical_trade/utilities/color_manager.dart';
 
-class SupplierPaymentEntryScreen extends StatefulWidget {
-  const SupplierPaymentEntryScreen({super.key});
+class CommissionPaymentEntryScreen extends StatefulWidget {
+  const CommissionPaymentEntryScreen({super.key});
   @override
-  State<SupplierPaymentEntryScreen> createState() => _SupplierPaymentEntryScreenState();
+  State<CommissionPaymentEntryScreen> createState() => _CommissionPaymentEntryScreenState();
 }
 
-class _SupplierPaymentEntryScreenState extends State<SupplierPaymentEntryScreen> {
+class _CommissionPaymentEntryScreenState extends State<CommissionPaymentEntryScreen> {
   Color getColor(Set<WidgetState> states) {
     return Colors.blue.shade200;
   }
@@ -20,7 +20,7 @@ class _SupplierPaymentEntryScreenState extends State<SupplierPaymentEntryScreen>
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _amountController = TextEditingController();
   final TextEditingController bankAccountController = TextEditingController();
-  final TextEditingController supplierController = TextEditingController();
+  final TextEditingController agentController = TextEditingController();
   final TextEditingController previousDueController = TextEditingController();
   var quantityController = TextEditingController();
   ///new condition
@@ -338,7 +338,7 @@ final LayerLink _pTypeLayerLink = LayerLink();
             onPressed: () => Navigator.pop(context),
           ),
           title: Text(
-            "Supplier Payment",
+            "Commission Payment",
             style: TextStyle(
               color: Colors.black,
               fontWeight: FontWeight.w500,
@@ -381,7 +381,7 @@ final LayerLink _pTypeLayerLink = LayerLink();
                                 borderRadius: BorderRadius.only(topLeft: Radius.circular(6.r),topRight: Radius.circular(6.r)),
                                 color: Color.fromARGB(255, 75, 76, 77),
                               ),
-                              child: Center(child: Text('Supplier Payment Information',style:TextStyle(fontWeight:FontWeight.bold, fontSize: 16.sp, color: Colors.white))),
+                              child: Center(child: Text('Commission Payment Information',style:TextStyle(fontWeight:FontWeight.bold, fontSize: 12.sp, color: Colors.white))),
                             ),
                           ),
                         ),
@@ -477,15 +477,15 @@ final LayerLink _pTypeLayerLink = LayerLink();
                                 _isDropdownOpen
                                     ? Icons.arrow_drop_up
                                     : Icons.arrow_drop_down,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                                 ],
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                ],
                                 ),
                                 SizedBox(height: 3.h),
                                 isBankListClicked == true
@@ -559,7 +559,7 @@ final LayerLink _pTypeLayerLink = LayerLink();
                           
                                 Row(
                                   children: [
-                                    Expanded(flex: 6, child: Text("Supplier",style: AllTextStyle.textFieldHeadStyle)),
+                                    Expanded(flex: 6, child: Text("Agent",style: AllTextStyle.textFieldHeadStyle)),
                                     const Expanded(flex: 1, child: Text(":")),
                                     Expanded(
                                       flex: 11,
@@ -629,7 +629,7 @@ final LayerLink _pTypeLayerLink = LayerLink();
                                 SizedBox(height: 3.h),
                                 Row(
                                   children: [
-                                    Expanded(flex: 6,child: Text("Due Amount",style: AllTextStyle.textFieldHeadStyle)),
+                                    Expanded(flex: 6,child: Text("Due Balance",style: AllTextStyle.textFieldHeadStyle)),
                                     const Expanded(flex: 1, child: Text(":")),
                                     Expanded(
                                       flex: 11,
@@ -716,25 +716,25 @@ final LayerLink _pTypeLayerLink = LayerLink();
                                Row(
                                   mainAxisAlignment: MainAxisAlignment.end,
                                   children: [
-                                    InkWell(
-                                      onTap: () {
-                                        emtyMethod();
-                                        FocusScope.of(context).requestFocus(quantityFocusNode);
-                                      },
-                                      child: Container(
-                                        height: 28.h,
-                                        width: 100.w,
-                                        decoration: BoxDecoration(
-                                          color: const Color.fromARGB(255, 252, 33, 4),
-                                          borderRadius: BorderRadius.circular(5.r),
-                                          boxShadow: [
-                                            BoxShadow(color: Colors.grey.withOpacity(0.6),spreadRadius: 2.r,blurRadius: 5.r,offset: const Offset(0, 3)),
-                                          ],
-                                        ),
-                                        child: Center(child: Text("Clear",style:AllTextStyle.saveButtonTextStyle)),
-                                      ),
-                                    ),
-                                    SizedBox(width: 10.w),
+                                    // InkWell(
+                                    //   onTap: () {
+                                    //     emtyMethod();
+                                    //     FocusScope.of(context).requestFocus(quantityFocusNode);
+                                    //   },
+                                    //   child: Container(
+                                    //     height: 28.h,
+                                    //     width: 100.w,
+                                    //     decoration: BoxDecoration(
+                                    //       color: const Color.fromARGB(255, 252, 33, 4),
+                                    //       borderRadius: BorderRadius.circular(5.r),
+                                    //       boxShadow: [
+                                    //         BoxShadow(color: Colors.grey.withOpacity(0.6),spreadRadius: 2.r,blurRadius: 5.r,offset: const Offset(0, 3)),
+                                    //       ],
+                                    //     ),
+                                    //     child: Center(child: Text("Clear",style:AllTextStyle.saveButtonTextStyle)),
+                                    //   ),
+                                    // ),
+                                    // SizedBox(width: 10.w),
                                     InkWell(
                                       onTap: () {
                                         // if(supplierController.text == ''){
@@ -953,7 +953,7 @@ final LayerLink _pTypeLayerLink = LayerLink();
   emtyMethod() {
     setState(() {
       _descriptionController.text = "";
-      supplierController.text = "";
+      agentController.text = "";
       previousDueController.text = "";
       _amountController.text = "";
       bankAccountController.text = "";

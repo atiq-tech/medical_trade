@@ -1,6 +1,8 @@
 library;
+import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:intl/intl.dart';
 import 'package:medical_trade/diagnostic_module/utils/all_textstyle.dart';
 import 'package:medical_trade/diagnostic_module/utils/common_textfield.dart';
 import 'package:medical_trade/diagnostic_module/utils/utils.dart';
@@ -24,6 +26,23 @@ class _AppointmentEntryScreenState extends State<AppointmentEntryScreen> {
   final _nameController = TextEditingController();
   final _mobileController = TextEditingController();
   final _doctorNameController = TextEditingController();
+  final _addressController = TextEditingController();
+   final _yearController = TextEditingController();
+  final _monthController = TextEditingController();
+  final _dayAgeController = TextEditingController();
+  final _remarkController = TextEditingController();
+  final _timeController = TextEditingController();
+   final _trIDController = TextEditingController();
+   final _departmentController = TextEditingController();
+  final _slotController = TextEditingController();
+  final _conFeesController = TextEditingController();
+  final _subTotalController = TextEditingController();
+  final _remarkAppointController = TextEditingController();
+  final _sLNoController = TextEditingController();
+  final _referenceController = TextEditingController();
+  final _discountParcentController = TextEditingController();
+  final _discountController = TextEditingController();
+  final _advanceController = TextEditingController();
   
   // SharedPreferences? sharedPreferences;
   // Future<void> _initializeData() async {
@@ -35,7 +54,7 @@ class _AppointmentEntryScreenState extends State<AppointmentEntryScreen> {
   //   print("userName==== $userName");
   //   print("userType==== $userType");
   // }
-
+  String? appointType = "";
   String? customerType = "";
   String? employeeSlNo;
   String? employeeId = "";
@@ -69,6 +88,50 @@ class _AppointmentEntryScreenState extends State<AppointmentEntryScreen> {
     }
   }
 
+  String? secondPickedDate;
+  void _secondSelectedDate() async {
+    final selectedDate = await showDatePicker(
+        context: context,
+        initialDate: DateTime.now(),
+        firstDate: DateTime(1950),
+        lastDate: DateTime(2050));
+    if (selectedDate != null) {
+      setState(() {
+        secondPickedDate = Utils.formatFrontEndDate(selectedDate);
+        backEndSecondtDate = Utils.formatBackEndDate(selectedDate);
+      });
+    }else{
+      setState(() {
+        secondPickedDate = Utils.formatFrontEndDate(toDay);
+        backEndSecondtDate = Utils.formatBackEndDate(toDay);
+      });
+    }
+  }
+
+   Future<void> _pickTime() async {
+  TimeOfDay? picked = await showTimePicker(
+    context: context,
+    initialTime: TimeOfDay.now(),
+  );
+
+  if (picked != null) {
+    final now = DateTime.now();
+    final dt = DateTime(now.year, now.month, now.day, picked.hour, picked.minute);
+
+    setState(() {
+      _timeController.text = DateFormat('hh:mm a').format(dt);  // ✅ 12-hour format with AM/PM
+    });
+  }
+}
+
+  // ✅ Variables
+  final List<String> _allGender = ["Male", "Female", "Other"];
+  String? _selectedGender;
+
+  // ✅ Controller
+  final TextEditingController _genderController = TextEditingController();
+
+
    @override
   void initState() {
     // TODO: implement initState
@@ -76,6 +139,8 @@ class _AppointmentEntryScreenState extends State<AppointmentEntryScreen> {
     //_initializeData();
     firstPickedDate = Utils.formatFrontEndDate(DateTime.now());
     backEndFirstDate = Utils.formatBackEndDate(DateTime.now());
+    secondPickedDate = Utils.formatFrontEndDate(DateTime.now());
+    backEndSecondtDate = Utils.formatBackEndDate(DateTime.now());
   }
 
   ScrollController mainScrollController = ScrollController();
@@ -139,13 +204,12 @@ class _AppointmentEntryScreenState extends State<AppointmentEntryScreen> {
         controller: mainScrollController,
         child: Column(
           children: [
-            Container(
+                  Container(
               padding: EdgeInsets.all(8.0.r),
               child: Container(
                 width: double.infinity,
-                padding: EdgeInsets.only(left: 5.0.w,right: 5.0.w,top: 5.0.h),
                 decoration: BoxDecoration(
-                  color: Colors.blue[100],
+                  color: const Color.fromARGB(255, 217, 213, 255),
                   borderRadius: BorderRadius.circular(10.0.r),
                   border: Border.all(color: const Color.fromARGB(255, 2, 196, 163), width: 1.0.w),
                   boxShadow: [
@@ -158,170 +222,628 @@ class _AppointmentEntryScreenState extends State<AppointmentEntryScreen> {
                 ),
                 child: Column(
                   children: [
-                      Row(children: [
-                      Expanded(flex:6, child: Text("Apt.Date", style:AllTextStyle.textFieldHeadStyle)),
-                      const Expanded(flex: 1, child: Text(":")),
-                      Expanded(
-                        flex: 16,
-                        child: Container(
+                    SizedBox(
                           height: 25.h,
-                          margin: EdgeInsets.only(bottom: 4.h),
-                          child: GestureDetector(
-                            onTap: (() {
-                              _firstSelectedDate();
-                            }),
-                            child: TextFormField(
-                              enabled: false,
-                              decoration: InputDecoration(contentPadding: EdgeInsets.only(left: 5.w),
-                                filled: true,
-                                fillColor: Colors.white,
-                                suffixIcon: Padding(padding: EdgeInsets.only(left: 20.w),
-                                child: Icon(Icons.calendar_month, color: Colors.black87,size: 16.r)),
-                                border: OutlineInputBorder(borderSide: BorderSide(color:  Colors.grey,width: 5.w)),
-                                hintText: firstPickedDate,
-                                hintStyle: AllTextStyle.dateFormatStyle
+                          width: double.infinity,
+                          child: Card(
+                            margin: EdgeInsets.only(bottom:3.h),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.only(topLeft: Radius.circular(6.r),topRight: Radius.circular(6.r)),
+                                color: const Color.fromARGB(255, 70, 54, 141),
                               ),
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return null;
-                                }
-                                return null;
-                              },
+                              child: Center(child: Text('Patient Information',style:TextStyle(fontWeight:FontWeight.bold, fontSize: 16.sp, color: Colors.white))),
                             ),
                           ),
                         ),
-                      ),
-                    ]),
-                    CommonTextFieldRow(
-                      label: "Patient",
-                      controller: _patientController,
-                      hintText: "Select Patient",
-                    ),
-                    SizedBox(height: 4.0.h),
-                    CommonTextFieldRow(
-                      label: "Name",
-                      controller: _nameController,
-                      hintText: "Enter Name",
-                    ),
-                    SizedBox(height: 4.0.h),
-                    CommonTextFieldRow(
-                      label: "Mobile",
-                      controller: _mobileController,
-                      hintText: "Enter Mobile Number",
-                    ),
-                    SizedBox(height: 4.0.h),
-                    CommonTextFieldRow(
-                      label: "Doctor",
-                      controller: _doctorNameController,
-                      hintText: "Select Doctor",
-                    ),
-                    SizedBox(height: 4.0.h),
-                    Row(
-                    children: [
-                    Expanded(flex: 6,child: Text("",style: AllTextStyle.textFieldHeadStyle)),
-                    const Expanded(flex: 1, child: Text("")),
-                    Expanded(
-                      flex: 16,
-                      child: Container(
-                        height: 60.h,
-                        padding: EdgeInsets.only(left: 5.w),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          border: Border.all(color: Colors.grey, width: 0.8.w),
-                          borderRadius: BorderRadius.circular(5.r),
+                    Container(
+                       padding: EdgeInsets.only(left: 5.0.w,right: 5.0.w,top: 0.0.h),
+                      child: Column(
+                        children: [
+                          CommonTextFieldRow(
+                            label: "Existing Patients",
+                            controller: _patientController,
+                            hintText: "Select Patient",
                           ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text("Atiqur Raman Atiq",style: AllTextStyle.dialogueTitle),
-                            Text("Emotion Specialist",style: AllTextStyle.textFieldHeadStyle),
-                            Text("Sunday, Monday",style: AllTextStyle.textFieldHeadStyle),
-                          ],
-                        ),
-                      ),
-                    ),
-                    ],
-                  ),
-                  SizedBox(height: 4.0.h),
-                  Align(
-                  alignment: Alignment.bottomRight,
-                  child: InkWell(
-                    onTap: () async {
-                      // Utils.closeKeyBoard(context);
-                      // print("Tapped Save");
-                      // if (_customerNameController.text == '') {
-                      //   Utils.showTopSnackBar(context, "Customer name is required");
-                      //   return;
-                      // }
-                      // if (_regionController.text == '') {
-                      //   Utils.showTopSnackBar(context, "Please Select Region");
-                      //   return;
-                      // }
-                      // if (_territoryController.text == '') {
-                      //   Utils.showTopSnackBar(context, "Please Select Territory");
-                      //   return;
-                      // }
-                      // if (_ownerMobileController.text == '') {
-                      //   Utils.showTopSnackBar(context, "Owner Mobile field is required");
-                      //   return;
-                      // }
-                      // if (_bankNameController.text == '') {
-                      //   Utils.showTopSnackBar(context, "Bank Name field is required");
-                      //   return;
-                      // }
-                      // if (_checkNoController.text == '') {
-                      //   Utils.showTopSnackBar(context, "Check No. field is required");
-                      //   return;
-                      // }
-                      // if (_bankBranchNameController.text == '') {
-                      //   Utils.showTopSnackBar(context, "Bank Branch field is required");
-                      //   return;
-                      // }
-                      // if (_accountNoController.text == '') {
-                      //   Utils.showTopSnackBar(context, "Account No. field is required");
-                      //   return;
-                      // }
-                      // setState(() {
-                      //   customerEntryBtnClk = true;
-                      // });
-                      // var result = await customerEntry(context);
-                      // if (result == "true") {
-                      //   Provider.of<CustomerListProvider>(context, listen: false).getCustomerList("", "", "");
-                      // }
-                      // setState(() {});
-                    },
-                    child: Container(
-                      height: 28.0.h,
-                      width: 80.0.w,
-                      decoration: BoxDecoration(
-                        color: Colors.blue.shade900,
-                        borderRadius: BorderRadius.circular(5.0.r),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey.withOpacity(0.6),
-                            spreadRadius: 2,
-                            blurRadius: 5,
-                            offset: const Offset(0, 3),
+                          CommonTextFieldRow(
+                            label: "Name",
+                            controller: _nameController,
+                            hintText: "Enter Name",
                           ),
-                        ],
-                      ),
-                      child: Center(
-                        child: customerEntryBtnClk
-                            ? SizedBox(
-                                height: 20.0.h,
-                                width: 20.0.w,
-                                child: CircularProgressIndicator(color: Colors.white),
-                              )
-                            : Text("SAVE", style: AllTextStyle.saveButtonTextStyle),
+                      
+                          SizedBox(height: 4.0.h),
+                          CommonTextFieldRow(
+                            label: "Mobile No",
+                            controller: _mobileController,
+                            hintText: "Enter Mobile",
+                          ),
+                          SizedBox(height: 4.0.h),
+                          Row(
+                            children: [
+                              Expanded(flex: 6,child: Text("Gender",style: AllTextStyle.dateFormatStyle)),
+                              const Expanded(flex: 1, child: Text(":")),
+                              Expanded(
+                                flex: 16,
+                                child: DropdownButtonHideUnderline(
+                                  child: DropdownButton2<String>(
+                                    isExpanded: true,
+                                    hint: Text(
+                                      _selectedGender ?? "Select gender",
+                                      style: TextStyle(
+                                        fontSize: 12.sp,
+                                        color: _selectedGender == null
+                                            ? Colors.grey
+                                            : const Color.fromARGB(221, 83, 83, 83),
+                                      ),
+                                    ),
+                                    // ✅ Items
+                                    items: _allGender
+                                        .map((gender) => DropdownMenuItem(
+                                              value: gender,
+                                              child: Text(
+                                                gender,
+                                                style: AllTextStyle.dateFormatStyle,
+                                              ),
+                                            ))
+                                        .toList(),
+
+                                    // ✅ Value
+                                    value: _selectedGender,
+                                    // ✅ On Change
+                                    onChanged: (value) {
+                                      setState(() {
+                                        _selectedGender = value!;
+                                        _genderController.text = value;
+                                      });
+                                    },
+
+                                    // ✅ Style
+                                    buttonStyleData: ButtonStyleData(
+                                      height: 25.h,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(5.r),
+                                        border: Border.all(color: Colors.grey),
+                                        color: Colors.white,
+                                      ),
+                                    ),
+
+                                    iconStyleData: IconStyleData(
+                                      icon: const Icon(Icons.arrow_drop_down),
+                                      iconSize: 24.r,
+                                    ),
+
+                                    dropdownStyleData: DropdownStyleData(
+                                      maxHeight: 200.h,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(5.r),
+                                        color: Colors.white,
+                                      ),
+                                    ),
+
+                                    menuItemStyleData: MenuItemStyleData(
+                                      height: 32.h,
+                                      padding:
+                                          const EdgeInsets.symmetric(horizontal: 5.0),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 4.0.h),
+                          Row(
+                            children: [
+                              Expanded(flex: 6,child: Text("Age ", style: AllTextStyle.textFieldHeadStyle)),
+                              const Expanded(flex: 1,child: Text(":")),
+                              Expanded(
+                                flex: 5,
+                                child: SizedBox(
+                                  height: 25.0.h,
+                                  child: TextField(
+                                    controller: _yearController,
+                                    style: AllTextStyle.dropDownlistStyle,
+                                    decoration: InputDecoration(
+                                      hintText: "Year",
+                                      hintStyle: AllTextStyle.textValueStyle,
+                                      contentPadding: EdgeInsets.only(left: 5.w, top: 4.h),
+                                      filled: true,
+                                      fillColor: Colors.white,
+                                      border: InputBorder.none,
+                                      focusedBorder: TextFieldInputBorder.focusEnabledBorder,
+                                      enabledBorder: TextFieldInputBorder.focusEnabledBorder,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(width: 5.w),
+                              Expanded(
+                                flex: 5,
+                                child: SizedBox(
+                                  height: 25.0.h,
+                                  child: TextField(
+                                    controller: _monthController,
+                                    style: AllTextStyle.dropDownlistStyle,
+                                    decoration: InputDecoration(
+                                      hintText: "Month",
+                                      hintStyle: AllTextStyle.textValueStyle,
+                                      contentPadding: EdgeInsets.only(left: 5.w, top: 4.h),
+                                      filled: true,
+                                      fillColor: Colors.white,
+                                      border: InputBorder.none,
+                                      focusedBorder: TextFieldInputBorder.focusEnabledBorder,
+                                      enabledBorder: TextFieldInputBorder.focusEnabledBorder,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(width: 5.w),
+                              Expanded(
+                                flex: 5,
+                                child: SizedBox(
+                                  height: 25.0.h,
+                                  child: TextField(
+                                    controller: _dayAgeController,
+                                    style: AllTextStyle.dropDownlistStyle,
+                                    decoration: InputDecoration(
+                                      hintText: "Day",
+                                      hintStyle: AllTextStyle.textValueStyle,
+                                      contentPadding: EdgeInsets.only(left: 5.w, top: 4.h),
+                                      filled: true,
+                                      fillColor: Colors.white,
+                                      border: InputBorder.none,
+                                      focusedBorder: TextFieldInputBorder.focusEnabledBorder,
+                                      enabledBorder: TextFieldInputBorder.focusEnabledBorder,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                         SizedBox(height: 4.0.h),
+                          Row(children: [
+                            Expanded(flex:6, child: Text("DOB", style:AllTextStyle.textFieldHeadStyle)),
+                            const Expanded(flex: 1, child: Text(":")),
+                            Expanded(
+                              flex: 16,
+                              child: Container(
+                                height: 25.h,
+                                child: GestureDetector(
+                                  onTap: (() {
+                                    //FocusScope.of(context).requestFocus(quantityFocusNode);
+                                    _firstSelectedDate();
+                                  }),
+                                  child: TextFormField(
+                                    enabled: false,
+                                    decoration: InputDecoration(contentPadding: EdgeInsets.only(left: 5.w),
+                                      filled: true,
+                                      fillColor: Colors.white,
+                                      suffixIcon: Padding(padding: EdgeInsets.only(left: 20.w),
+                                      child: Icon(Icons.calendar_month, color: Colors.black87,size: 16.r)),
+                                      border: OutlineInputBorder(borderSide: BorderSide(color:  Colors.grey,width: 5.w)),
+                                      hintText: firstPickedDate,
+                                      hintStyle: AllTextStyle.dateFormatStyle
+                                    ),
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return null;
+                                      }
+                                      return null;
+                                    },
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ]),
+                   
+                          SizedBox(height: 4.0.h),
+                          CommonTextFieldRow(
+                            label: "Address",
+                            controller: _addressController,
+                            hintText: "Enter Address",
+                          ),
+                          
+                          SizedBox(height: 4.0.h),
+                          CommonTextFieldRow(
+                            label: "Remark",
+                            controller: _remarkController,
+                            hintText: "Enter Remark",
+                            maxLines: 2,
+                          ),
+                       ],
                       ),
                     ),
-                  ),
-                  ),
-                  SizedBox(height: 4.0.h),
-                 ],
+                  ],
                 ),
               ),
             ),
+      
+            Container(
+            padding: EdgeInsets.all(8.0.r),
+            child: Container(
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: Colors.blue[100],
+                borderRadius: BorderRadius.circular(10.0.r),
+                border: Border.all(color: const Color.fromARGB(255, 2, 196, 163), width: 1.0.w),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.6),
+                    spreadRadius: 2, blurRadius: 5,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: Column(
+                children: [
+                  SizedBox(
+                    height: 25.h,
+                    width: double.infinity,
+                    child: Card(
+                      margin: EdgeInsets.only(bottom:3.h),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.only(topLeft: Radius.circular(6.r),topRight: Radius.circular(6.r)),
+                          color: Colors.blue.shade900,
+                        ),
+                        child: Center(child: Text('Appointment Information',style:TextStyle(fontWeight:FontWeight.bold, fontSize: 16.sp, color: Colors.white))),
+                      ),
+                    ),
+                  ),
+                  Container(
+                    padding: EdgeInsets.only(left: 5.0.w,right: 5.0.w,top: 5.0.h),
+                    child: Column(
+                      children: [
+                          CommonTextFieldRow(
+                            label: "Tr.ID",
+                            controller: _trIDController,
+                            hintText: "100059",
+                          ),
+                          SizedBox(height: 4.0.h),
+                          Row(children: [
+                          Expanded(flex:6, child: Text("Apt.Date", style:AllTextStyle.textFieldHeadStyle)),
+                          const Expanded(flex: 1, child: Text(":")),
+                          Expanded(
+                            flex: 16,
+                            child: Container(
+                              height: 25.h,
+                              margin: EdgeInsets.only(bottom: 4.h),
+                              child: GestureDetector(
+                                onTap: (() {
+                                  _secondSelectedDate();
+                                }),
+                                child: TextFormField(
+                                  enabled: false,
+                                  decoration: InputDecoration(contentPadding: EdgeInsets.only(left: 5.w),
+                                    filled: true,
+                                    fillColor: Colors.white,
+                                    suffixIcon: Padding(padding: EdgeInsets.only(left: 20.w),
+                                    child: Icon(Icons.calendar_month, color: Colors.black87,size: 16.r)),
+                                    border: OutlineInputBorder(borderSide: BorderSide(color:  Colors.grey,width: 5.w)),
+                                    hintText: secondPickedDate,
+                                    hintStyle: AllTextStyle.dateFormatStyle
+                                  ),
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return null;
+                                    }
+                                    return null;
+                                  },
+                                ),
+                              ),
+                            ),
+                          ),
+                        ]),
+                         CommonTextFieldRow(
+                          label: "Department",
+                          controller: _departmentController,
+                          hintText: "Select Department",
+                        ),
+                        SizedBox(height: 4.0.h),
+                        CommonTextFieldRow(
+                          label: "Slot",
+                          controller: _slotController,
+                          hintText: "Select Slot",
+                        ),
+                        SizedBox(height: 4.0.h),
+                        CommonTextFieldRow(
+                          label: "Con.Fees",
+                          controller: _conFeesController,
+                          hintText: "0",
+                        ),
+                        SizedBox(height: 4.0.h),
+                        CommonTextFieldRow(
+                          label: "Subtotal",
+                          controller: _subTotalController,
+                          hintText: "0",
+                        ),
+                        SizedBox(height: 4.0.h),
+                        CommonTextFieldRow(
+                          label: "Remark",
+                          controller: _remarkAppointController,
+                          hintText: "Enter Remark",
+                        ),
+                        SizedBox(height: 4.0.h),
+                        CommonTextFieldRow(
+                          label: "SL.No.",
+                          controller: _sLNoController,
+                          hintText: "01",
+                        ),
+                        SizedBox(height: 4.0.h),
+                        Row(children: [
+                          Expanded(flex:6, child: Text("Apt.Time", style:AllTextStyle.textFieldHeadStyle)),
+                          const Expanded(flex: 1, child: Text(":")),
+                        Expanded(
+                        flex:16,
+                        child: Container(
+                          height: 25.h,
+                          margin: EdgeInsets.only(bottom: 4.h),
+                          child: TextField(
+                            controller: _timeController,
+                            readOnly: true,
+                            style: AllTextStyle.dateFormatStyle,
+                            decoration: InputDecoration(
+                              contentPadding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 3.h),
+                              filled: true,
+                              fillColor: Colors.white,
+                              hintText: 'Time',
+                              suffixIcon: Icon(Icons.access_time,size: 15.r),
+                              border: InputBorder.none,
+                              focusedBorder:TextFieldInputBorder.focusEnabledBorder,
+                              enabledBorder:TextFieldInputBorder.focusEnabledBorder
+                            ),
+                            onTap: _pickTime,
+                          ),
+                        ),
+                       ),]),
+                        CommonTextFieldRow(
+                          label: "Doctor",
+                          controller: _doctorNameController,
+                          hintText: "Select Doctor",
+                        ),
+                        SizedBox(height: 4.0.h),
+                        CommonTextFieldRow(
+                          label: "Reference",
+                          controller: _referenceController,
+                          hintText: "Select Reference",
+                        ),
+                        SizedBox(height: 4.0.h),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Expanded(flex: 6, child: Text("Discount", style: AllTextStyle.textFieldHeadStyle)),
+                            const Expanded(flex: 1, child: Text(":")),
+                            Expanded(
+                              flex: 7,
+                              child: Container(
+                                height: 25.0.h,
+                                child: TextField(
+                                  style: AllTextStyle.textValueStyle,
+                                  controller: _discountParcentController,
+                                  onChanged: (value) {
+                                  },
+                                  keyboardType: TextInputType.phone,
+                                  decoration: InputDecoration(contentPadding: EdgeInsets.only(left: 3.w),
+                                      hintText: "0",
+                                      filled: true,
+                                      fillColor: Colors.white,
+                                      border: InputBorder.none,
+                                      focusedBorder:TextFieldInputBorder.focusEnabledBorder,
+                                      enabledBorder:TextFieldInputBorder.focusEnabledBorder
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Expanded(flex: 3, child: Center(child: Text("%", style: AllTextStyle.textFieldHeadStyle))),
+                            Expanded(
+                              flex: 6,
+                              child: SizedBox(
+                                height: 25.0.h,
+                                child: TextField(
+                                  style: AllTextStyle.textValueStyle,
+                                  controller: _discountController,
+                                  keyboardType: TextInputType.number,
+                                  onChanged: (value) {
+                                  },
+                                  decoration: InputDecoration(
+                                    contentPadding: EdgeInsets.only(left: 3.w),
+                                    hintText: "0",
+                                    filled: true,
+                                    fillColor: Colors.white,
+                                    border: InputBorder.none,
+                                    focusedBorder:TextFieldInputBorder.focusEnabledBorder,
+                                    enabledBorder:TextFieldInputBorder.focusEnabledBorder
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 4.0.h),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Expanded(flex: 6, child: Text("Advance", style: AllTextStyle.textFieldHeadStyle)),
+                            const Expanded(flex: 1, child: Text(":")),
+                            Expanded(
+                              flex: 7,
+                              child: Container(
+                                height: 25.0.h,
+                                child: TextField(
+                                  style: AllTextStyle.textValueStyle,
+                                  controller: _advanceController,
+                                  onChanged: (value) {
+                                  },
+                                  keyboardType: TextInputType.phone,
+                                  decoration: InputDecoration(contentPadding: EdgeInsets.only(left: 3.w),
+                                      hintText: "0",
+                                      filled: true,
+                                      fillColor: Colors.white,
+                                      border: InputBorder.none,
+                                      focusedBorder:TextFieldInputBorder.focusEnabledBorder,
+                                      enabledBorder:TextFieldInputBorder.focusEnabledBorder
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Expanded(
+                              flex: 3,
+                              child: Center(child: Text("Due:", style: AllTextStyle.textFieldHeadStyle))),
+                            Expanded(
+                              flex: 6,
+                              child: Container(
+                                height: 25.h,
+                                decoration: ContDecoration.contDecoration,
+                                child: Padding(
+                                  padding: EdgeInsets.only(left: 5.w, top: 3.h),
+                                  child: Text("0",style: AllTextStyle.textValueStyle),
+                                ),
+                              )
+                            ),
+                          ],
+                        ),
+                        Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    appointType="reference";
+                                  });
+                                },
+                                child: Row(
+                                  children: [
+                                    const Text("Reference:"),
+                                    Transform.scale(
+                                      scale: 0.8,
+                                      child: Radio(
+                                          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                          visualDensity: const VisualDensity(horizontal: -4, vertical: -4),
+                                          fillColor:MaterialStateColor.resolveWith((states) => const Color.fromARGB(255, 5, 114, 165)),
+                                          value: "reference",
+                                          groupValue: appointType,
+                                          onChanged: (value) {
+                                            setState(() {
+                                              appointType = value.toString();
+                                        });
+                                          }),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              SizedBox(width: 8.w),
+                                GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    appointType="no";
+                                    });
+                                },
+                                child: Row(
+                                  children: [
+                                    const Text("No"),
+                                    Transform.scale(
+                                      scale: 0.8,
+                                      child: Radio(
+                                          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                          visualDensity: const VisualDensity(horizontal: -4, vertical: -4),
+                                          fillColor:MaterialStateColor.resolveWith((states) => const Color.fromARGB(255, 5, 114, 165)),
+                                          value: "no",
+                                          groupValue: appointType,
+                                          onChanged: (value) {
+                                            setState(() {
+                                              appointType = value.toString();
+                                          });
+                                          }),
+                                    ),
+                                    
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+              
+                      Align(
+                      alignment: Alignment.bottomRight,
+                      child: InkWell(
+                        onTap: () async {
+                          // Utils.closeKeyBoard(context);
+                          // print("Tapped Save");
+                          // if (_customerNameController.text == '') {
+                          //   Utils.showTopSnackBar(context, "Customer name is required");
+                          //   return;
+                          // }
+                          // if (_regionController.text == '') {
+                          //   Utils.showTopSnackBar(context, "Please Select Region");
+                          //   return;
+                          // }
+                          // if (_territoryController.text == '') {
+                          //   Utils.showTopSnackBar(context, "Please Select Territory");
+                          //   return;
+                          // }
+                          // if (_ownerMobileController.text == '') {
+                          //   Utils.showTopSnackBar(context, "Owner Mobile field is required");
+                          //   return;
+                          // }
+                          // if (_bankNameController.text == '') {
+                          //   Utils.showTopSnackBar(context, "Bank Name field is required");
+                          //   return;
+                          // }
+                          // if (_checkNoController.text == '') {
+                          //   Utils.showTopSnackBar(context, "Check No. field is required");
+                          //   return;
+                          // }
+                          // if (_bankBranchNameController.text == '') {
+                          //   Utils.showTopSnackBar(context, "Bank Branch field is required");
+                          //   return;
+                          // }
+                          // if (_accountNoController.text == '') {
+                          //   Utils.showTopSnackBar(context, "Account No. field is required");
+                          //   return;
+                          // }
+                          // setState(() {
+                          //   customerEntryBtnClk = true;
+                          // });
+                          // var result = await customerEntry(context);
+                          // if (result == "true") {
+                          //   Provider.of<CustomerListProvider>(context, listen: false).getCustomerList("", "", "");
+                          // }
+                          // setState(() {});
+                        },
+                        child: Container(
+                          height: 28.0.h,
+                          width: 80.0.w,
+                          decoration: BoxDecoration(
+                            color: Colors.blue.shade900,
+                            borderRadius: BorderRadius.circular(5.0.r),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey.withOpacity(0.6),
+                                spreadRadius: 2,
+                                blurRadius: 5,
+                                offset: const Offset(0, 3),
+                              ),
+                            ],
+                          ),
+                          child: Center(
+                            child: customerEntryBtnClk
+                                ? SizedBox(
+                                    height: 20.0.h,
+                                    width: 20.0.w,
+                                    child: CircularProgressIndicator(color: Colors.white),
+                                  )
+                                : Text("SAVE", style: AllTextStyle.saveButtonTextStyle),
+                          ),
+                        ),
+                      ),
+                      ),
+                      SizedBox(height: 4.0.h),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+    
             // SizedBox(height: 4.0.h),
             // CustomerListProvider.isCustomerTypeChange
             //     ? SizedBox(

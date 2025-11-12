@@ -19,13 +19,14 @@ class _TestEntryScreenState extends State<TestEntryScreen> {
     return Colors.white;
   }
   final _testIDController = TextEditingController();
-  final _departmentController = TextEditingController();
+  final _specimenController = TextEditingController();
   final _testNameController = TextEditingController();
   final _roomNoController = TextEditingController();
   final _priceController = TextEditingController();
   final _dayController = TextEditingController();
   final _hourController = TextEditingController();
   final _minuteController = TextEditingController();
+  final _remarkController = TextEditingController();
   
   // SharedPreferences? sharedPreferences;
   // Future<void> _initializeData() async {
@@ -140,18 +141,18 @@ class _TestEntryScreenState extends State<TestEntryScreen> {
 
                     SizedBox(height: 4.0.h),
                     CommonTextFieldRow(
-                      label: "Department",
-                      controller: _departmentController,
-                      hintText: "Enter Department",
-                    ),
-
-                    SizedBox(height: 4.0.h),
-                    CommonTextFieldRow(
-                      label: "Test Name",
+                      label: "Name",
                       controller: _testNameController,
                       hintText: "Enter Test Name",
                     ),
 
+                    SizedBox(height: 4.0.h),
+                     CommonTextFieldRow(
+                      label: "Specimen",
+                      controller: _specimenController,
+                      hintText: "Select Specimen",
+                    ),
+                    
                     SizedBox(height: 4.0.h),
                     CommonTextFieldRow(
                       label: "Room No",
@@ -234,6 +235,12 @@ class _TestEntryScreenState extends State<TestEntryScreen> {
                       ),
                     ],
                    ),
+                   SizedBox(height: 4.0.h),
+                    CommonTextFieldRow(
+                      label: "Remark",
+                      controller: _remarkController,
+                      hintText: "Enter Remark",
+                    ),
                   SizedBox(height: 4.0.h),  
                   Align(
                   alignment: Alignment.bottomRight,
@@ -403,7 +410,8 @@ class _TestEntryScreenState extends State<TestEntryScreen> {
     _roomNoController.text = "";
     _priceController.text = "";
     _dayController.text = "";
-    _departmentController.text = "";
+    _specimenController.text = "";
+    _remarkController.text = "";
     _hourController.text = "";
     _minuteController.text = "";
   });

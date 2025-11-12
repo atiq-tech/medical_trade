@@ -54,109 +54,110 @@ class _PatientPaymentEntryScreenState extends State<PatientPaymentEntryScreen> {
     }
   }
   bool _isDropdownOpen = false;
-  // String? getTransactionType;
-  // String? _transactionType = 'Payment';
-  // final List<String> _transactionTypeList = [
-  //   'Receive',
-  //   'Payment',
-  // ];
+  String? paymentType;
+  String? _selectedType = 'Payment';
+  final List<String> _selectedTypeList = [
+    'Received',
+    'Payment',
+  ];
 
-  // final LayerLink _trTypeLayerLink = LayerLink();
-  // OverlayEntry? _trTypeOverlayEntry;
+  final LayerLink _layerLink = LayerLink();
+  OverlayEntry? _overlayEntry;
 
-  // final GlobalKey _trkey = GlobalKey();
-  // Size _trTypeDropdownSize = Size.zero;
+  final GlobalKey _key = GlobalKey();
+  Size _dropdownSize = Size.zero;
 
-  // void _getTrTypeDropdownSize(Duration _) {
-  //   final RenderBox renderBox = _trkey.currentContext?.findRenderObject() as RenderBox;
-  //   _trTypeDropdownSize = renderBox.size;
-  // }
+  void _getDropdownSize(Duration _) {
+    final RenderBox renderBox = _key.currentContext?.findRenderObject() as RenderBox;
+    _dropdownSize = renderBox.size;
+  }
 
-  // void _toggleTrTypeDropdown() {
-  //   if (_isDropdownOpen) {
-  //     _removeTrTypeDropdown();
-  //   } else {
-  //     _showTrTypeDropdown();
-  //   }
-  // }
+  void _toggleDropdown() {
+    if (_isDropdownOpen) {
+      _removeDropdown();
+    } else {
+      _showDropdown();
+    }
+  }
 
-  // void _showTrTypeDropdown() {
-  //   _trTypeOverlayEntry = _createTrTypeOverlayEntry();
-  //   Overlay.of(context).insert(_trTypeOverlayEntry!);
-  //   setState(() {
-  //     _isDropdownOpen = true;
-  //   });
-  // }
+  void _showDropdown() {
+    _overlayEntry = _createOverlayEntry();
+    Overlay.of(context).insert(_overlayEntry!);
+    setState(() {
+      _isDropdownOpen = true;
+    });
+  }
 
-  // void _removeTrTypeDropdown() {
-  //   _trTypeOverlayEntry?.remove();
-  //   _trTypeOverlayEntry = null;
-  //   setState(() {
-  //     _isDropdownOpen = false;
-  //   });
-  // }
+  void _removeDropdown() {
+    _overlayEntry?.remove();
+    _overlayEntry = null;
+    setState(() {
+      _isDropdownOpen = false;
+    });
+  }
 
-  // OverlayEntry _createTrTypeOverlayEntry() {
-  //   return OverlayEntry(
-  //     builder: (context) => GestureDetector(
-  //       onTap: _removeTrTypeDropdown,
-  //       behavior: HitTestBehavior.translucent,
-  //       child: Stack(
-  //         children: [
-  //           Positioned(
-  //             width: _trTypeDropdownSize.width,
-  //             child: CompositedTransformFollower(
-  //               link: _trTypeLayerLink,
-  //               showWhenUnlinked: false,
-  //               offset: Offset(0.0, _trTypeDropdownSize.height + 2),
-  //               child: Material(
-  //                 elevation: 9.0,
-  //                 color: Colors.blue.shade50,
-  //                 borderRadius: BorderRadius.circular(5.r),
-  //                 child: Column(
-  //                   mainAxisSize: MainAxisSize.min,
-  //                   children: _transactionTypeList.asMap().entries.map((entry) {
-  //                     final index = entry.key;
-  //                     final type = entry.value;
-  //                     return InkWell(
-  //                       onTap: () {
-  //                         _onSelectedTRType(type);
-  //                         _removeTrTypeDropdown();
-  //                       },
-  //                       child: Column(
-  //                         children: [
-  //                           Container(
-  //                             width: double.infinity,
-  //                             padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
-  //                             child: Text(type, style: TextStyle(fontSize: 13.sp)),
-  //                           ),
-  //                           if (index != _transactionTypeList.length - 1)
-  //                             Divider(height: 1.h, thickness: 0.8, color: Colors.indigo.shade400),
-  //                         ],
-  //                       ),
-  //                     );
-  //                   }).toList(),
-  //                 ),
-  //               ),
-  //             ),
-  //           ),
-  //         ],
-  //       ),
-  //     ),
-  //   );
-  // }
+  OverlayEntry _createOverlayEntry() {
+    return OverlayEntry(
+      builder: (context) => GestureDetector(
+        onTap: _removeDropdown,
+        behavior: HitTestBehavior.translucent,
+        child: Stack(
+          children: [
+            Positioned(
+              width: _dropdownSize.width,
+              child: CompositedTransformFollower(
+                link: _layerLink,
+                showWhenUnlinked: false,
+                offset: Offset(0.0, _dropdownSize.height + 0),
+                child: Material(
+                  elevation: 9.0,
+                  color: Colors.blue.shade50,
+                  borderRadius: BorderRadius.circular(5.r),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: _selectedTypeList.asMap().entries.map((entry) {
+                      final index = entry.key;
+                      final type = entry.value;
+                      return InkWell(
+                        onTap: () {
+                          _onSelectedType(type);
+                          _removeDropdown();
+                        },
+                        child: Column(
+                          children: [
+                            Container(
+                              width: double.infinity,
+                              padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
+                              child: Text(type, style: TextStyle(fontSize: 13.sp)),
+                            ),
+                            if (index != _selectedTypeList.length - 1)
+                              Divider(height: 1.h, thickness: 0.8, color: Colors.indigo.shade400),
+                          ],
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
-  // void _onSelectedTRType(String selectedValue) {
-  //      setState(() {
-  //         _transactionType = selectedValue;
-  //         if (selectedValue == "Receive") {
-  //           getTransactionType = "CR";
-  //         }
-  //         if (selectedValue == "Payment") {
-  //           getTransactionType = "CP";
-  //         }
-  //   });
-  // }
+  void _onSelectedType(String selectedValue) {
+       setState(() {
+         _selectedType = selectedValue;
+       if (selectedValue == "Received") {
+          paymentType = "In Cash";
+        }
+       if (selectedValue == "Payment") {
+          paymentType = "Out Cash";
+        }
+    });
+  }
+
 
   bool isBankListClicked = false;
   String? getPaymentType;
@@ -295,7 +296,7 @@ final LayerLink _pTypeLayerLink = LayerLink();
   
   @override
   void initState() {
-    //WidgetsBinding.instance.addPostFrameCallback(_getTrTypeDropdownSize);
+    WidgetsBinding.instance.addPostFrameCallback(_getDropdownSize);
     WidgetsBinding.instance.addPostFrameCallback(_getPTypeDropdownSize);
     // _initializeData();
     firstPickedDate = Utils.formatFrontEndDate(DateTime.now());
@@ -624,6 +625,46 @@ final LayerLink _pTypeLayerLink = LayerLink();
                                     ),
                                   ],
                                 ),
+                                SizedBox(height: 4.h),
+                                  Row(
+                                    children: [
+                                      Expanded(flex: 6,child: Text("Tr. Type",style:AllTextStyle.textFieldHeadStyle)),
+                                      const Expanded(flex: 1, child: Text(":")),
+                                      Expanded(
+                                        flex: 11,
+                                        child: CompositedTransformTarget(
+                                          link: _layerLink,
+                                          child: GestureDetector(
+                                          onTap: _toggleDropdown,
+                                          child: Container(
+                                          key: _key,
+                                          padding: EdgeInsets.symmetric(horizontal: 6.w),
+                                          height: 25.h,
+                                          decoration: ContDecoration.contDecoration,
+                                        child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                      Text(
+                                    _selectedType!,
+                                    style: TextStyle(fontSize: 13.sp),
+                                  ),
+                                  GestureDetector(
+                                    onTap: _toggleDropdown,
+                                    child: Icon(
+                                      color: Colors.grey.shade700,
+                                      _isDropdownOpen
+                                          ? Icons.arrow_drop_up
+                                          : Icons.arrow_drop_down,
+                                    ),
+                                  ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
                                 SizedBox(height: 3.h),
                                 Row(
                                   children: [
@@ -684,7 +725,7 @@ final LayerLink _pTypeLayerLink = LayerLink();
                                 SizedBox(height: 3.h),
                                 Row(
                                   children: [
-                                    Expanded(flex: 6,child:Text("Description",style:AllTextStyle.textFieldHeadStyle)),
+                                    Expanded(flex: 6,child:Text("Note",style:AllTextStyle.textFieldHeadStyle)),
                                     const Expanded(flex: 1, child: Text(":")),
                                     Expanded(
                                       flex: 11,
@@ -695,7 +736,7 @@ final LayerLink _pTypeLayerLink = LayerLink();
                                           maxLines: 2,
                                           controller: _descriptionController,
                                           decoration: InputDecoration(contentPadding: EdgeInsets.symmetric(vertical: 5.h, horizontal: 5.w),
-                                            hintText: "Note",
+                                            hintText: "Remarks",
                                             filled: true,
                                             fillColor: Colors.white,
                                             border: InputBorder.none,
@@ -714,25 +755,25 @@ final LayerLink _pTypeLayerLink = LayerLink();
                                Row(
                                   mainAxisAlignment: MainAxisAlignment.end,
                                   children: [
-                                    InkWell(
-                                      onTap: () {
-                                        emtyMethod();
-                                        FocusScope.of(context).requestFocus(quantityFocusNode);
-                                      },
-                                      child: Container(
-                                        height: 28.h,
-                                        width: 100.w,
-                                        decoration: BoxDecoration(
-                                          color: const Color.fromARGB(255, 252, 33, 4),
-                                          borderRadius: BorderRadius.circular(5.r),
-                                          boxShadow: [
-                                            BoxShadow(color: Colors.grey.withOpacity(0.6),spreadRadius: 2.r,blurRadius: 5.r,offset: const Offset(0, 3)),
-                                          ],
-                                        ),
-                                        child: Center(child: Text("Clear",style:AllTextStyle.saveButtonTextStyle)),
-                                      ),
-                                    ),
-                                    SizedBox(width: 10.w),
+                                    // InkWell(
+                                    //   onTap: () {
+                                    //     emtyMethod();
+                                    //     FocusScope.of(context).requestFocus(quantityFocusNode);
+                                    //   },
+                                    //   child: Container(
+                                    //     height: 28.h,
+                                    //     width: 100.w,
+                                    //     decoration: BoxDecoration(
+                                    //       color: const Color.fromARGB(255, 252, 33, 4),
+                                    //       borderRadius: BorderRadius.circular(5.r),
+                                    //       boxShadow: [
+                                    //         BoxShadow(color: Colors.grey.withOpacity(0.6),spreadRadius: 2.r,blurRadius: 5.r,offset: const Offset(0, 3)),
+                                    //       ],
+                                    //     ),
+                                    //     child: Center(child: Text("Clear",style:AllTextStyle.saveButtonTextStyle)),
+                                    //   ),
+                                    // ),
+                                    // SizedBox(width: 10.w),
                                     InkWell(
                                       onTap: () {
                                         // if(supplierController.text == ''){
@@ -789,7 +830,7 @@ final LayerLink _pTypeLayerLink = LayerLink();
                                         ),
                                         child: Center(
                                             child: isBtnLoading ? SizedBox(height: 20.h,width:20.w,child: CircularProgressIndicator(color: Colors.white,)) : Text(
-                                                "Save",style:AllTextStyle.saveButtonTextStyle)),
+                                                "Paid",style:AllTextStyle.saveButtonTextStyle)),
                                       ),
                                     ),
                                   ],

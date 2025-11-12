@@ -1,4 +1,5 @@
 library;
+import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
@@ -31,14 +32,23 @@ class _TestReceiptScreenState extends State<TestReceiptScreen> {
   final _dayController = TextEditingController();
   final _hourController = TextEditingController();
   final _minuteController = TextEditingController();
-  final _othersController = TextEditingController();
-  final _refferedController = TextEditingController();
+  final _collectionChargeController = TextEditingController();
+  final _subAmountController = TextEditingController();
   final _addressController = TextEditingController();
   final _vatPercentageController = TextEditingController();
   final _vatController = TextEditingController();
   final _discountParcentageController = TextEditingController();
   final _discountController = TextEditingController();
   final _paidController = TextEditingController();
+   final _yearController = TextEditingController();
+  final _monthController = TextEditingController();
+  final _dayAgeController = TextEditingController();
+  final _testDiscountParcentController = TextEditingController();
+  final _testDiscountController = TextEditingController();
+  final _doctorController = TextEditingController();
+  final _referenceByController = TextEditingController();
+  final _invoiceNoController = TextEditingController();
+  final _sLNoController = TextEditingController();
   
   // SharedPreferences? sharedPreferences;
   // Future<void> _initializeData() async {
@@ -51,7 +61,7 @@ class _TestReceiptScreenState extends State<TestReceiptScreen> {
   //   print("userType==== $userType");
   // }
 
-  String? customerType = "";
+  String? invoiceType = "";
   String? employeeSlNo;
   String? employeeId = "";
   String? userEmployeeId = "";
@@ -82,6 +92,26 @@ class _TestReceiptScreenState extends State<TestReceiptScreen> {
     }
   }
 
+  String? secondPickedDate;
+  void _secondSelectedDate() async {
+    final selectedDate = await showDatePicker(
+        context: context,
+        initialDate: DateTime.now(),
+        firstDate: DateTime(1950),
+        lastDate: DateTime(2050));
+    if (selectedDate != null) {
+      setState(() {
+        secondPickedDate = Utils.formatFrontEndDate(selectedDate);
+        backEndSecondtDate = Utils.formatBackEndDate(selectedDate);
+      });
+    }else{
+      setState(() {
+        secondPickedDate = Utils.formatFrontEndDate(toDay);
+        backEndSecondtDate = Utils.formatBackEndDate(toDay);
+      });
+    }
+  }
+
   final TextEditingController _dateController = TextEditingController();
   final TextEditingController _timeController = TextEditingController();
 
@@ -99,24 +129,38 @@ class _TestReceiptScreenState extends State<TestReceiptScreen> {
     }
   }
 
-  Future<void> _pickTime() async {
-    TimeOfDay? picked = await showTimePicker(
-      context: context,
-      initialTime: TimeOfDay.now(),
-    );
-    if (picked != null) {
-      final now = DateTime.now();
-      final dt = DateTime(now.year, now.month, now.day, picked.hour, picked.minute);
-      setState(() {
-        _timeController.text = DateFormat('HH:mm').format(dt);
-      });
-    }
+ Future<void> _pickTime() async {
+  TimeOfDay? picked = await showTimePicker(
+    context: context,
+    initialTime: TimeOfDay.now(),
+  );
+
+  if (picked != null) {
+    final now = DateTime.now();
+    final dt = DateTime(now.year, now.month, now.day, picked.hour, picked.minute);
+
+    setState(() {
+      _timeController.text = DateFormat('hh:mm a').format(dt);  // ✅ 12-hour format with AM/PM
+    });
   }
+}
+
   List<AddToCartModel> addToCartList = [];
+
+  // ✅ Variables
+  final List<String> _allGender = ["Male", "Female", "Other"];
+  String? _selectedGender;
+
+  // ✅ Controller
+  final TextEditingController _genderController = TextEditingController();
+
+
   @override
   void initState() {
     firstPickedDate = Utils.formatFrontEndDate(DateTime.now());
     backEndFirstDate = Utils.formatBackEndDate(DateTime.now());
+    secondPickedDate = Utils.formatFrontEndDate(DateTime.now());
+    backEndSecondtDate = Utils.formatBackEndDate(DateTime.now());
     // TODO: implement initState
     super.initState();
     //_initializeData();
@@ -171,7 +215,7 @@ bool _isDiscountAmountChanging = false;
 void _calculateTotals() {
   double vatPercentage = double.tryParse(_vatPercentageController.text) ?? 0;
   double discountPercentage = double.tryParse(_discountParcentageController.text) ?? 0;
-  double others = double.tryParse(_othersController.text) ?? 0;
+  double others = double.tryParse(_collectionChargeController.text) ?? 0;
   double paid = double.tryParse(_paidController.text) ?? 0;
 
   double vatAmount = subTotal * vatPercentage / 100;
@@ -288,8 +332,8 @@ void _onDiscountAmountChanged(String value) {
     _dayController.clear();
     _hourController.clear();
     _minuteController.clear();
-    _othersController.clear();
-    _refferedController.clear();
+    _collectionChargeController.clear();
+    _referenceByController.clear();
     _addressController.clear();
     _vatPercentageController.clear();
     _vatController.clear();
@@ -333,9 +377,8 @@ void _onDiscountAmountChanged(String value) {
               padding: EdgeInsets.all(8.0.r),
               child: Container(
                 width: double.infinity,
-                padding: EdgeInsets.only(left: 5.0.w,right: 5.0.w,top: 5.0.h),
                 decoration: BoxDecoration(
-                  color: Color.fromARGB(255, 186, 185, 245),
+                  color: const Color.fromARGB(255, 170, 216, 240),
                   borderRadius: BorderRadius.circular(10.0.r),
                   border: Border.all(color: const Color.fromARGB(255, 2, 196, 163), width: 1.0.w),
                   boxShadow: [
@@ -348,77 +391,234 @@ void _onDiscountAmountChanged(String value) {
                 ),
                 child: Column(
                   children: [
-                    Row(children: [
-                      Expanded(flex:6, child: Text("Bill Date", style:AllTextStyle.textFieldHeadStyle)),
-                      const Expanded(flex: 1, child: Text(":")),
-                      Expanded(
-                        flex: 16,
-                        child: Container(
+                    SizedBox(
                           height: 25.h,
-                          margin: EdgeInsets.only(bottom: 4.h),
-                          child: GestureDetector(
-                            onTap: (() {
-                              //FocusScope.of(context).requestFocus(quantityFocusNode);
-                              _firstSelectedDate();
-                            }),
-                            child: TextFormField(
-                              enabled: false,
-                              decoration: InputDecoration(contentPadding: EdgeInsets.only(left: 5.w),
-                                filled: true,
-                                fillColor: Colors.white,
-                                suffixIcon: Padding(padding: EdgeInsets.only(left: 20.w),
-                                child: Icon(Icons.calendar_month, color: Colors.black87,size: 16.r)),
-                                border: OutlineInputBorder(borderSide: BorderSide(color:  Colors.grey,width: 5.w)),
-                                hintText: firstPickedDate,
-                                hintStyle: AllTextStyle.dateFormatStyle
+                          width: double.infinity,
+                          child: Card(
+                            margin: EdgeInsets.only(bottom:3.h),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.only(topLeft: Radius.circular(6.r),topRight: Radius.circular(6.r)),
+                                color: const Color.fromARGB(255, 70, 54, 141),
                               ),
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return null;
-                                }
-                                return null;
-                              },
+                              child: Center(child: Text('Test Information',style:TextStyle(fontWeight:FontWeight.bold, fontSize: 16.sp, color: Colors.white))),
                             ),
                           ),
                         ),
+                    Container(
+                       padding: EdgeInsets.only(left: 5.0.w,right: 5.0.w,top: 5.0.h),
+                      child: Column(
+                        children: [
+                          
+                          CommonTextFieldRow(
+                            label: "Patient",
+                            controller: _patientController,
+                            hintText: "Select Patient",
+                          ),
+                      
+                          SizedBox(height: 4.0.h),
+                          CommonTextFieldRow(
+                            label: "Name",
+                            controller: _nameController,
+                            hintText: "Enter Name",
+                          ),
+                      
+                          SizedBox(height: 4.0.h),
+                          CommonTextFieldRow(
+                            label: "Mobile No",
+                            controller: _mobileController,
+                            hintText: "Enter Mobile",
+                          ),
+                          SizedBox(height: 4.0.h),
+                          Row(
+                            children: [
+                              Expanded(flex: 6,child: Text("Gender",style: AllTextStyle.dateFormatStyle)),
+                              const Expanded(flex: 1, child: Text(":")),
+                              Expanded(
+                                flex: 16,
+                                child: DropdownButtonHideUnderline(
+                                  child: DropdownButton2<String>(
+                                    isExpanded: true,
+                                    hint: Text(
+                                      _selectedGender ?? "Select gender",
+                                      style: TextStyle(
+                                        fontSize: 12.sp,
+                                        color: _selectedGender == null
+                                            ? Colors.grey
+                                            : const Color.fromARGB(221, 83, 83, 83),
+                                      ),
+                                    ),
+                                    // ✅ Items
+                                    items: _allGender
+                                        .map((gender) => DropdownMenuItem(
+                                              value: gender,
+                                              child: Text(
+                                                gender,
+                                                style: AllTextStyle.dateFormatStyle,
+                                              ),
+                                            ))
+                                        .toList(),
+
+                                    // ✅ Value
+                                    value: _selectedGender,
+                                    // ✅ On Change
+                                    onChanged: (value) {
+                                      setState(() {
+                                        _selectedGender = value!;
+                                        _genderController.text = value;
+                                      });
+                                    },
+
+                                    // ✅ Style
+                                    buttonStyleData: ButtonStyleData(
+                                      height: 25.h,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(5.r),
+                                        border: Border.all(color: Colors.grey),
+                                        color: Colors.white,
+                                      ),
+                                    ),
+
+                                    iconStyleData: IconStyleData(
+                                      icon: const Icon(Icons.arrow_drop_down),
+                                      iconSize: 24.r,
+                                    ),
+
+                                    dropdownStyleData: DropdownStyleData(
+                                      maxHeight: 200.h,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(5.r),
+                                        color: Colors.white,
+                                      ),
+                                    ),
+
+                                    menuItemStyleData: MenuItemStyleData(
+                                      height: 32.h,
+                                      padding:
+                                          const EdgeInsets.symmetric(horizontal: 5.0),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 4.0.h),
+                          Row(
+                            children: [
+                              Expanded(flex: 6,child: Text("Age ", style: AllTextStyle.textFieldHeadStyle)),
+                              const Expanded(flex: 1,child: Text(":")),
+                              Expanded(
+                                flex: 5,
+                                child: SizedBox(
+                                  height: 25.0.h,
+                                  child: TextField(
+                                    controller: _yearController,
+                                    style: AllTextStyle.dropDownlistStyle,
+                                    decoration: InputDecoration(
+                                      hintText: "Year",
+                                      hintStyle: AllTextStyle.textValueStyle,
+                                      contentPadding: EdgeInsets.only(left: 5.w, top: 4.h),
+                                      filled: true,
+                                      fillColor: Colors.white,
+                                      border: InputBorder.none,
+                                      focusedBorder: TextFieldInputBorder.focusEnabledBorder,
+                                      enabledBorder: TextFieldInputBorder.focusEnabledBorder,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(width: 5.w),
+                              Expanded(
+                                flex: 5,
+                                child: SizedBox(
+                                  height: 25.0.h,
+                                  child: TextField(
+                                    controller: _monthController,
+                                    style: AllTextStyle.dropDownlistStyle,
+                                    decoration: InputDecoration(
+                                      hintText: "Month",
+                                      hintStyle: AllTextStyle.textValueStyle,
+                                      contentPadding: EdgeInsets.only(left: 5.w, top: 4.h),
+                                      filled: true,
+                                      fillColor: Colors.white,
+                                      border: InputBorder.none,
+                                      focusedBorder: TextFieldInputBorder.focusEnabledBorder,
+                                      enabledBorder: TextFieldInputBorder.focusEnabledBorder,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(width: 5.w),
+                              Expanded(
+                                flex: 5,
+                                child: SizedBox(
+                                  height: 25.0.h,
+                                  child: TextField(
+                                    controller: _dayAgeController,
+                                    style: AllTextStyle.dropDownlistStyle,
+                                    decoration: InputDecoration(
+                                      hintText: "Day",
+                                      hintStyle: AllTextStyle.textValueStyle,
+                                      contentPadding: EdgeInsets.only(left: 5.w, top: 4.h),
+                                      filled: true,
+                                      fillColor: Colors.white,
+                                      border: InputBorder.none,
+                                      focusedBorder: TextFieldInputBorder.focusEnabledBorder,
+                                      enabledBorder: TextFieldInputBorder.focusEnabledBorder,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                         SizedBox(height: 4.0.h),
+                          Row(children: [
+                            Expanded(flex:6, child: Text("Date of Birth", style:AllTextStyle.textFieldHeadStyle)),
+                            const Expanded(flex: 1, child: Text(":")),
+                            Expanded(
+                              flex: 16,
+                              child: Container(
+                                height: 25.h,
+                                child: GestureDetector(
+                                  onTap: (() {
+                                    //FocusScope.of(context).requestFocus(quantityFocusNode);
+                                    _firstSelectedDate();
+                                  }),
+                                  child: TextFormField(
+                                    enabled: false,
+                                    decoration: InputDecoration(contentPadding: EdgeInsets.only(left: 5.w),
+                                      filled: true,
+                                      fillColor: Colors.white,
+                                      suffixIcon: Padding(padding: EdgeInsets.only(left: 20.w),
+                                      child: Icon(Icons.calendar_month, color: Colors.black87,size: 16.r)),
+                                      border: OutlineInputBorder(borderSide: BorderSide(color:  Colors.grey,width: 5.w)),
+                                      hintText: firstPickedDate,
+                                      hintStyle: AllTextStyle.dateFormatStyle
+                                    ),
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return null;
+                                      }
+                                      return null;
+                                    },
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ]),
+                   
+                          SizedBox(height: 4.0.h),
+                          CommonTextFieldRow(
+                            label: "Address",
+                            controller: _addressController,
+                            hintText: "Enter Address",
+                            maxLines: 2,
+                          ),
+                          
+                       ],
                       ),
-                    ]),
-                    CommonTextFieldRow(
-                      label: "Patient",
-                      controller: _patientController,
-                      hintText: "Select Patient",
                     ),
-
-                    SizedBox(height: 4.0.h),
-                    CommonTextFieldRow(
-                      label: "Name",
-                      controller: _nameController,
-                      hintText: "Enter Name",
-                    ),
-
-                    SizedBox(height: 4.0.h),
-                    CommonTextFieldRow(
-                      label: "Mobile",
-                      controller: _mobileController,
-                      hintText: "Enter Mobile",
-                    ),
-
-                    SizedBox(height: 4.0.h),
-                    CommonTextFieldRow(
-                      label: "Referred by",
-                      controller: _refferedController,
-                      hintText: "Atiqur Rahman Atiq",
-                    ),
-                    
-                    SizedBox(height: 4.0.h),
-                    CommonTextFieldRow(
-                      label: "Address",
-                      controller: _addressController,
-                      hintText: "Enter Address",
-                      maxLines: 2,
-                    ),
-                    
-                 ],
+                  ],
                 ),
               ),
             ),
@@ -441,56 +641,6 @@ void _onDiscountAmountChanged(String value) {
                 ),
                 child: Column(
                   children: [
-                    Row(children: [
-                      Expanded(flex:6, child: Text("Delivery Date", style:AllTextStyle.textFieldHeadStyle)),
-                      const Expanded(flex: 1, child: Text(":")),
-                      Expanded(
-                        flex: 9,
-                        child: Container(
-                          height: 25.h,
-                          margin: EdgeInsets.only(bottom: 4.h,right: 3.w),
-                          child: TextField(
-                            controller: _dateController,
-                            readOnly: true,
-                            style: AllTextStyle.dateFormatStyle,
-                            decoration: InputDecoration(
-                              contentPadding: EdgeInsets.symmetric(horizontal: 3.w, vertical: 3.h),
-                              filled: true,
-                              fillColor: Colors.white,
-                              hintText: 'Date',
-                              suffixIcon: Icon(Icons.calendar_today,size: 12.r),
-                              border: InputBorder.none,
-                              focusedBorder:TextFieldInputBorder.focusEnabledBorder,
-                              enabledBorder:TextFieldInputBorder.focusEnabledBorder
-                            ),
-                            onTap: _pickDate,
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        flex: 7,
-                        child: Container(
-                          height: 25.h,
-                          margin: EdgeInsets.only(bottom: 4.h),
-                          child: TextField(
-                            controller: _timeController,
-                            readOnly: true,
-                            style: AllTextStyle.dateFormatStyle,
-                            decoration: InputDecoration(
-                              contentPadding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 3.h),
-                              filled: true,
-                              fillColor: Colors.white,
-                              hintText: 'Time',
-                              suffixIcon: Icon(Icons.access_time,size: 12.r),
-                              border: InputBorder.none,
-                              focusedBorder:TextFieldInputBorder.focusEnabledBorder,
-                              enabledBorder:TextFieldInputBorder.focusEnabledBorder
-                            ),
-                            onTap: _pickTime,
-                          ),
-                        ),
-                      ),
-                    ]),
                     CommonTextFieldRow(
                       label: "Test Name",
                       controller: _testNameController,
@@ -512,6 +662,119 @@ void _onDiscountAmountChanged(String value) {
                       hintText: "0",
                       keyboardType: TextInputType.number,
                     ),
+                     SizedBox(height: 4.0.h),
+                    CommonTextFieldRow(
+                      label: "Sub Amount",
+                      controller: _subAmountController,
+                      hintText: "0",
+                      keyboardType: TextInputType.number,
+                    ),
+                    SizedBox(height: 4.0.h),
+                     Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Expanded(flex: 6, child: Text("Discount", style: AllTextStyle.textFieldHeadStyle)),
+                        const Expanded(flex: 1, child: Text(":")),
+                        Expanded(
+                          flex: 8,
+                          child: Container(
+                            height: 25.0.h,
+                            margin: EdgeInsets.only(left: 3.w, right: 5.w),
+                            child: TextField(
+                              style: AllTextStyle.textValueStyle,
+                              controller: _testDiscountParcentController,
+                              onChanged: (value) {
+                              },
+                              keyboardType: TextInputType.phone,
+                              decoration: InputDecoration(contentPadding: EdgeInsets.only(left: 3.w),
+                                  hintText: "0",
+                                  filled: true,
+                                  fillColor: Colors.white,
+                                  border: InputBorder.none,
+                                  focusedBorder:TextFieldInputBorder.focusEnabledBorder,
+                                  enabledBorder:TextFieldInputBorder.focusEnabledBorder
+                              ),
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 4.w),
+                        Text("%", style: AllTextStyle.textFieldHeadStyle),
+                        SizedBox(width: 8.w),
+                        Expanded(
+                          flex: 7,
+                          child: SizedBox(
+                            height: 25.0.h,
+                            child: TextField(
+                              style: AllTextStyle.textValueStyle,
+                              controller: _testDiscountController,
+                              keyboardType: TextInputType.number,
+                              onChanged: (value) {
+                              },
+                              decoration: InputDecoration(
+                                contentPadding: EdgeInsets.only(left: 6.w),
+                                hintText: "0",
+                                filled: true,
+                                fillColor: Colors.white,
+                                border: InputBorder.none,
+                                focusedBorder:TextFieldInputBorder.focusEnabledBorder,
+                                enabledBorder:TextFieldInputBorder.focusEnabledBorder
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 4.0.h),
+                    Row(children: [
+                      Expanded(flex:6, child: Text("Delivery At", style:AllTextStyle.textFieldHeadStyle)),
+                      const Expanded(flex: 1, child: Text(":")),
+                      Expanded(
+                        flex: 9,
+                        child: Container(
+                          height: 25.h,
+                          margin: EdgeInsets.only(bottom: 4.h,right: 3.w),
+                          child: TextField(
+                            controller: _dateController,
+                            readOnly: true,
+                            style: TextStyle(fontSize: 12),
+                            decoration: InputDecoration(
+                              contentPadding: EdgeInsets.symmetric(vertical: 3.h),
+                              filled: true,
+                              fillColor: Colors.white,
+                              hintText: 'Date',
+                              suffixIcon: Icon(Icons.calendar_today,size: 12.r),
+                              border: InputBorder.none,
+                              focusedBorder:TextFieldInputBorder.focusEnabledBorder,
+                              enabledBorder:TextFieldInputBorder.focusEnabledBorder
+                            ),
+                            onTap: _pickDate,
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        flex: 7,
+                        child: Container(
+                          height: 25.h,
+                          margin: EdgeInsets.only(bottom: 4.h),
+                          child: TextField(
+                            controller: _timeController,
+                            readOnly: true,
+                            style: TextStyle(fontSize: 12),
+                            decoration: InputDecoration(
+                              contentPadding: EdgeInsets.symmetric(vertical: 3.h),
+                              filled: true,
+                              fillColor: Colors.white,
+                              hintText: 'Time',
+                              suffixIcon: Icon(Icons.access_time,size: 12.r),
+                              border: InputBorder.none,
+                              focusedBorder:TextFieldInputBorder.focusEnabledBorder,
+                              enabledBorder:TextFieldInputBorder.focusEnabledBorder
+                            ),
+                            onTap: _pickTime,
+                          ),
+                        ),
+                      ),
+                    ]),
                     SizedBox(height: 4.0.h),
                    Align(
                     alignment: Alignment.bottomRight,
@@ -604,6 +867,196 @@ void _onDiscountAmountChanged(String value) {
               ),
             ),
             Container(
+            padding: EdgeInsets.all(8.0.r),
+            child: Container(
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: const Color.fromARGB(255, 170, 216, 240),
+                borderRadius: BorderRadius.circular(10.0.r),
+                border: Border.all(color: const Color.fromARGB(255, 2, 196, 163), width: 1.0.w),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.6),
+                    spreadRadius: 2, blurRadius: 5,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: Column(
+                children: [
+                  SizedBox(
+                    height: 25.h,
+                    width: double.infinity,
+                    child: Card(
+                      margin: EdgeInsets.only(bottom:3.h),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.only(topLeft: Radius.circular(6.r),topRight: Radius.circular(6.r)),
+                          color:const Color.fromARGB(255, 70, 54, 141),
+                        ),
+                        child: Center(child: Text('Invoice Details',style:TextStyle(fontWeight:FontWeight.bold, fontSize: 16.sp, color: Colors.white))),
+                      ),
+                    ),
+                  ),
+                  Container(
+                      padding: EdgeInsets.only(left: 5.0.w,right: 5.0.w,top: 5.0.h),
+                    child: Column(
+                      children: [
+                        CommonTextFieldRow(
+                          label: "Invoice No",
+                          controller: _invoiceNoController,
+                          hintText: "1000550",
+                        ),
+                    
+                        SizedBox(height: 4.0.h),
+                        CommonTextFieldRow(
+                          label: "SL No",
+                          controller: _sLNoController,
+                          hintText: "1",
+                        ),
+                    
+                        SizedBox(height: 4.0.h),
+                        CommonTextFieldRow(
+                          label: "Doctor",
+                          controller: _doctorController,
+                          hintText: "Select Doctor",
+                        ),
+
+                        SizedBox(height: 4.0.h),
+                        CommonTextFieldRow(
+                          label: "Ref.By",
+                          controller: _referenceByController,
+                          hintText: "Select Reference",
+                        ),
+                        SizedBox(height: 4.0.h),
+                        Row(children: [
+                          Expanded(flex:6, child: Text("Date", style:AllTextStyle.textFieldHeadStyle)),
+                          const Expanded(flex: 1, child: Text(":")),
+                          Expanded(
+                            flex: 16,
+                            child: Container(
+                              height: 25.h,
+                              child: GestureDetector(
+                                onTap: (() {
+                                  //FocusScope.of(context).requestFocus(quantityFocusNode);
+                                  _secondSelectedDate();
+                                }),
+                                child: TextFormField(
+                                  enabled: false,
+                                  decoration: InputDecoration(contentPadding: EdgeInsets.only(left: 5.w),
+                                    filled: true,
+                                    fillColor: Colors.white,
+                                    suffixIcon: Padding(padding: EdgeInsets.only(left: 20.w),
+                                    child: Icon(Icons.calendar_month, color: Colors.black87,size: 16.r)),
+                                    border: OutlineInputBorder(borderSide: BorderSide(color:  Colors.grey,width: 5.w)),
+                                    hintText: secondPickedDate,
+                                    hintStyle: AllTextStyle.dateFormatStyle
+                                  ),
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return null;
+                                    }
+                                    return null;
+                                  },
+                                ),
+                              ),
+                            ),
+                          ),
+                        ]),
+                            Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    invoiceType="doctor";
+                                  });
+                                },
+                                child: Row(
+                                  children: [
+                                    const Text("Doctor:"),
+                                    Transform.scale(
+                                      scale: 0.8,
+                                      child: Radio(
+                                          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                          visualDensity: const VisualDensity(horizontal: -4, vertical: -4),
+                                          fillColor:MaterialStateColor.resolveWith((states) => const Color.fromARGB(255, 5, 114, 165)),
+                                          value: "doctor",
+                                          groupValue: invoiceType,
+                                          onChanged: (value) {
+                                            setState(() {
+                                              invoiceType = value.toString();
+                                        });
+                                          }),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              SizedBox(width: 8.w),
+                                GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    invoiceType="ref";
+                                    });
+                                },
+                                child: Row(
+                                  children: [
+                                    const Text("Ref.:"),
+                                    Transform.scale(
+                                      scale: 0.8,
+                                      child: Radio(
+                                          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                          visualDensity: const VisualDensity(horizontal: -4, vertical: -4),
+                                          fillColor:MaterialStateColor.resolveWith((states) => const Color.fromARGB(255, 5, 114, 165)),
+                                          value: "ref",
+                                          groupValue: invoiceType,
+                                          onChanged: (value) {
+                                            setState(() {
+                                              invoiceType = value.toString();
+                                          });
+                                          }),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              SizedBox(width: 8.w),
+                                GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    invoiceType="no";
+                                    });
+                                },
+                                child: Row(
+                                  children: [
+                                    const Text("No"),
+                                    Transform.scale(
+                                      scale: 0.8,
+                                      child: Radio(
+                                          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                          visualDensity: const VisualDensity(horizontal: -4, vertical: -4),
+                                          fillColor:MaterialStateColor.resolveWith((states) => const Color.fromARGB(255, 5, 114, 165)),
+                                          value: "no",
+                                          groupValue: invoiceType,
+                                          onChanged: (value) {
+                                            setState(() {
+                                              invoiceType = value.toString();
+                                          });
+                                          }),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+              
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+            Container(
               width: double.infinity,
               margin: EdgeInsets.only(top: 10.h, left: 10.0.w, right: 10.0.w, bottom: 5.h),
               decoration: BoxDecoration(
@@ -638,6 +1091,36 @@ void _onDiscountAmountChanged(String value) {
                                 child: Text(double.parse("$subTotal").toStringAsFixed(0), style: AllTextStyle.textValueStyle,
                                 ),
                               )),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Expanded(flex: 6, child: Text("Collection Charge",style: AllTextStyle.textFieldHeadStyle)),
+                          const Expanded(flex: 1, child: Text(":")),
+                          Expanded(
+                            flex: 8,
+                            child: Container(
+                              height: 25.0.h,
+                              margin: EdgeInsets.only(top: 4.h),
+                              child: TextField(
+                                style: AllTextStyle.textValueStyle,
+                                controller: _collectionChargeController,
+                                onChanged: (value) {
+                                  _calculateTotals();
+                                },
+                                keyboardType: TextInputType.number,
+                                decoration: InputDecoration(
+                                  contentPadding: EdgeInsets.only(top: 5.h, left: 3.w),
+                                  hintText: "0",
+                                  filled: true,
+                                  fillColor: Colors.white,
+                                  border: InputBorder.none,
+                                  focusedBorder:TextFieldInputBorder.focusEnabledBorder,
+                                  enabledBorder:TextFieldInputBorder.focusEnabledBorder
+                                ),
+                              ),
+                            ),
+                          ),
                         ],
                       ),
                       Row(
@@ -760,40 +1243,11 @@ void _onDiscountAmountChanged(String value) {
                           ),
                         ],
                       ),
-                      Row(
-                        children: [
-                          Expanded(flex: 6, child: Text("Others",style: AllTextStyle.textFieldHeadStyle)),
-                          const Expanded(flex: 1, child: Text(":")),
-                          Expanded(
-                            flex: 16,
-                            child: Container(
-                              height: 25.0.h,
-                              margin: EdgeInsets.only(top: 4.h, bottom: 4.h),
-                              child: TextField(
-                                style: AllTextStyle.textValueStyle,
-                                controller: _othersController,
-                                onChanged: (value) {
-                                  _calculateTotals();
-                                },
-                                keyboardType: TextInputType.number,
-                                decoration: InputDecoration(
-                                  contentPadding: EdgeInsets.only(top: 5.h, left: 3.w),
-                                  hintText: "0",
-                                  filled: true,
-                                  fillColor: Colors.white,
-                                  border: InputBorder.none,
-                                  focusedBorder:TextFieldInputBorder.focusEnabledBorder,
-                                  enabledBorder:TextFieldInputBorder.focusEnabledBorder
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
+                      SizedBox(height: 4.0.h),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          Expanded(flex: 6, child: Text("Total Bill",style: AllTextStyle.textFieldHeadStyle)),
+                          Expanded(flex: 6, child: Text("Total",style: AllTextStyle.textFieldHeadStyle)),
                           const Expanded(flex: 1, child: Text(":")),
                           Expanded(
                             flex: 16,
@@ -885,7 +1339,7 @@ void _onDiscountAmountChanged(String value) {
                                   color: const Color.fromARGB(255, 118, 160, 4),
                                   borderRadius: BorderRadius.circular(5.0.r),
                                 ),
-                                child: Center(child: Text("Clear", style: AllTextStyle.saveButtonTextStyle),
+                                child: Center(child: Text("New", style: AllTextStyle.saveButtonTextStyle),
                                 ),
                               ),
                             ),

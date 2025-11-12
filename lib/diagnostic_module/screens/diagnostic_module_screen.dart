@@ -1,17 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:medical_trade/diagnostic_module/screens/appointment_entry_screen.dart';
-import 'package:medical_trade/diagnostic_module/screens/appointment_list_screen.dart';
 import 'package:medical_trade/diagnostic_module/screens/bank_transaction_entry_screen.dart';
 import 'package:medical_trade/diagnostic_module/screens/cash_transaction_entry_screen.dart';
+import 'package:medical_trade/diagnostic_module/screens/commission_payment_entry_screen.dart';
 import 'package:medical_trade/diagnostic_module/screens/doctor_entry_screen.dart';
 import 'package:medical_trade/diagnostic_module/screens/doctor_list_screen.dart';
 import 'package:medical_trade/diagnostic_module/screens/patient_entry_screen.dart';
 import 'package:medical_trade/diagnostic_module/screens/patient_list_screen.dart';
 import 'package:medical_trade/diagnostic_module/screens/patient_payment_entry_screen.dart';
-import 'package:medical_trade/diagnostic_module/screens/supplier_payment_entry_screen.dart';
 import 'package:medical_trade/diagnostic_module/screens/test_entry_screen.dart';
-import 'package:medical_trade/diagnostic_module/screens/test_receipt_list_screen.dart';
 import 'package:medical_trade/diagnostic_module/screens/test_receipt_screen.dart';
 import 'package:medical_trade/utilities/assets_manager.dart';
 import 'package:medical_trade/utilities/color_manager.dart';
@@ -52,21 +50,21 @@ class DiagnosticModuleScreen extends StatelessWidget {
         'icon': DiagnosticModule.testReceipt,
         'color': Colors.indigo,
       },
-      {
-        'title': 'Test Receipt List',
-        'icon': DiagnosticModule.testReceiptList,
-        'color': Colors.green
-      },
+      // {
+      //   'title': 'Test Receipt List',
+      //   'icon': DiagnosticModule.testReceiptList,
+      //   'color': Colors.green
+      // },
       {
         'title': 'Appointment Entry',
         'icon': DiagnosticModule.appointment,
-        'color': const Color.fromARGB(255, 1, 160, 192),
+        'color': const Color.fromARGB(255, 162, 173, 2),
       },
-      {
-        'title': 'Appointment List',
-        'icon': DiagnosticModule.appointmentList,
-        'color': const Color.fromARGB(255, 46, 118, 133),
-      },
+      // {
+      //   'title': 'Appointment List',
+      //   'icon': DiagnosticModule.appointmentList,
+      //   'color': const Color.fromARGB(255, 46, 118, 133),
+      // },
       {
         'title': 'Cash Transaction',
         'icon': DiagnosticModule.cashTransaction,
@@ -78,7 +76,7 @@ class DiagnosticModuleScreen extends StatelessWidget {
         'color': Colors.green,
       },
       {
-        'title': 'Supplier Payment',
+        'title': 'Commission Payment',
         'icon': DiagnosticModule.supplierPay,
         'color': Colors.brown
       },
@@ -119,12 +117,12 @@ class DiagnosticModuleScreen extends StatelessWidget {
                :item['title']=="Patient List" ? Navigator.push(context,MaterialPageRoute(builder: (_) => PatientListScreen()))
                :item['title']=="Test Entry" ? Navigator.push(context,MaterialPageRoute(builder: (_) => TestEntryScreen()))
                :item['title']=="Appointment Entry" ?Navigator.push(context,MaterialPageRoute(builder: (_) => AppointmentEntryScreen())) 
-               :item['title']=="Appointment List" ?Navigator.push(context,MaterialPageRoute(builder: (_) => AppointmentListScreen()))
+              // :item['title']=="Appointment List" ?Navigator.push(context,MaterialPageRoute(builder: (_) => AppointmentListScreen()))
                :item['title']=="Test Receipt" ?Navigator.push(context,MaterialPageRoute(builder: (_) => TestReceiptScreen()))
-               :item['title']=="Test Receipt List" ?Navigator.push(context,MaterialPageRoute(builder: (_) => TestReceiptListScreen()))
+               //:item['title']=="Test Receipt List" ?Navigator.push(context,MaterialPageRoute(builder: (_) => TestReceiptListScreen()))
                :item['title']=="Cash Transaction" ?Navigator.push(context,MaterialPageRoute(builder: (_) => CashTransactionEntryScreen()))
                :item['title']=="Bank Transaction" ?Navigator.push(context,MaterialPageRoute(builder: (_) => BankTransactionEntryScreen()))
-               :item['title']=="Supplier Payment" ?Navigator.push(context,MaterialPageRoute(builder: (_) => SupplierPaymentEntryScreen()))
+               :item['title']=="Commission Payment" ?Navigator.push(context,MaterialPageRoute(builder: (_) => CommissionPaymentEntryScreen()))
                :item['title']=="Doctor Entry" ?Navigator.push(context,MaterialPageRoute(builder: (_) => DoctorEntryScreen()))
                :item['title']=="Doctor List" ?Navigator.push(context,MaterialPageRoute(builder: (_) => DoctorListScreen()))
                : Navigator.push(context,MaterialPageRoute(builder: (_) => PatientPaymentEntryScreen()));

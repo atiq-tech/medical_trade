@@ -634,21 +634,18 @@ class _BankTransactionEntryScreenState extends State<BankTransactionEntryScreen>
                             const Expanded(flex: 1, child: Text(":")),
                             Expanded(
                               flex: 11,
-                              child: SizedBox(
-                                height: 25.h,
-                                width: MediaQuery.of(context).size.width / 2,
-                                child: TextField(
-                                  style: TextStyle(fontSize: 13.sp),
-                                  controller: _noteController,
-                                  decoration: InputDecoration(
-                                    contentPadding: EdgeInsets.symmetric(vertical: 5.h,horizontal: 5.w),
-                                    hintText: "Note here",
-                                    filled: true,
-                                    fillColor: Colors.white,
-                                    border: InputBorder.none,
-                                    focusedBorder:TextFieldInputBorder.focusEnabledBorder,
-                                    enabledBorder:TextFieldInputBorder.focusEnabledBorder,
-                                  ),
+                              child: TextField(
+                                style: TextStyle(fontSize: 13.sp),
+                                controller: _noteController,
+                                maxLines: 2,
+                                decoration: InputDecoration(
+                                  contentPadding: EdgeInsets.symmetric(vertical: 5.h,horizontal: 5.w),
+                                  hintText: "Remarks",
+                                  filled: true,
+                                  fillColor: Colors.white,
+                                  border: InputBorder.none,
+                                  focusedBorder:TextFieldInputBorder.focusEnabledBorder,
+                                  enabledBorder:TextFieldInputBorder.focusEnabledBorder,
                                 ),
                               ),
                             ),
@@ -658,14 +655,14 @@ class _BankTransactionEntryScreenState extends State<BankTransactionEntryScreen>
                       ///HiddenItemsLoading(controller: quantityController,focusNode: quantityFocusNode),
                         SizedBox(height: 5.h),
                         Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          mainAxisAlignment: MainAxisAlignment.end,
                           children: [
-                            Row(
-                              children: [
-                                const Text("Current Balance    :  "),
-                                Text("$currentBalance"),
-                              ],
-                            ),
+                            // Row(
+                            //   children: [
+                            //     const Text("Current Balance    :  "),
+                            //     Text("$currentBalance"),
+                            //   ],
+                            // ),
                             // ((role == 'Superadmin' || role == 'admin') || actionList.contains('e') == true) ?
                              InkWell(
                               onTap: () {

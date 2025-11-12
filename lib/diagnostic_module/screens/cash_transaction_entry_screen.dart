@@ -22,6 +22,8 @@ class _CashTransactionEntryScreenState extends State<CashTransactionEntryScreen>
   final _AmountController = TextEditingController();
   final tnxIdNoController = TextEditingController();
   var quantityController = TextEditingController();
+  final bankAccountController = TextEditingController();
+  
   ///new condition
   FocusNode quantityFocusNode = FocusNode();
 
@@ -130,6 +132,114 @@ class _CashTransactionEntryScreenState extends State<CashTransactionEntryScreen>
     });
   }
 
+
+   bool isBankListClicked = false;
+  String? getPaymentType;
+  String? _paymentType = 'Cash';
+  final List<String> _paymentTypeList = [
+    'Cash',
+    'Bank',
+  ];
+
+final LayerLink _pTypeLayerLink = LayerLink();
+  OverlayEntry? _pTypeOverlayEntry;
+
+  final GlobalKey _pkey = GlobalKey();
+  Size _pTypeDropdownSize = Size.zero;
+
+  void _getPTypeDropdownSize(Duration _) {
+    final RenderBox renderBox = _pkey.currentContext?.findRenderObject() as RenderBox;
+    _pTypeDropdownSize = renderBox.size;
+  }
+
+  void _togglePTypeDropdown() {
+    if (_isDropdownOpen) {
+      _removePTypeDropdown();
+    } else {
+      _showPTypeDropdown();
+    }
+  }
+
+  void _showPTypeDropdown() {
+    _pTypeOverlayEntry = _createPTypeOverlayEntry();
+    Overlay.of(context).insert(_pTypeOverlayEntry!);
+    setState(() {
+      _isDropdownOpen = true;
+    });
+  }
+
+  void _removePTypeDropdown() {
+    _pTypeOverlayEntry?.remove();
+    _pTypeOverlayEntry = null;
+    setState(() {
+      _isDropdownOpen = false;
+    });
+  }
+
+  OverlayEntry _createPTypeOverlayEntry() {
+    return OverlayEntry(
+      builder: (context) => GestureDetector(
+        onTap: _removePTypeDropdown,
+        behavior: HitTestBehavior.translucent,
+        child: Stack(
+          children: [
+            Positioned(
+              width: _pTypeDropdownSize.width,
+              child: CompositedTransformFollower(
+                link: _pTypeLayerLink,
+                showWhenUnlinked: false,
+                offset: Offset(0.0, _pTypeDropdownSize.height + 2),
+                child: Material(
+                  elevation: 9.0,
+                  color: Colors.blue.shade50,
+                  borderRadius: BorderRadius.circular(5.r),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: _paymentTypeList.asMap().entries.map((entry) {
+                      final index = entry.key;
+                      final type = entry.value;
+                      return InkWell(
+                        onTap: () {
+                          _onSelectedPType(type);
+                          _removePTypeDropdown();
+                        },
+                        child: Column(
+                          children: [
+                            Container(
+                              width: double.infinity,
+                              padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
+                              child: Text(type, style: TextStyle(fontSize: 13.sp)),
+                            ),
+                            if (index != _paymentTypeList.length - 1)
+                              Divider(height: 1.h, thickness: 0.8, color: Colors.indigo.shade400),
+                          ],
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _onSelectedPType(String selectValue) {
+     setState(() {
+      _paymentType = selectValue;
+      if (selectValue == "Cash") {
+        getPaymentType = "cash";
+      }
+      if (selectValue == "Bank") {
+        getPaymentType = "bank";
+      }
+      _paymentType == "Bank" ? isBankListClicked = true : isBankListClicked = false;
+     });
+  }
+
+
   //String? _selectedAccount;
   String? firstPickedDate;
   var backEndFirstDate;
@@ -186,6 +296,7 @@ class _CashTransactionEntryScreenState extends State<CashTransactionEntryScreen>
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback(_getDropdownSize);
+    WidgetsBinding.instance.addPostFrameCallback(_getPTypeDropdownSize);
     //_initializeData();
     firstPickedDate = Utils.formatFrontEndDate(DateTime.now());
     backEndFirstDate = Utils.formatBackEndDate(DateTime.now());
@@ -235,7 +346,7 @@ class _CashTransactionEntryScreenState extends State<CashTransactionEntryScreen>
       });
     }
   }
-  final  _accountController = TextEditingController();
+  //final  _accountController = TextEditingController();
   @override
   Widget build(BuildContext context) {
     mainScrollController.addListener(mainScrollListener);
@@ -276,366 +387,463 @@ class _CashTransactionEntryScreenState extends State<CashTransactionEntryScreen>
           child: Column(
             children: [
               Container(
-                padding: EdgeInsets.only(top:8.h,left: 8.w, right: 8.w,bottom: 6.h),
-                child: Container(
-                    width: double.infinity,
-                    padding: EdgeInsets.all(4.r),
-                    decoration: BoxDecoration(
-                    color: Colors.deepPurple.shade100,
-                      borderRadius: BorderRadius.circular(10.r),
-                      border: Border.all(color: const Color.fromARGB(255,7,125,180),width: 1.w),
-                      boxShadow: [
-                        // ignore: deprecated_member_use
-                        BoxShadow(color: Colors.grey.withOpacity(0.6),spreadRadius: 2,blurRadius: 5.r,offset: const Offset(0, 3)),
-                      ],
-                    ),
-                  child: Column(
-                    children: [
-                      Row(
-                        children: [
-                          Expanded(flex: 6,child: Text("Tr. Id",style:AllTextStyle.textFieldHeadStyle)),
-                          const Expanded(flex: 1, child: Text(':')),
-                          Expanded(
-                            flex: 15,
-                            child: Container(
-                              height: 25.h,
-                              decoration: ContDecoration.contDecoration,
-                              child: TextField(
-                                style: AllTextStyle.dropDownlistStyle,
-                                controller: tnxIdNoController,
-                                decoration: InputDecoration(contentPadding: EdgeInsets.only(bottom: 17.5.h,left: 5.w),
-                                  enabled: false,
-                                  filled: true,
-                                  border: InputBorder.none,
-                                  focusedBorder: TextFieldInputBorder.focusEnabledBorder,
-                                  enabledBorder: TextFieldInputBorder.focusEnabledBorder
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 4.h),
-                      Row(
-                        children: [
-                          Expanded(flex: 6,child: Text("Tr. Type",style:AllTextStyle.textFieldHeadStyle)),
-                          const Expanded(flex: 1, child: Text(":")),
-                          Expanded(
-                        flex: 15,
-                        child: CompositedTransformTarget(
-                          link: _layerLink,
-                          child: GestureDetector(
-                          onTap: _toggleDropdown,
-                          child: Container(
-                          key: _key,
-                          padding: EdgeInsets.symmetric(horizontal: 6.w),
-                          height: 25.h,
-                           decoration: ContDecoration.contDecoration,
-                         child: Row(
-                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                       children: [
-                       Text(
-                    _selectedType!,
-                    style: TextStyle(fontSize: 13.sp),
-                  ),
-                  GestureDetector(
-                    onTap: _toggleDropdown,
-                    child: Icon(
-                      color: Colors.grey.shade700,
-                      _isDropdownOpen
-                          ? Icons.arrow_drop_up
-                          : Icons.arrow_drop_down,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-       ),
-                      ],
-                    ),
-                      SizedBox(height: 4.h),
-                      Row(
-                        children: [
-                          Expanded(flex: 6,child:Text("Account",style:AllTextStyle.textFieldHeadStyle)),
-                          const Expanded(flex: 1, child: Text(":")),
-                          Expanded(
-                            flex: 15,
-                            child: Container(
-                              height: 25.h,
-                              width: MediaQuery.of(context).size.width / 2,
-                              decoration: ContDecoration.contDecoration,
-                            //    child: TypeAheadField<AccountModel>(
-                            //    controller: _accountController,
-                            //    builder: (context, controller, focusNode) {
-                            //      return TextField(
-                            //        controller: controller,
-                            //        focusNode: focusNode,
-                            //        style: TextStyle(fontSize: 13, color: Colors.grey.shade800, overflow: TextOverflow.ellipsis),
-                            //        decoration: InputDecoration(contentPadding: EdgeInsets.only(left: 5.0, top: 4.0),
-                            //          isDense: true,
-                            //          hintText: 'Select Account',
-                            //          hintStyle: TextStyle(fontSize: 13),
-                            //          suffixIcon: _selectedAccount == '' || _selectedAccount == 'null' || _selectedAccount == null || controller.text == '' ? null
-                            //              : GestureDetector(
-                            //            onTap: () {
-                            //              setState(() {
-                            //                _accountController.clear();
-                            //                controller.clear();
-                            //                _selectedAccount = null;
-                            //              });
-                            //            },
-                            //            child: Padding(padding: EdgeInsets.all(5), child: Icon(Icons.close, size: 16)),
-                            //          ),
-                            //          suffixIconConstraints: BoxConstraints(maxHeight: 30),
-                            //          filled: false,
-                            //          fillColor: Colors.white,
-                            //          border: InputBorder.none,
-                            //        ),
-                            //          onTap: () {
-                            //         if (_selectedAccount != null && _selectedAccount != '' && _selectedAccount != 'null') {
-                            //          setState(() {
-                            //             _accountController.clear();
-                            //             controller.clear();
-                            //             _selectedAccount = null;
-                            //            });
-                            //          }
-                            //         },
-                            //      );
-                            //    },
-                            //    suggestionsCallback: (pattern) async {
-                            //     return Future.delayed(const Duration(seconds: 1), () {
-                            //    return allAccountList
-                            //     .where((element) => element.name.toLowerCase().contains(pattern.toLowerCase()))
-                            //    .toList().cast<AccountModel>(); 
-                            //     });
-                            //     },
-                             
-                            //    itemBuilder: (context, AccountModel suggestion) {
-                            //      return Padding(
-                            //        padding: EdgeInsets.symmetric(horizontal: 6,vertical: 4),
-                            //        child: Text("${suggestion.code} - ${suggestion.name}",
-                            //          style: TextStyle(fontSize: 12), maxLines: 1, overflow: TextOverflow.ellipsis,
-                            //        ),
-                            //      );
-                            //    },
-                            //    onSelected: (AccountModel suggestion) {
-                            //        setState(() {
-                            //         _accountController.text = "${suggestion.code} - ${suggestion.name}";
-                            //         _selectedAccount = suggestion.id.toString();
-                            //       });  
-                            //    },
-                            //  ),
-                            
-                            ),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          Expanded(flex:6,child:Text("Tr.Date",style:AllTextStyle.textFieldHeadStyle)),
-                          const Expanded(flex: 1, child: Text(":")),
-                          Expanded(
-                            flex: 15,
-                            child: Container(
-                              margin: EdgeInsets.only(top: 4.h, bottom: 4.h),
-                              height: 25.h,
-                              decoration: ContDecoration.contDecoration,
-                              child: GestureDetector(
-                                onTap: (() {
-                                  FocusScope.of(context).requestFocus(quantityFocusNode);
-                                  firstSelectedDate();
-                                }),
-                                child: TextFormField(
-                                  enabled: false,
-                                  decoration: InputDecoration(
-                                    contentPadding: EdgeInsets.only(left: 5.w),
-                                    suffixIcon: Padding(padding: EdgeInsets.only(left: 20.w),
-                                      child: Icon(Icons.calendar_month,color: Colors.black87,size: 16.r),
-                                    ),
-                                    border: const OutlineInputBorder(borderSide: BorderSide.none),
-                                    hintText: firstPickedDate,
-                                    hintStyle: AllTextStyle.dateFormatStyle
-                                  ),
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return null;
-                                    }
-                                    return null;
-                                  },
-                                ),
-                              // ):GestureDetector(
-                              //   onTap: (() {
-                              //     // FocusScope.of(context).requestFocus(quantityFocusNode);
-                              //     // firstSelectedDate();
-                              //   }),
-                              //   child: TextFormField(
-                              //     enabled: false,
-                              //     decoration: InputDecoration(
-                              //       contentPadding: const EdgeInsets.only(left: 5),
-                              //       // suffixIcon: const Padding(padding: EdgeInsets.only(left: 20.0),
-                              //       //   child: Icon(Icons.calendar_month,color: Colors.black87,size: 16),
-                              //       // ),
-                              //       border: const OutlineInputBorder(borderSide: BorderSide.none),
-                              //       hintText: firstPickedDate,
-                              //       hintStyle: AllTextStyle.dateFormatStyle
-                              //     ),
-                              //     validator: (value) {
-                              //       if (value == null || value.isEmpty) {
-                              //         return null;
-                              //       }            return null;
-                              //     },
-                              //   ),
-                              ),
-                            ),
-                          )
-                        ,
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          Expanded(flex: 6,child:Text("Description",style:AllTextStyle.textFieldHeadStyle)),
-                          const Expanded(flex: 1, child: Text(":")),
-                          Expanded(
-                            flex: 15,
-                            child: SizedBox(
-                              height: 25.h,
-                              width: MediaQuery.of(context).size.width / 2,
-                              child: TextField(
-                                style: AllTextStyle.dropDownlistStyle,
-                                controller: _DescriptionController,
-                                decoration: InputDecoration(
-                                  contentPadding: EdgeInsets.symmetric(vertical: 5.h, horizontal: 5.w),
-                                  hintText: "Note",
-                                  hintStyle: AllTextStyle.dropDownlistStyle,
-                                  filled: true,
-                                  fillColor: Colors.white,
-                                  border: InputBorder.none,
-                                  focusedBorder: TextFieldInputBorder.focusEnabledBorder,
-                                  enabledBorder: TextFieldInputBorder.focusEnabledBorder
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 4.h),
-                      Row(
-                        children: [
-                          Expanded(flex: 6,child: Text("Amount",style:AllTextStyle.textFieldHeadStyle)),
-                          const Expanded(flex: 1, child: Text(":")),
-                          Expanded(
-                            flex: 15,
-                            child: SizedBox(
-                              height: 25.h,
-                              width: MediaQuery.of(context).size.width / 2,
-                              child: TextField(
-                                style: TextStyle(fontSize: 13.sp),
-                                controller: _AmountController,
-                                keyboardType: TextInputType.number,
-                                decoration: InputDecoration(contentPadding: EdgeInsets.symmetric(vertical: 5.h, horizontal: 5.w),
-                                  hintText: "0",
-                                  filled: true,
-                                  fillColor: Colors.white,
-                                  border: InputBorder.none,
-                                  focusedBorder: TextFieldInputBorder.focusEnabledBorder,
-                                  enabledBorder: TextFieldInputBorder.focusEnabledBorder
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      ///=====customer loading hide 
-                      ///HiddenItemsLoading(controller: quantityController,focusNode: quantityFocusNode),
-                      SizedBox(height: 5.h),
-                    //  ((role == 'Superadmin' || role == 'admin') || actionList.contains('e') == true) ?
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          InkWell(
-                            onTap: () {
-                              FocusScope.of(context).requestFocus(quantityFocusNode);
-                              _AmountController.text = '';
-                              _DescriptionController.text = '';
-                              //_selectedAccount = "";
-                              _accountController.text = "";
-                              _selectedType = "";
-                            },
-                            child: Container(
-                              height: 25.h,
-                              width: 100.w,
-                              decoration: BoxDecoration(
-                                color: const Color.fromARGB(255, 252, 33, 4),
-                                borderRadius: BorderRadius.circular(5.r),
-                                boxShadow: [
-                                  // ignore: deprecated_member_use
-                                  BoxShadow(color: Colors.grey.withOpacity(0.6),spreadRadius: 2,blurRadius: 5.r,offset: const Offset(0, 3)),
-                                ],
-                              ),
-                              child: Center(child: Text("Clear",style:AllTextStyle.saveButtonTextStyle)),
-                            ),
-                          ),
-                          SizedBox(width: 10.w),
-                          InkWell(
-                            onTap: () {
-                              // Utils.closeKeyBoard(context);
-                              // if(_accountController.text ==''){
-                              //   Utils.errorSnackBar(context, "Account field is required");
-                              // }
-                              // else if(_AmountController.text == ''){
-                              //   Utils.errorSnackBar(context, "Amount field is required");
-                              // }
-                              // else{
-                              //   setState(() {
-                              //     isLoading = true;
-                              //   });
-                              //   fetchAddCashTransactions(
-                              //       context,
-                              //       int.parse("$_selectedAccount"),
-                              //       tnxIdNoController.text,
-                              //       "$backEndFirstDate",
-                              //       _DescriptionController.text,
-                              //       paymentType == "In Cash" ? _AmountController.text:'0',
-                              //       paymentType == "In Cash" ? '0':_AmountController.text,
-                              //       paymentType
-
-                              //   ).then((value){
-                              //     if(value=="true"){
-                              //       _AmountController.text = '';
-                              //       _DescriptionController.text = '';
-                              //       _selectedAccount = "";
-                              //       _accountController.text = "";
-                              //       paymentType = "";
-                              //       Provider.of<CashTransactionProvider>(context, listen: false).getCashTransactionApi(" ","${Utils.formatBackEndDate(DateTime.now())}","${Utils.formatBackEndDate(DateTime.now())}","");
-                              //       getCashTransactionId();
-                              //       setState(() {
-                              //       });
-                              //     }
-                              //   });
-                              // }
-                            },
-                            child: Container(
-                              height: 25.h,
-                              width: 100.w,
-                              decoration: BoxDecoration(
-                                color:Colors.indigo,
-                                borderRadius: BorderRadius.circular(5.r),
-                                boxShadow: [
-                                  // ignore: deprecated_member_use
-                                  BoxShadow(color: Colors.grey.withOpacity(0.6),spreadRadius: 2,blurRadius: 5.r,offset: const Offset(0, 3)),
-                                ],
-                              ),
-                              child: Center(child: isLoading ? SizedBox(height: 20.h,width:20.h,child: CircularProgressIndicator(color: Colors.white,)) : Text(
-                                  "Save", style:AllTextStyle.saveButtonTextStyle)),
-                            ),
-                          ),
-                        ],
-                      ),
-                      // :SizedBox(),
+                  width: double.infinity,
+                  margin: EdgeInsets.all(8.r),
+                  decoration: BoxDecoration(
+                  color: Colors.deepPurple.shade100,
+                    borderRadius: BorderRadius.circular(10.r),
+                    border: Border.all(color: const Color.fromARGB(255,7,125,180),width: 1.w),
+                    boxShadow: [
+                      // ignore: deprecated_member_use
+                      BoxShadow(color: Colors.grey.withOpacity(0.6),spreadRadius: 2,blurRadius: 5.r,offset: const Offset(0, 3)),
                     ],
                   ),
+                child: Column(
+                  children: [
+                    SizedBox(
+                      height: 25.h,
+                      width: double.infinity,
+                      child: Card(
+                        margin: EdgeInsets.only(bottom:3.h),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.only(topLeft: Radius.circular(6.r),topRight: Radius.circular(6.r)),
+                            color:const Color.fromARGB(255, 70, 54, 141),
+                          ),
+                          child: Center(child: Text('Cash Transaction Information',style:TextStyle(fontWeight:FontWeight.bold, fontSize: 14.sp, color: Colors.white))),
+                        ),
+                      ),
+                    ),
+                    Container(
+                      padding: EdgeInsets.only(top:3.h,left: 8.w, right: 6.w,bottom: 6.h),
+                      child: Column(
+                        children: [
+                          Row(
+                            children: [
+                              Expanded(flex: 6,child: Text("Tr. No",style:AllTextStyle.textFieldHeadStyle)),
+                              const Expanded(flex: 1, child: Text(':')),
+                              Expanded(
+                                flex: 15,
+                                child: Container(
+                                  height: 25.h,
+                                  decoration: ContDecoration.contDecoration,
+                                  child: TextField(
+                                    style: AllTextStyle.dropDownlistStyle,
+                                    controller: tnxIdNoController,
+                                    decoration: InputDecoration(contentPadding: EdgeInsets.only(bottom: 17.5.h,left: 5.w),
+                                      enabled: false,
+                                      filled: true,
+                                      border: InputBorder.none,
+                                      focusedBorder: TextFieldInputBorder.focusEnabledBorder,
+                                      enabledBorder: TextFieldInputBorder.focusEnabledBorder
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 4.h),
+                          Row(
+                            children: [
+                              Expanded(flex: 6,child: Text("Tr. Type",style:AllTextStyle.textFieldHeadStyle)),
+                              const Expanded(flex: 1, child: Text(":")),
+                              Expanded(
+                            flex: 15,
+                            child: CompositedTransformTarget(
+                              link: _layerLink,
+                              child: GestureDetector(
+                              onTap: _toggleDropdown,
+                              child: Container(
+                              key: _key,
+                              padding: EdgeInsets.symmetric(horizontal: 6.w),
+                              height: 25.h,
+                               decoration: ContDecoration.contDecoration,
+                             child: Row(
+                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                           children: [
+                           Text(
+                        _selectedType!,
+                        style: TextStyle(fontSize: 13.sp),
+                      ),
+                      GestureDetector(
+                        onTap: _toggleDropdown,
+                        child: Icon(
+                          color: Colors.grey.shade700,
+                          _isDropdownOpen
+                              ? Icons.arrow_drop_up
+                              : Icons.arrow_drop_down,
+                        ),
+                      ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                             ),
+                          ],
+                        ),
+                        SizedBox(height: 3.h),
+                        Row(
+                        children: [
+                          Expanded(flex: 6, child: Text("Pay. Type",style: AllTextStyle.textFieldHeadStyle)),
+                          const Expanded(flex: 1, child: Text(":")),
+                          Expanded(
+                          flex: 15,
+                          child: CompositedTransformTarget(
+                            link: _pTypeLayerLink,
+                            child: GestureDetector(
+                            onTap: _togglePTypeDropdown,
+                            child: Container(
+                            key: _pkey,
+                            padding: EdgeInsets.symmetric(horizontal: 6.w),
+                            height: 25.h,
+                            decoration: ContDecoration.contDecoration,
+                          child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                        Text(
+                      _paymentType!,
+                      style: TextStyle(fontSize: 13.sp),
+                    ),
+                    GestureDetector(
+                      onTap: _togglePTypeDropdown,
+                      child: Icon(
+                        color: Colors.grey.shade700,
+                        _isDropdownOpen
+                            ? Icons.arrow_drop_up
+                            : Icons.arrow_drop_down,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        ],
+                        ),
+                        SizedBox(height: 4.h),
+                        isBankListClicked == true
+                          ? Row(
+                            children: [
+                              Expanded(flex: 6,child: Text("Bank",style: AllTextStyle.textFieldHeadStyle)),
+                              const Expanded(flex: 1, child: Text(":")),
+                              Expanded(
+                                flex: 15,
+                                child: Container(
+                                  height: 25.h,
+                                  width: MediaQuery.of(context).size.width / 2,
+                                  margin: EdgeInsets.only(bottom: 4.h),
+                                  decoration: ContDecoration.contDecoration,
+                                  // child: TypeAheadField<BankAccountModel>(
+                                  // controller: bankAccountController,
+                                  // builder: (context, controller, focusNode) {
+                                  // return TextField(
+                                  // controller: controller,
+                                  // focusNode: focusNode,
+                                  // style: TextStyle(fontSize: 13, color: Colors.grey.shade800, overflow: TextOverflow.ellipsis),
+                                  // decoration: InputDecoration(contentPadding: EdgeInsets.only(left: 5.0, top: 4.0),
+                                  //   isDense: true,
+                                  //   hintText: 'Select Account',
+                                  //   hintStyle: TextStyle(fontSize: 13),
+                                  //   suffixIcon: _selectedBankAccount == '' || _selectedBankAccount == 'null' || _selectedBankAccount == null || controller.text == '' ? null
+                                  //       : GestureDetector(
+                                  //     onTap: () {
+                                  //       setState(() {
+                                  //         bankAccountController.clear();
+                                  //         controller.clear();
+                                  //         _selectedBankAccount = null;
+                                  //       });
+                                  //     },
+                                  //     child: Padding(padding: EdgeInsets.all(5), child: Icon(Icons.close, size: 16)),
+                                  //   ),
+                                  //   suffixIconConstraints: BoxConstraints(maxHeight: 30),
+                                  //   filled: false,
+                                  //   fillColor: Colors.white,
+                                  //   border: InputBorder.none,
+                                  // ),
+                                  // );
+                                  // },
+                                  // suggestionsCallback: (pattern) async {
+                                  // return Future.delayed(const Duration(seconds: 1), () {
+                                  //   return allBankAccountList
+                                  //   .where((element) => element.name.toLowerCase().contains(pattern.toLowerCase()))
+                                  //   .toList().cast<BankAccountModel>(); 
+                                  //   });
+                                  //   },                    
+                                  // itemBuilder: (context, BankAccountModel suggestion) {
+                                  //   return Padding(
+                                  // padding: EdgeInsets.symmetric(horizontal: 6,vertical: 4),
+                                  // child: Text("${suggestion.name} - ${suggestion.number} (${suggestion.bankName})",
+                                  //   style: TextStyle(fontSize: 12), maxLines: 1, overflow: TextOverflow.ellipsis,
+                                  // ),
+                                  // );
+                                  // },
+                                  // onSelected: (BankAccountModel suggestion) {
+                                  // setState(() {
+                                  //   bankAccountController.text = "${suggestion.name} - ${suggestion.number} (${suggestion.bankName})";
+                                  //   _selectedBankAccount = suggestion.id.toString();
+                                  // });  
+                                  // },
+                                  // ),
+                              
+                                ),
+                              ),
+                            ],
+                          ): Container(),
+                          Row(
+                            children: [
+                              Expanded(flex: 6,child:Text("Account",style:AllTextStyle.textFieldHeadStyle)),
+                              const Expanded(flex: 1, child: Text(":")),
+                              Expanded(
+                                flex: 15,
+                                child: Container(
+                                  height: 25.h,
+                                  width: MediaQuery.of(context).size.width / 2,
+                                  decoration: ContDecoration.contDecoration,
+                                //    child: TypeAheadField<AccountModel>(
+                                //    controller: _accountController,
+                                //    builder: (context, controller, focusNode) {
+                                //      return TextField(
+                                //        controller: controller,
+                                //        focusNode: focusNode,
+                                //        style: TextStyle(fontSize: 13, color: Colors.grey.shade800, overflow: TextOverflow.ellipsis),
+                                //        decoration: InputDecoration(contentPadding: EdgeInsets.only(left: 5.0, top: 4.0),
+                                //          isDense: true,
+                                //          hintText: 'Select Account',
+                                //          hintStyle: TextStyle(fontSize: 13),
+                                //          suffixIcon: _selectedAccount == '' || _selectedAccount == 'null' || _selectedAccount == null || controller.text == '' ? null
+                                //              : GestureDetector(
+                                //            onTap: () {
+                                //              setState(() {
+                                //                _accountController.clear();
+                                //                controller.clear();
+                                //                _selectedAccount = null;
+                                //              });
+                                //            },
+                                //            child: Padding(padding: EdgeInsets.all(5), child: Icon(Icons.close, size: 16)),
+                                //          ),
+                                //          suffixIconConstraints: BoxConstraints(maxHeight: 30),
+                                //          filled: false,
+                                //          fillColor: Colors.white,
+                                //          border: InputBorder.none,
+                                //        ),
+                                //          onTap: () {
+                                //         if (_selectedAccount != null && _selectedAccount != '' && _selectedAccount != 'null') {
+                                //          setState(() {
+                                //             _accountController.clear();
+                                //             controller.clear();
+                                //             _selectedAccount = null;
+                                //            });
+                                //          }
+                                //         },
+                                //      );
+                                //    },
+                                //    suggestionsCallback: (pattern) async {
+                                //     return Future.delayed(const Duration(seconds: 1), () {
+                                //    return allAccountList
+                                //     .where((element) => element.name.toLowerCase().contains(pattern.toLowerCase()))
+                                //    .toList().cast<AccountModel>(); 
+                                //     });
+                                //     },
+                                 
+                                //    itemBuilder: (context, AccountModel suggestion) {
+                                //      return Padding(
+                                //        padding: EdgeInsets.symmetric(horizontal: 6,vertical: 4),
+                                //        child: Text("${suggestion.code} - ${suggestion.name}",
+                                //          style: TextStyle(fontSize: 12), maxLines: 1, overflow: TextOverflow.ellipsis,
+                                //        ),
+                                //      );
+                                //    },
+                                //    onSelected: (AccountModel suggestion) {
+                                //        setState(() {
+                                //         _accountController.text = "${suggestion.code} - ${suggestion.name}";
+                                //         _selectedAccount = suggestion.id.toString();
+                                //       });  
+                                //    },
+                                //  ),
+                                
+                                ),
+                              ),
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              Expanded(flex:6,child:Text("Tr.Date",style:AllTextStyle.textFieldHeadStyle)),
+                              const Expanded(flex: 1, child: Text(":")),
+                              Expanded(
+                                flex: 15,
+                                child: Container(
+                                  margin: EdgeInsets.only(top: 4.h, bottom: 4.h),
+                                  height: 25.h,
+                                  decoration: ContDecoration.contDecoration,
+                                  child: GestureDetector(
+                                    onTap: (() {
+                                      FocusScope.of(context).requestFocus(quantityFocusNode);
+                                      firstSelectedDate();
+                                    }),
+                                    child: TextFormField(
+                                      enabled: false,
+                                      decoration: InputDecoration(
+                                        contentPadding: EdgeInsets.only(left: 5.w),
+                                        suffixIcon: Padding(padding: EdgeInsets.only(left: 20.w),
+                                          child: Icon(Icons.calendar_month,color: Colors.black87,size: 16.r),
+                                        ),
+                                        border: const OutlineInputBorder(borderSide: BorderSide.none),
+                                        hintText: firstPickedDate,
+                                        hintStyle: AllTextStyle.dateFormatStyle
+                                      ),
+                                      validator: (value) {
+                                        if (value == null || value.isEmpty) {
+                                          return null;
+                                        }
+                                        return null;
+                                      },
+                                    ),
+                                  // ):GestureDetector(
+                                  //   onTap: (() {
+                                  //     // FocusScope.of(context).requestFocus(quantityFocusNode);
+                                  //     // firstSelectedDate();
+                                  //   }),
+                                  //   child: TextFormField(
+                                  //     enabled: false,
+                                  //     decoration: InputDecoration(
+                                  //       contentPadding: const EdgeInsets.only(left: 5),
+                                  //       // suffixIcon: const Padding(padding: EdgeInsets.only(left: 20.0),
+                                  //       //   child: Icon(Icons.calendar_month,color: Colors.black87,size: 16),
+                                  //       // ),
+                                  //       border: const OutlineInputBorder(borderSide: BorderSide.none),
+                                  //       hintText: firstPickedDate,
+                                  //       hintStyle: AllTextStyle.dateFormatStyle
+                                  //     ),
+                                  //     validator: (value) {
+                                  //       if (value == null || value.isEmpty) {
+                                  //         return null;
+                                  //       }            return null;
+                                  //     },
+                                  //   ),
+                                  ),
+                                ),
+                              )
+                            ,
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              Expanded(flex: 6,child:Text("Note",style:AllTextStyle.textFieldHeadStyle)),
+                              const Expanded(flex: 1, child: Text(":")),
+                              Expanded(
+                                flex: 15,
+                                child: TextField(
+                                  style: AllTextStyle.dropDownlistStyle,
+                                  controller: _DescriptionController,
+                                  maxLines: 2,
+                                  decoration: InputDecoration(
+                                    contentPadding: EdgeInsets.symmetric(vertical: 5.h, horizontal: 5.w),
+                                    hintText: "Remarks",
+                                    hintStyle: AllTextStyle.dropDownlistStyle,
+                                    filled: true,
+                                    fillColor: Colors.white,
+                                    border: InputBorder.none,
+                                    focusedBorder: TextFieldInputBorder.focusEnabledBorder,
+                                    enabledBorder: TextFieldInputBorder.focusEnabledBorder
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 4.h),
+                          Row(
+                            children: [
+                              Expanded(flex: 6,child: Text("Amount",style:AllTextStyle.textFieldHeadStyle)),
+                              const Expanded(flex: 1, child: Text(":")),
+                              Expanded(
+                                flex: 15,
+                                child: SizedBox(
+                                  height: 25.h,
+                                  width: MediaQuery.of(context).size.width / 2,
+                                  child: TextField(
+                                    style: TextStyle(fontSize: 13.sp),
+                                    controller: _AmountController,
+                                    keyboardType: TextInputType.number,
+                                    decoration: InputDecoration(contentPadding: EdgeInsets.symmetric(vertical: 5.h, horizontal: 5.w),
+                                      hintText: "0",
+                                      filled: true,
+                                      fillColor: Colors.white,
+                                      border: InputBorder.none,
+                                      focusedBorder: TextFieldInputBorder.focusEnabledBorder,
+                                      enabledBorder: TextFieldInputBorder.focusEnabledBorder
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          ///=====customer loading hide 
+                          ///HiddenItemsLoading(controller: quantityController,focusNode: quantityFocusNode),
+                          SizedBox(height: 5.h),
+                        //  ((role == 'Superadmin' || role == 'admin') || actionList.contains('e') == true) ?
+                          Align(
+                            alignment: Alignment.bottomRight,
+                            child: InkWell(
+                              onTap: () {
+                                // Utils.closeKeyBoard(context);
+                                // if(_accountController.text ==''){
+                                //   Utils.errorSnackBar(context, "Account field is required");
+                                // }
+                                // else if(_AmountController.text == ''){
+                                //   Utils.errorSnackBar(context, "Amount field is required");
+                                // }
+                                // else{
+                                //   setState(() {
+                                //     isLoading = true;
+                                //   });
+                                //   fetchAddCashTransactions(
+                                //       context,
+                                //       int.parse("$_selectedAccount"),
+                                //       tnxIdNoController.text,
+                                //       "$backEndFirstDate",
+                                //       _DescriptionController.text,
+                                //       paymentType == "In Cash" ? _AmountController.text:'0',
+                                //       paymentType == "In Cash" ? '0':_AmountController.text,
+                                //       paymentType
+                                                  
+                                //   ).then((value){
+                                //     if(value=="true"){
+                                //       _AmountController.text = '';
+                                //       _DescriptionController.text = '';
+                                //       _selectedAccount = "";
+                                //       _accountController.text = "";
+                                //       paymentType = "";
+                                //       Provider.of<CashTransactionProvider>(context, listen: false).getCashTransactionApi(" ","${Utils.formatBackEndDate(DateTime.now())}","${Utils.formatBackEndDate(DateTime.now())}","");
+                                //       getCashTransactionId();
+                                //       setState(() {
+                                //       });
+                                //     }
+                                //   });
+                                // }
+                              },
+                              child: Container(
+                                height: 25.h,
+                                width: 100.w,
+                                decoration: BoxDecoration(
+                                  color:Colors.indigo,
+                                  borderRadius: BorderRadius.circular(5.r),
+                                  boxShadow: [
+                                    // ignore: deprecated_member_use
+                                    BoxShadow(color: Colors.grey.withOpacity(0.6),spreadRadius: 2,blurRadius: 5.r,offset: const Offset(0, 3)),
+                                  ],
+                                ),
+                                child: Center(child: isLoading ? SizedBox(height: 20.h,width:20.h,child: CircularProgressIndicator(color: Colors.white,)) : Text(
+                                    "Save", style:AllTextStyle.saveButtonTextStyle)),
+                              ),
+                            ),
+                          ),
+                          // :SizedBox(),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ),
               // const SizedBox(height: 8.0),
