@@ -907,21 +907,18 @@ void _onDiscountAmountChanged(String value) {
                           controller: _invoiceNoController,
                           hintText: "1000550",
                         ),
-                    
                         SizedBox(height: 4.0.h),
                         CommonTextFieldRow(
                           label: "SL No",
                           controller: _sLNoController,
                           hintText: "1",
                         ),
-                    
                         SizedBox(height: 4.0.h),
                         CommonTextFieldRow(
                           label: "Doctor",
                           controller: _doctorController,
                           hintText: "Select Doctor",
                         ),
-
                         SizedBox(height: 4.0.h),
                         CommonTextFieldRow(
                           label: "Ref.By",

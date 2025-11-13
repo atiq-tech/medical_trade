@@ -227,14 +227,12 @@ String? firstPickedDate;
                         ),
                       ),
                     ]),
-                   
                     SizedBox(height: 4.0.h),
                     CommonTextFieldRow(
                       label: "Remark",
                       controller: _remarkController,
                       hintText: "Enter Remark",
                     ),
-
                     SizedBox(height: 4.0.h),
                     CommonTextFieldRow(
                       label: "Address",

@@ -1,6 +1,5 @@
 // String baseUrl = "https://globaloilsoftware.com/api/v1/";//Main
 // String imageBaseUrl = "https://globaloilsoftware.com/";//imgUrlbase
-
 //String baseUrl = "https://demo.safaagroproducts.com/api/v1/";//sub
 //String imageBaseUrl = "https://demo.safaagroproducts.com/uploads/users/";//imgUrlbase
 

@@ -292,7 +292,6 @@ final LayerLink _pTypeLayerLink = LayerLink();
   //   print("role=====  $role");
   // }
 
-  
   @override
   void initState() {
     //WidgetsBinding.instance.addPostFrameCallback(_getTrTypeDropdownSize);
