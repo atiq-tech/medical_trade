@@ -1,28 +1,4 @@
 class ContactModel {
-  bool? success;
-  String? message;
-  CompanyData? data;
-
-  ContactModel({this.success, this.message, this.data});
-
-  ContactModel.fromJson(Map<String, dynamic> json) {
-    success = json['success'];
-    message = json['message'];
-    data = json['data'] != null ? CompanyData.fromJson(json['data']) : null;
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> map = {};
-    map['success'] = success;
-    map['message'] = message;
-    if (data != null) {
-      map['data'] = data!.toJson();
-    }
-    return map;
-  }
-}
-
-class CompanyData {
   int? id;
   String? name;
   String? technologist;
@@ -34,19 +10,20 @@ class CompanyData {
   String? createdAt;
   String? updatedAt;
 
-  CompanyData(
-      {this.id,
-      this.name,
-      this.technologist,
-      this.phone,
-      this.email,
-      this.address,
-      this.logo,
-      this.headerImage,
-      this.createdAt,
-      this.updatedAt});
+  ContactModel({
+    this.id,
+    this.name,
+    this.technologist,
+    this.phone,
+    this.email,
+    this.address,
+    this.logo,
+    this.headerImage,
+    this.createdAt,
+    this.updatedAt,
+  });
 
-  CompanyData.fromJson(Map<String, dynamic> json) {
+  ContactModel.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     name = json['name'];
     technologist = json['technologist'];
@@ -60,29 +37,20 @@ class CompanyData {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> map = {};
-    map['id'] = id;
-    map['name'] = name;
-    map['technologist'] = technologist;
-    map['phone'] = phone;
-    map['email'] = email;
-    map['address'] = address;
-    map['logo'] = logo;
-    map['header_image'] = headerImage;
-    map['created_at'] = createdAt;
-    map['updated_at'] = updatedAt;
-    return map;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
+    data['name'] = name;
+    data['technologist'] = technologist;
+    data['phone'] = phone;
+    data['email'] = email;
+    data['address'] = address;
+    data['logo'] = logo;
+    data['header_image'] = headerImage;
+    data['created_at'] = createdAt;
+    data['updated_at'] = updatedAt;
+    return data;
   }
 }
-
-
-
-
-
-
-
-
-
 
 
 

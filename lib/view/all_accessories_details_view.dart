@@ -387,7 +387,7 @@ class _AllAccessoriesDetailsViewState extends State<AllAccessoriesDetailsView> {
                               padding: EdgeInsets.only(
                                   left: 12.w, top: 8.h, bottom: 8.h),
                               child: Text(
-                                contactProvider.companyProfile?.data?.name
+                                contactProvider.companyProfile?.name
                                         ?.toString() ??
                                     "",
                                 style: FontManager.headline.copyWith(
@@ -397,21 +397,21 @@ class _AllAccessoriesDetailsViewState extends State<AllAccessoriesDetailsView> {
                                 ),
                               ),
                             ),
-                            // InkWell(
-                            //   onTap: () => _launchPhone(contactProvider
-                            //           .contactModel?.contactNumberone
-                            //           ?.toString() ??
-                            //       ""),
-                            //   child: Padding(
-                            //     padding:
-                            //         EdgeInsets.only(left: 12.w, right: 12.w),
-                            //     child: Icon(
-                            //       Icons.call,
-                            //       size: 22.sp,
-                            //       color: Colors.green,
-                            //     ),
-                            //   ),
-                            // ),
+                            InkWell(
+                              onTap: () => _launchPhone(contactProvider
+                                      .companyProfile?.phone
+                                      ?.toString() ??
+                                  ""),
+                              child: Padding(
+                                padding:
+                                    EdgeInsets.only(left: 12.w, right: 12.w),
+                                child: Icon(
+                                  Icons.call,
+                                  size: 22.sp,
+                                  color: Colors.green,
+                                ),
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -440,7 +440,7 @@ class _AllAccessoriesDetailsViewState extends State<AllAccessoriesDetailsView> {
                               padding: EdgeInsets.only(
                                   left: 12.w, top: 8.h, bottom: 8.h),
                               child: Text(
-                                contactProvider.companyProfile?.data?.name
+                                contactProvider.companyProfile?.name
                                         ?.toString() ??
                                     "",
                                 style: FontManager.headline.copyWith(

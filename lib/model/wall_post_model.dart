@@ -1,32 +1,3 @@
-class WallPostResponse {
-  bool? success;
-  String? message;
-  List<WallPostModel>? data;
-
-  WallPostResponse({this.success, this.message, this.data});
-
-  WallPostResponse.fromJson(Map<String, dynamic> json) {
-    success = json['success'];
-    message = json['message'];
-    if (json['data'] != null) {
-      data = <WallPostModel>[];
-      json['data'].forEach((v) {
-        data!.add(WallPostModel.fromJson(v));
-      });
-    }
-  }
-
-  Map<String, dynamic> toJson() {
-    final map = <String, dynamic>{};
-    map['success'] = success;
-    map['message'] = message;
-    if (data != null) {
-      map['data'] = data!.map((v) => v.toJson()).toList();
-    }
-    return map;
-  }
-}
-
 class WallPostModel {
   int? id;
   String? wallPostId;

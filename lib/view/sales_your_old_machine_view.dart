@@ -72,15 +72,24 @@ class _SalesYourOldMachineViewState extends State<SalesYourOldMachineView> {
       // print("fgsdfg v1 1 1 1: ${divisionProvider.divisions}");
       // print("Districts v1 1 1 1: ${districtProvider.districts}");
       // Update divisionsNameMap after fetching divisons
-      setState(() {
+       setState(() {
         divisionNameMap = Map.fromEntries(divisionProvider.divisions.map(
-            (division) =>MapEntry(division.divisionSlNo, division.divisionName)));
+            (division) =>MapEntry(division.id, division.name)));
       });
+      ///===old===
+      // setState(() {
+      //   divisionNameMap = Map.fromEntries(divisionProvider.divisions.map(
+      //       (division) =>MapEntry(division.divisionSlNo, division.divisionName)));
+      // });
       // Update districtsNameMap after fetching districts
       setState(() {
         districtsNameMap = Map.fromEntries(districtProvider.districts.map(
-            (district) => MapEntry(district.districtSlNo, district.districtName)));
+            (district) => MapEntry(district.id, district.areaName)));
       });
+      // setState(() {
+      //   districtsNameMap = Map.fromEntries(districtProvider.districts.map(
+      //       (district) => MapEntry(district.districtSlNo, district.districtName)));
+      // });
     });
   }
 
@@ -315,7 +324,7 @@ class _SalesYourOldMachineViewState extends State<SalesYourOldMachineView> {
                                               child: SingleChildScrollView(
                                                 scrollDirection: Axis.horizontal,
                                                 child: Text(
-                                                  _selectedDivisions.map((division) => division.divisionName).join(', '),
+                                                  _selectedDivisions.map((division) => division.name).join(', '),
                                                   style: TextStyle(
                                                       fontWeight: FontWeight.w600,
                                                       fontSize: 14.sp,
@@ -359,7 +368,7 @@ class _SalesYourOldMachineViewState extends State<SalesYourOldMachineView> {
                                               return Padding(
                                                 padding: EdgeInsets.symmetric(vertical: 5.h, horizontal: 10.w),
                                                 child: Text(
-                                                  suggestion.divisionName,
+                                                  suggestion.name,
                                                   style: TextStyle(fontSize: 14.sp),
                                                   maxLines: 1,
                                                   overflow: TextOverflow.ellipsis,
@@ -525,7 +534,7 @@ class _SalesYourOldMachineViewState extends State<SalesYourOldMachineView> {
                                                 child: Text(
                                                   _selectedDistricts
                                                       .map((district) =>
-                                                          district.districtName)
+                                                          district.areaName)
                                                       .join(', '),
                                                   style: TextStyle(
                                                     fontWeight: FontWeight.w600,
@@ -571,7 +580,7 @@ class _SalesYourOldMachineViewState extends State<SalesYourOldMachineView> {
                                               return Padding(
                                                 padding: EdgeInsets.symmetric(vertical: 5.h, horizontal: 10.w),
                                                 child: Text(
-                                                  suggestion.districtName,
+                                                  suggestion.areaName,
                                                   style: TextStyle(fontSize: 14.sp),
                                                   maxLines: 1,
                                                   overflow: TextOverflow.ellipsis,
@@ -841,15 +850,11 @@ class _SalesYourOldMachineViewState extends State<SalesYourOldMachineView> {
                                 return;
                               }
 
-                              List<String> selectedDivisionIds =
-                                  _selectedDivisions
-                                      .map((division) => division.divisionSlNo)
-                                      .toList();
-                              List<String> selectedDistrictIds =
-                                  _selectedDistricts
-                                      .map((district) => district.districtSlNo)
-                                      .toList();
+                              //List<String> selectedDivisionIds = _selectedDivisions.map((division) => division.id).toList();
+                              List<String> selectedDivisionIds = _selectedDivisions.map((division) => division.id.toString()).toList();
 
+                              //List<String> selectedDistrictIds = _selectedDistricts.map((district) => district.districtSlNo).toList();
+                              List<String> selectedDistrictIds = _selectedDistricts.map((district) => district.id.toString()).toList();
                               // Convert _imagesList (XFile) to a list of File
                               List<File> images =
                                   _imagesList.map((e) => File(e.path)).toList();

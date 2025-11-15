@@ -25,8 +25,7 @@ class ContactProvider with ChangeNotifier {
         final jsonData = json.decode(response.body);
         _companyProfile = ContactModel.fromJson(jsonData);
       } else {
-        _errorMessage =
-            'Failed to load company profile: ${response.reasonPhrase}';
+        _errorMessage ='Failed to load company profile: ${response.reasonPhrase}';
       }
     } catch (error) {
       _errorMessage = 'Error: $error';

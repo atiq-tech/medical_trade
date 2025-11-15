@@ -19,23 +19,60 @@ class RegisterAuthProvider extends ChangeNotifier {
   String? get errorMessage => _errorMessage;
 
   Future<void> fetchCustomerCode() async {
-    final url = AppUrl.getCustomerCodeEndPoint;
-    try {
-      final response = await http.get(Uri.parse(url));
-      if (response.statusCode == 200) {
-        _customerCode = response.body;
-        _errorMessage = null; // Reset error message on success
+  final url = AppUrl.getCustomerCodeEndPoint;
+  try {
+    final response = await http.get(Uri.parse(url));
+
+    if (response.statusCode == 200) {
+      final responseData = jsonDecode(response.body);
+
+      if (responseData['success'] == true && responseData['data'] != null) {
+        _customerCode = responseData['data']; // শুধু code অংশটা নিচ্ছে
+        _errorMessage = null;
+        print("Customer Code fetched: $_customerCode");
       } else {
         _customerCode = null;
-        _errorMessage = 'Failed to fetch customer code';
+        _errorMessage =
+            'Invalid response: ${responseData['message'] ?? 'Unknown error'}';
+        print("Error: $_errorMessage");
       }
-    } catch (e) {
+    } else {
       _customerCode = null;
-      ErrorHandling.handleError(e as Exception,
-          customMessage: 'Failed to fetch customer code');
+      _errorMessage =
+          'Failed to fetch customer code (Status: ${response.statusCode})';
+      print("Error: $_errorMessage");
     }
-    notifyListeners();
+  } catch (e) {
+    _customerCode = null;
+    _errorMessage = 'Failed to fetch customer code';
+    ErrorHandling.handleError(
+      e is Exception ? e : Exception(e.toString()),
+      customMessage: _errorMessage!,
+    );
   }
+
+  notifyListeners();
+}
+
+///===old====
+  // Future<void> fetchCustomerCode() async {
+  //   final url = AppUrl.getCustomerCodeEndPoint;
+  //   try {
+  //     final response = await http.get(Uri.parse(url));
+  //     if (response.statusCode == 200) {
+  //       _customerCode = response.body;
+  //       _errorMessage = null; // Reset error message on success
+  //     } else {
+  //       _customerCode = null;
+  //       _errorMessage = 'Failed to fetch customer code';
+  //     }
+  //   } catch (e) {
+  //     _customerCode = null;
+  //     ErrorHandling.handleError(e as Exception,
+  //         customMessage: 'Failed to fetch customer code');
+  //   }
+  //   notifyListeners();
+  // }
 
   Future<bool> register({
     required BuildContext context,

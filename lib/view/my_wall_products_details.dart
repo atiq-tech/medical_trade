@@ -408,7 +408,7 @@ class _MyWallProductsDetailsState extends State<MyWallProductsDetails> {
                               padding: EdgeInsets.only(
                                   left: 12.w, top: 8.h, bottom: 8.h),
                               child: Text(
-                                contactProvider.companyProfile?.data?.name
+                                contactProvider.companyProfile?.name
                                         ?.toString() ??
                                     "",
                                 style: FontManager.headline.copyWith(
@@ -420,7 +420,7 @@ class _MyWallProductsDetailsState extends State<MyWallProductsDetails> {
                             ),
                             InkWell(
                               onTap: () => _launchPhone(contactProvider
-                                      .companyProfile?.data?.phone
+                                      .companyProfile?.phone
                                       ?.toString() ??
                                   ""),
                               child: Padding(
@@ -461,7 +461,7 @@ class _MyWallProductsDetailsState extends State<MyWallProductsDetails> {
                               padding: EdgeInsets.only(
                                   left: 12.w, top: 8.h, bottom: 8.h),
                               child: Text(
-                                contactProvider.companyProfile?.data?.name
+                                contactProvider.companyProfile?.name
                                         ?.toString() ??
                                     "",
                                 style: FontManager.headline.copyWith(
@@ -473,7 +473,7 @@ class _MyWallProductsDetailsState extends State<MyWallProductsDetails> {
                             ),
                            InkWell(
                               onTap: () => _launchPhone(contactProvider
-                                      .companyProfile?.data?.phone
+                                      .companyProfile?.phone
                                       ?.toString() ??
                                   ""),
                               child: Padding(

@@ -564,8 +564,8 @@ class _MyWallPostViewState extends State<MyWallPostView> {
                             fontWeight: FontWeight.bold),
                       ),
                       GestureDetector(
-                        onTap: () => _launchPhone("${contactProvider.companyProfile!.data!.phone}"),
-                        child: Text("${contactProvider.companyProfile!.data!.phone}",
+                        onTap: () => _launchPhone("${contactProvider.companyProfile!.phone}"),
+                        child: Text("${contactProvider.companyProfile!.phone}",
                           style: FontManager.smallTextbottomnavigaton.copyWith(
                               color: Colors.white,
                               fontSize: 16.sp,

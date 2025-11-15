@@ -295,14 +295,26 @@ class _RegisterWidgetsState extends State<_RegisterWidgets> {
       setState(() {
         divisionsNameMap = Map.fromEntries(divisionProvider.divisions.map(
             (division) =>
-                MapEntry(division.divisionSlNo, division.divisionName)));
+                MapEntry(division.id, division.name)));
       });
+      ///==old===
+      //  setState(() {
+      //   divisionsNameMap = Map.fromEntries(divisionProvider.divisions.map(
+      //       (division) =>
+      //           MapEntry(division.divisionSlNo, division.divisionName)));
+      // });
       // Update districtsNameMap after fetching districts
+
       setState(() {
         districtsNameMap = Map.fromEntries(districtProvider.districts.map(
             (district) =>
-                MapEntry(district.districtSlNo, district.districtName)));
+                MapEntry(district.id, district.areaName)));
       });
+      // setState(() {
+      //   districtsNameMap = Map.fromEntries(districtProvider.districts.map(
+      //       (district) =>
+      //           MapEntry(district.districtSlNo, district.districtName)));
+      // });
     });
   }
 
@@ -570,7 +582,7 @@ class _RegisterWidgetsState extends State<_RegisterWidgets> {
                               itemBuilder: (context, suggestion) {
                                 return ListTile(
                                   title: Text(
-                                    suggestion.divisionName,
+                                    suggestion.name,
                                     style: TextStyle(fontSize: 14.sp),
                                   ),
                                 );
@@ -582,9 +594,9 @@ class _RegisterWidgetsState extends State<_RegisterWidgets> {
                                   if (!_selectDivision.contains(suggestion)) {
                                     _selectDivision.add(suggestion);
                                     _divisionController.text = _selectDivision
-                                        .map((division) => division.divisionName)
+                                        .map((division) => division.name)
                                         .join(', ');
-                                    _selectedDivision = suggestion.divisionSlNo;
+                                    _selectedDivision = suggestion.id;
                                   }
                                 });
                               },
@@ -734,7 +746,7 @@ class _RegisterWidgetsState extends State<_RegisterWidgets> {
                               return Padding(
                                 padding: EdgeInsets.symmetric(vertical: 5.h, horizontal: 10.w),
                                 child: Text(
-                                  suggestion.districtName,
+                                  suggestion.areaName,
                                   style: TextStyle(fontSize: 14.sp),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
@@ -745,8 +757,8 @@ class _RegisterWidgetsState extends State<_RegisterWidgets> {
                               setState(() {
                                 if (!_selectedDistricts.contains(suggestion)) {
                                   _selectedDistricts.add(suggestion);
-                                  _districtController.text = _selectedDistricts.map((district) => district.districtName).join(', ');
-                                  _selectedDistrict = suggestion.districtSlNo;
+                                  _districtController.text = _selectedDistricts.map((district) => district.areaName).join(', ');
+                                  _selectedDistrict = suggestion.id;
                                 }
                               });
                             },
