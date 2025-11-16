@@ -6,7 +6,7 @@ class CategoryProvider extends ChangeNotifier{
   List<NewCategoryModel> allCategoriesList = [];
   static bool isAllCategoriesLoading = false;
   getCategories() async {
-    allCategoriesList = await ApiServiceNew.fetchCategoryApi();
+    allCategoriesList = (await ApiServiceNew.fetchCategoryApi())!;
   off();
   notifyListeners();
   }

@@ -20,8 +20,8 @@ import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class MyWallProductsDetails extends StatefulWidget {
-  // final WallPostModel item;
-  final WallPostNewModel item;
+  final WallPostModel item;
+  //final WallPostNewModel item;
   const MyWallProductsDetails({super.key, required this.item});
 
   @override

@@ -1,79 +1,129 @@
 import 'package:dio/dio.dart';
+import 'package:get_storage/get_storage.dart';
+import 'package:http/http.dart' hide Response;
 import 'package:medical_trade/config/app_url.dart';
+import 'package:medical_trade/model/get_category_product_model.dart';
 import 'package:medical_trade/new_part/model/client_post_model.dart';
 import 'package:medical_trade/new_part/model/new_category_model.dart';
 import 'package:medical_trade/new_part/model/wall_post_new_model.dart';
 
-class ApiServiceNew{
- static fetchCategoryApi() async {
+class ApiServiceNew {
+  // Read token from GetStorage
+  static String getToken() {
+    final box = GetStorage();
+    return box.read('loginToken') ?? "";
+  }
+
+  //========= fetch categories
+  static Future<List<NewCategoryModel>?> fetchCategoryApi() async {
     try {
       String url = AppUrl.getcategoriesEndPoint;
-      Response response = await Dio().get(url,
-          options: Options(headers: {
+      final token = getToken();
+
+      Response response = await Dio().get(
+        url,
+        options: Options(
+          headers: {
             "Content-Type": "application/json",
-          }));
+            "Authorization": "Bearer $token",
+          },
+        ),
+      );
+
       var data = response.data;
-      print("Gategory data====$data");
-      return List.from(data["data"]).map((e) => NewCategoryModel.fromMap(e)).toList();
+      print("Category data === $data");
+      return List.from(data).map((e) => NewCategoryModel.fromMap(e)).toList();
     } catch (e) {
-      print(e);
+      print("API ERROR fetchCategoryApi === $e");
+      return null;
     }
-    return null;
   }
-  //=========client post
+
+  //========= fetch client posts
   static Future<List<ClientPostModel>?> fetchClientPostApi() async {
-  try {
-    String url = AppUrl.myWallEndPint;
+    try {
+      String url = AppUrl.myWallEndPint;
+      final token = getToken();
 
-    Response response = await Dio().get(url,
-      options: Options(headers: {"Content-Type": "application/json"}),
-    );
+      Response response = await Dio().get(
+        url,
+        options: Options(
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer $token",
+          },
+        ),
+      );
 
-    var data = response.data;
+      var data = response.data;
+      print("API DATA === $data");
 
-    print("API DATA === $data");
-
-    return List.from(data["data"]).map((e) => ClientPostModel.fromMap(e)).toList();
-  } catch (e) {
-    print("API ERROR === $e");
-    return null;
+      return List.from(data["data"])
+          .map((e) => ClientPostModel.fromMap(e))
+          .toList();
+    } catch (e) {
+      print("API ERROR fetchClientPostApi === $e");
+      return null;
+    }
   }
-}
 
-  //  static fetchClientPostApi() async {
-  //   try {
-  //     String url = AppUrl.getClientPostEndPoint;
-  //     Response response = await Dio().get(url,
-  //         options: Options(headers: {
-  //           "Content-Type": "application/json",
-  //         }));
-  //     var data = response.data;
-  //     print("getClientPost data====$data");
-  //     return List.from(data["data"]).map((e) => ClientPostModel.fromMap(e)).toList();
-  //   } catch (e) {
-  //     print(e);
-  //   }
-  //   return null;
-  // }
-
-  
-   //=========client post
+  //========= fetch wall posts
   static Future<List<WallPostNewModel>?> fetchWallPostNewApi() async {
-  try {
-    String url = AppUrl.myWallEndPint;
+    try {
+      String url = AppUrl.myWallEndPint;
+      final token = getToken();
 
-    Response response = await Dio().get(url,
-      options: Options(headers: {"Content-Type": "application/json"}),
+      Response response = await Dio().get(
+        url,
+        options: Options(
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer $token",
+          },
+        ),
+      );
+
+      var data = response.data;
+      print("API DATA myWallEndPint === $data");
+
+      return List.from(data)
+          .map((e) => WallPostNewModel.fromMap(e))
+          .toList();
+    } catch (e) {
+      print("API ERROR fetchWallPostNewApi === $e");
+      return null;
+    }
+  }
+
+
+    //========= fetch categories
+ static Future<List<GetCategoryProductModel>?> fetchGetProductsApi() async { 
+  try {
+    String url = AppUrl.getProductsEndPoint;
+    final token = getToken();
+
+    Response response = await Dio().get(
+      url,
+      options: Options(
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
+        },
+      ),
     );
 
     var data = response.data;
+    print("get products data === $data");
 
-    print("API DATA myWallEndPint === $data");
+    // Use fromJson instead of fromMap
+    return List.from(data["data"])
+        .map((e) => GetCategoryProductModel.fromJson(e))
+        .toList();
 
-    return List.from(data["data"]).map((e) => WallPostNewModel.fromMap(e)).toList();
   } catch (e) {
-    print("API ERROR === $e");
+    print("API ERROR fetchCategoryApi === $e");
     return null;
   }
 }
+
 }

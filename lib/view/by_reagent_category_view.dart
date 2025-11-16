@@ -409,7 +409,7 @@ class _ByReagentCategoryViewState extends State<ByReagentCategoryView> {
                               ),
                               SizedBox(height: 2.h),
                               Text(
-                                "\$ ${product.productSellingPrice}",
+                                "\$ ${product.price}",
                                 style: TextStyle(
                                   fontSize: 14.sp,
                                   fontWeight: FontWeight.w500,

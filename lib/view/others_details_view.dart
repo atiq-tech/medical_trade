@@ -53,12 +53,12 @@ class _OthersDetailsViewState extends State<OthersDetailsView> {
             GestureDetector(
               onTap: () => _openZoomView(context),
               child: CarouselSlider(
-                items: widget.item.productGallery!.map((item) {
+                items: widget.item.images!.map((item) {
                   return Builder(
                     builder: (BuildContext context) {
                       return Image.network(
-                        width: double.infinity.w,
-                        'https://soft.madicaltrade.com/uploads/product_gallery/${item.productImage}',
+                        'https://app.medicaltradeltd.com/$item',
+                        width: double.infinity,
                         fit: BoxFit.cover,
                         loadingBuilder: (context, child, loadingProgress) {
                           if (loadingProgress == null) {
@@ -74,8 +74,7 @@ class _OthersDetailsViewState extends State<OthersDetailsView> {
                             ),
                           );
                         },
-                        errorBuilder: (context, error, stackTrace) =>
-                            Icon(Icons.error),
+                        errorBuilder: (context, error, stackTrace) => Icon(Icons.error),
                       );
                     },
                   );
@@ -83,7 +82,6 @@ class _OthersDetailsViewState extends State<OthersDetailsView> {
                 options: CarouselOptions(
                   autoPlay: false,
                   enlargeCenterPage: true,
-                  // aspectRatio: 2.0,
                   viewportFraction: 1.0,
                   onPageChanged: (index, reason) {
                     Provider.of<AppProvider>(context, listen: false)
@@ -92,16 +90,15 @@ class _OthersDetailsViewState extends State<OthersDetailsView> {
                 ),
               ),
             ),
-            Consumer<AppProvider>(builder: (context, provider, _) {
+
+             Consumer<AppProvider>(builder: (context, provider, _) {
               return Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: widget.item.productGallery!.map((url) {
-                  int index = widget.item.productGallery!.indexOf(url);
+                children: List.generate(widget.item.images!.length, (index) {
                   return Container(
                     width: 8,
                     height: 8,
-                    margin:
-                        EdgeInsets.symmetric(vertical: 10.h, horizontal: 3.w),
+                    margin: EdgeInsets.symmetric(vertical: 10.h, horizontal: 3.w),
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       color: provider.carouselIndex == index
@@ -109,7 +106,7 @@ class _OthersDetailsViewState extends State<OthersDetailsView> {
                           : const Color.fromRGBO(0, 0, 0, 0.4),
                     ),
                   );
-                }).toList(),
+                }),
               );
             }),
             SizedBox(height: 40.h),
@@ -129,7 +126,7 @@ class _OthersDetailsViewState extends State<OthersDetailsView> {
                               MaterialPageRoute(
                                 builder: (context) => ImageZoomScreen(
                                   imageUrl:
-                                      'https://madicaltrade.com/uploads/products/${widget.item.image}',
+                                      'https://app.medicaltradeltd.com/${widget.item.image}',
                                 ),
                               ),
                             );
@@ -143,7 +140,7 @@ class _OthersDetailsViewState extends State<OthersDetailsView> {
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(8.r),
                               child: Image.network(
-                                'https://madicaltrade.com/uploads/products/${widget.item.image}',
+                                'https://app.medicaltradeltd.com/${widget.item.image}',
                                 fit: BoxFit.cover,
                                 loadingBuilder: (BuildContext context,
                                     Widget child,
@@ -198,7 +195,7 @@ class _OthersDetailsViewState extends State<OthersDetailsView> {
                                 height: 8.h,
                               ),
                               Text(
-                                "BDT ${widget.item.productSellingPrice}",
+                                "BDT ${widget.item.price}",
                                 textAlign: TextAlign.start,
                                 style: FontManager.headline.copyWith(
                                   color: Colors.green,
@@ -255,7 +252,7 @@ class _OthersDetailsViewState extends State<OthersDetailsView> {
                                   ),
                                   Flexible(
                                     child: Text(
-                                      widget.item.productCategoryName
+                                      widget.item.productCategoryId
                                           .toString(),
                                       textAlign: TextAlign.start,
                                       style: FontManager.headline.copyWith(
@@ -546,7 +543,7 @@ class _OthersDetailsViewState extends State<OthersDetailsView> {
                                                 provider
                                                     .fetchCustomerCodeAndSendOrder(
                                                   wallpostId: widget
-                                                      .item.productSlNo
+                                                      .item.id
                                                       .toString(),
                                                 )
                                                     .then((_) {
@@ -665,13 +662,13 @@ class _OthersDetailsViewState extends State<OthersDetailsView> {
             ],
           ),
           body: PhotoViewGallery.builder(
-            itemCount: widget.item.productGallery?.length ?? 0,
+            itemCount: widget.item.images?.length ?? 0,
             pageController: PageController(initialPage: _currentIndex),
             onPageChanged: (index) => setState(() => _currentIndex = index),
             builder: (context, index) {
               return PhotoViewGalleryPageOptions(
                 imageProvider: NetworkImage(
-                  'https://soft.madicaltrade.com/uploads/product_gallery/${widget.item.productGallery?[index].productImage}',
+                  'https://app.medicaltradeltd.com/${widget.item.images?[index]}',
                 ),
                 minScale: PhotoViewComputedScale.contained,
                 maxScale: PhotoViewComputedScale.covered * 2,
@@ -682,11 +679,10 @@ class _OthersDetailsViewState extends State<OthersDetailsView> {
               child: CircularProgressIndicator(
                 value: event == null
                     ? null
-                    : event.cumulativeBytesLoaded /
-                        (event.expectedTotalBytes ?? 1),
+                    : event.cumulativeBytesLoaded / (event.expectedTotalBytes ?? 1),
               ),
             ),
-          ),
+          )
         );
       },
     );

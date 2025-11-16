@@ -5,6 +5,8 @@ import 'package:medical_trade/controller/contact_api.dart';
 import 'package:medical_trade/diagnostic_module/screens/diagnostic_module_screen.dart';
 import 'package:medical_trade/new_part/screens/all_category_screen.dart';
 import 'package:medical_trade/new_part/screens/all_client_post_screen.dart';
+import 'package:medical_trade/new_part/screens/all_product_screen.dart';
+import 'package:medical_trade/new_part/screens/category_old_screen.dart';
 import 'package:medical_trade/new_part/screens/wallpostnew_screen.dart';
 import 'package:medical_trade/utilities/assets_manager.dart';
 import 'package:medical_trade/utilities/color_manager.dart';
@@ -53,15 +55,16 @@ class _HomeViewState extends State<HomeView> {
         'title': 'New Machine',
         'color': ColorManager.homeContainerOne,
         'icon': ImageAssets.newMachine,
-        //'page': const NewMachine(),
+        ///'page': const NewMachine(),
         'page': const CategoryListScreen(),
       },
       {
         'title': 'Old Machine',
         'color': const Color(0xFF0199A6),
         'icon': ImageAssets.oldMachine,
+        'page': CategoryOldScreen(),
         //'page': const OldMachine(),
-        'page': const ClientPostScreen(),
+        //'page': const ClientPostScreen(),
       },
       {
         'title': 'Buy Reagent',
@@ -81,6 +84,7 @@ class _HomeViewState extends State<HomeView> {
         'title': 'All Accessories',
         'color': const Color(0xFF9D29B1),
         'icon': ImageAssets.allAccessories,
+        //'page': AllProductsScreen(),
         'page': const AllAccessories(),
       },
       {
