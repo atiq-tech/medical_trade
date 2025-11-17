@@ -281,10 +281,8 @@ class _RegisterWidgetsState extends State<_RegisterWidgets> {
     super.initState();
     // Add post frame callback
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final districtProvider =
-          Provider.of<DistrictProvider>(context, listen: false);
-      final divisionProvider =
-          Provider.of<DivisionProvider>(context, listen: false);
+      final districtProvider = Provider.of<DistrictProvider>(context, listen: false);
+      final divisionProvider = Provider.of<DivisionProvider>(context, listen: false);
 
       // Fetch data
       await Future.wait([
@@ -294,9 +292,11 @@ class _RegisterWidgetsState extends State<_RegisterWidgets> {
       // Update DivisionMap after fetching dividions
       setState(() {
         divisionsNameMap = Map.fromEntries(divisionProvider.divisions.map(
-            (division) =>
-                MapEntry(division.id, division.name)));
+            (division) => MapEntry(division.id.toString(), division.name),
+          ),
+        );
       });
+
       ///==old===
       //  setState(() {
       //   divisionsNameMap = Map.fromEntries(divisionProvider.divisions.map(
@@ -307,8 +307,7 @@ class _RegisterWidgetsState extends State<_RegisterWidgets> {
 
       setState(() {
         districtsNameMap = Map.fromEntries(districtProvider.districts.map(
-            (district) =>
-                MapEntry(district.id, district.areaName)));
+            (district) => MapEntry(district.id.toString(), district.areaName)));
       });
       // setState(() {
       //   districtsNameMap = Map.fromEntries(districtProvider.districts.map(
@@ -589,6 +588,18 @@ class _RegisterWidgetsState extends State<_RegisterWidgets> {
                               },
 
                               /// ✅ When user selects a suggestion
+                              // onSelected: (suggestion) {
+                              //   setState(() {
+                              //     if (!_selectDivision.contains(suggestion)) {
+                              //       _selectDivision.add(suggestion);
+                              //       _divisionController.text = _selectDivision
+                              //           .map((division) => division.name)
+                              //           .join(', ');
+                              //       _selectedDivision = suggestion.id.toString();
+                              //     }
+                              //     print("_selectedDivision==========$_selectDivision");
+                              //   });
+                              // },
                               onSelected: (suggestion) {
                                 setState(() {
                                   if (!_selectDivision.contains(suggestion)) {
@@ -596,10 +607,13 @@ class _RegisterWidgetsState extends State<_RegisterWidgets> {
                                     _divisionController.text = _selectDivision
                                         .map((division) => division.name)
                                         .join(', ');
-                                    _selectedDivision = suggestion.id;
+                                    _selectedDivision = suggestion.id.toString();
                                   }
+
+                                  print("Selected Division ID = $_selectedDivision");
                                 });
                               },
+
 
                               /// Optional: how suggestions box looks
                               decorationBuilder: (context, child) {
@@ -758,8 +772,9 @@ class _RegisterWidgetsState extends State<_RegisterWidgets> {
                                 if (!_selectedDistricts.contains(suggestion)) {
                                   _selectedDistricts.add(suggestion);
                                   _districtController.text = _selectedDistricts.map((district) => district.areaName).join(', ');
-                                  _selectedDistrict = suggestion.id;
+                                  _selectedDistrict = suggestion.id.toString();
                                 }
+                                print("_selected District  ID = $_selectedDistrict");
                               });
                             },
                             decorationBuilder: (context, child) {
@@ -1000,7 +1015,6 @@ class _RegisterWidgetsState extends State<_RegisterWidgets> {
                 SizedBox(height: 20.0.h),
                 InkWell(
                   onTap: () async {
-                    // Retrieve the text from the controllers
                     String organization = _organizationController.text.trim();
                     String customerName = _customerNameController.text.trim();
                     String title = _titleController.text.trim();
@@ -1010,8 +1024,20 @@ class _RegisterWidgetsState extends State<_RegisterWidgets> {
                     String upazila = _upazilaController.text.trim();
                     String password = _passwordController.text.trim();
                     String rePassword = _rePasswordController.text.trim();
+                    print("organization=======$organization");
+                    print("customerName=======$customerName");
+                    print("title=======$title");
+                    print("username=======$username");
+                    print("mobile=======$mobile");
+                    print("address=======$address");
+                    print("upazila=======$upazila");
+                    print("password=======$password");
+                    print("rePassword=======$rePassword");
+                    print("_selectedDivision=======$_selectedDivision");
+                    print("_selectedDistrict=======$_selectedDistrict");
+                    print("_image=======$_image");
 
-                    // Check if passwords match
+                    // Password Match Check
                     if (password != rePassword) {
                       CustomToast.show(
                         context: context,
@@ -1020,17 +1046,19 @@ class _RegisterWidgetsState extends State<_RegisterWidgets> {
                       );
                       return;
                     }
-                    // Check if any of the fields are empty, except for the image
+
+                    // Required Field Check
                     if (organization.isEmpty ||
                         customerName.isEmpty ||
                         title.isEmpty ||
                         username.isEmpty ||
                         mobile.isEmpty ||
                         address.isEmpty ||
-                        _selectedDivision == null ||
-                        _selectedDistrict == null ||
                         upazila.isEmpty ||
-                        password.isEmpty) {
+                        password.isEmpty ||
+                        rePassword.isEmpty ||
+                        _selectedDivision == null ||
+                        _selectedDistrict == null) {
                       CustomToast.show(
                         context: context,
                         text: "Please fill all required fields.",
@@ -1039,7 +1067,7 @@ class _RegisterWidgetsState extends State<_RegisterWidgets> {
                       return;
                     }
 
-                    // Call the register method and check the result
+                    // Now register
                     bool success = await registerProvider.register(
                       context: context,
                       organizationName: organization,
@@ -1052,18 +1080,17 @@ class _RegisterWidgetsState extends State<_RegisterWidgets> {
                       districtId: _selectedDistrict!,
                       upazila: upazila,
                       password: password,
+                      confirmPassword: rePassword,
                       image: _image,
                     );
 
                     if (success) {
                       CustomToast.show(
-                        // ignore: use_build_context_synchronously
                         context: context,
                         text: "Registration successful!",
                         isSuccess: true,
                       );
                       Navigator.pushReplacement(
-                        // ignore: use_build_context_synchronously
                         context,
                         MaterialPageRoute(
                           builder: (context) => const LoginView(isLogin: true),
@@ -1071,6 +1098,80 @@ class _RegisterWidgetsState extends State<_RegisterWidgets> {
                       );
                     }
                   },
+
+                  // onTap: () async {
+                  //   // Retrieve the text from the controllers
+                  //   String organization = _organizationController.text.trim();
+                  //   String customerName = _customerNameController.text.trim();
+                  //   String title = _titleController.text.trim();
+                  //   String username = _usernameController.text.trim();
+                  //   String mobile = _mobileController.text.trim();
+                  //   String address = _addressController.text.trim();
+                  //   String upazila = _upazilaController.text.trim();
+                  //   String password = _passwordController.text.trim();
+                  //   String rePassword = _rePasswordController.text.trim();
+
+                  //   // Check if passwords match
+                  //   if (password != rePassword) {
+                  //     CustomToast.show(
+                  //       context: context,
+                  //       text: "Passwords do not match.",
+                  //       isSuccess: false,
+                  //     );
+                  //     return;
+                  //   }
+                  //   // Check if any of the fields are empty, except for the image
+                  //   if (organization.isEmpty ||
+                  //       customerName.isEmpty ||
+                  //       title.isEmpty ||
+                  //       username.isEmpty ||
+                  //       mobile.isEmpty ||
+                  //       address.isEmpty ||
+                  //       _selectedDivision == null ||
+                  //       _selectedDistrict == null ||
+                  //       upazila.isEmpty ||
+                  //       password.isEmpty||rePassword.isEmpty) {
+                  //     CustomToast.show(
+                  //       context: context,
+                  //       text: "Please fill all required fields.",
+                  //       isSuccess: false,
+                  //     );
+                  //     return;
+                  //   }
+
+                  //   // Call the register method and check the result
+                  //   bool success = await registerProvider.register(
+                  //     context: context,
+                  //     organizationName: organization,
+                  //     customerName: customerName,
+                  //     title: title,
+                  //     username: username,
+                  //     mobile: mobile,
+                  //     address: address,
+                  //     divisionId: _selectedDivision!,
+                  //     districtId: _selectedDistrict!,
+                  //     upazila: upazila,
+                  //     password: password,
+                  //     confirmPassword: rePassword,
+                  //     image: _image,
+                  //   );
+
+                  //   if (success) {
+                  //     CustomToast.show(
+                  //       // ignore: use_build_context_synchronously
+                  //       context: context,
+                  //       text: "Registration successful!",
+                  //       isSuccess: true,
+                  //     );
+                  //     Navigator.pushReplacement(
+                  //       // ignore: use_build_context_synchronously
+                  //       context,
+                  //       MaterialPageRoute(
+                  //         builder: (context) => const LoginView(isLogin: true),
+                  //       ),
+                  //     );
+                  //   }
+                  // },
                   child: Container(
                     height: 40.h,
                     decoration: BoxDecoration(

@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
@@ -23,22 +22,70 @@ class _EngineeringSupportState extends State<EngineeringSupport> {
   final TextEditingController _mobileController = TextEditingController();
   final TextEditingController _originController = TextEditingController();
   final TextEditingController _modelController = TextEditingController();
-  final TextEditingController _machineDetailsController =
-      TextEditingController();
+  final TextEditingController _machineDetailsController = TextEditingController();
 
-  final List<XFile> _imagesList = [];
-  void _pickImage() async {
-    final pickedFiles = await ImagePicker().pickMultiImage();
+  // final List<XFile> _imagesList = [];
+  // void _pickImage() async {
+  //   final pickedFiles = await ImagePicker().pickMultiImage();
 
-    if (pickedFiles.isNotEmpty) {
-      setState(() {
-        _imagesList.clear(); // Clear previous images
-        for (var pickedFile in pickedFiles) {
-          _imagesList.add(XFile(pickedFile.path));
-        }
-      });
-    }
-  }
+  //   if (pickedFiles.isNotEmpty) {
+  //     setState(() {
+  //       _imagesList.clear(); // Clear previous images
+  //       for (var pickedFile in pickedFiles) {
+  //         _imagesList.add(XFile(pickedFile.path));
+  //       }
+  //     });
+  //   }
+  // }
+
+final List<XFile> _imagesList = [];
+
+void _pickImage() async {
+  showModalBottomSheet(
+    context: context,
+    builder: (context) {
+      return SafeArea(
+        child: Wrap(
+          children: [
+            ListTile(
+              leading: Icon(Icons.camera_alt),
+              title: Text("Camera"),
+              onTap: () async {
+                Navigator.pop(context);
+                final XFile? photo = await ImagePicker().pickImage(
+                  source: ImageSource.camera,
+                );
+
+                if (photo != null) {
+                  setState(() {
+                    //_imagesList.clear(); // আগের সব ছবি রিমুভ
+                    _imagesList.add(photo);
+                  });
+                }
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.photo_library),
+              title: Text("Gallery (Multi Image)"),
+              onTap: () async {
+                Navigator.pop(context);
+                final pickedFiles = await ImagePicker().pickMultiImage();
+
+                if (pickedFiles.isNotEmpty) {
+                  setState(() {
+                    _imagesList.clear();
+                    _imagesList.addAll(pickedFiles);
+                  });
+                }
+              },
+            ),
+          ],
+        ),
+      );
+    },
+  );
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -192,6 +239,7 @@ class _EngineeringSupportState extends State<EngineeringSupport> {
                               ),
                             ),
                           ),
+                         
                           SizedBox(height: 16.h),
                           CustomTextFromfieldTwo(
                             controller: _machineNameController,
@@ -269,11 +317,11 @@ class _EngineeringSupportState extends State<EngineeringSupport> {
                                       ),
                                     ),
                                     child: TextFormField(
+                                      style: TextStyle(fontSize: 12.sp),
                                       controller: _machineDetailsController,
                                       maxLines: 3,
                                       decoration: InputDecoration(
-                                        hintText:
-                                            "Enter Machine Problem Details",
+                                        hintText:"Enter Machine Problem Details",
                                         hintStyle: TextStyle(
                                           fontSize: 12.sp,
                                           color: Colors.grey[500],
@@ -307,17 +355,12 @@ class _EngineeringSupportState extends State<EngineeringSupport> {
                                     _imagesList.isEmpty) {
                                   CustomToast.show(
                                       context: context,
-                                      text:
-                                          "Please fill all fields and select images.",
+                                      text: "Please fill all fields and select images.",
                                       isSuccess: false);
                                   return;
                                 }
-
                                 // Convert _imagesList (XFile) to a list of File
-                                List<File> images = _imagesList
-                                    .map((e) => File(e.path))
-                                    .toList();
-
+                                List<File> images = _imagesList.map((e) => File(e.path)).toList();
                                 // Call the saveSupportData function
                                 await supportProvider.saveSupportData(
                                   images: images,
@@ -326,8 +369,7 @@ class _EngineeringSupportState extends State<EngineeringSupport> {
                                   context: context,
                                   machineName: _machineNameController.text,
                                   mobile: _mobileController.text,
-                                  machineDetails:
-                                      _machineDetailsController.text,
+                                  machineDetails:_machineDetailsController.text,
                                   onSuccess: () {
                                     _machineNameController.clear();
                                     _modelController.clear();
@@ -335,9 +377,7 @@ class _EngineeringSupportState extends State<EngineeringSupport> {
                                     _mobileController.clear();
                                     _machineDetailsController.clear();
                                     _imagesList.clear();
-
-                                    debugPrint(
-                                        "Image list length: ${_imagesList.length}");
+                                    debugPrint("Image list length: ${_imagesList.length}");
                                   },
                                 );
                               },
@@ -345,19 +385,14 @@ class _EngineeringSupportState extends State<EngineeringSupport> {
                                 height: 30.h,
                                 width: 60.w,
                                 decoration: BoxDecoration(
-                                  color: const Color.fromARGB(
-                                      255, 34, 139, 34), // Forest Green
-
-                                  borderRadius:
-                                      BorderRadius.circular(AppSize.s8.r),
+                                  color: const Color.fromARGB(255, 34, 139, 34), 
+                                  borderRadius: BorderRadius.circular(AppSize.s8.r),
                                   boxShadow: [
                                     BoxShadow(
-                                      color: Colors.black.withOpacity(
-                                          0.25), // Shadow color with opacity
-                                      offset: const Offset(0,
-                                          4), // Horizontal and vertical offset
-                                      blurRadius: 8.0, // Blur radius
-                                      spreadRadius: 1.0, // Spread radius
+                                      color: Colors.black.withOpacity( 0.25), 
+                                      offset: const Offset(0,4),
+                                      blurRadius: 8.0, 
+                                      spreadRadius: 1.0, 
                                     ),
                                   ],
                                 ),

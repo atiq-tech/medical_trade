@@ -22,10 +22,10 @@ class AppUrl {
   //end
 
   //Register Api All
-  static var registerEndPint = '$baseUrl/user-register';
+  static var registerEndPint = '$baseUrl/registration';
   static var getDivisionsEndPoint = '$baseUrl/get-divisions';
   static var getDistrictsEndPoint = '$baseUrl/get-districts';
-  static var getCustomerCodeEndPoint = '$baseUrl/generate-customercode';
+  static var getCustomerCodeEndPoint = '$baseUrl/get-customer-code';
   //end
 
   //home Api All Detail & Categories

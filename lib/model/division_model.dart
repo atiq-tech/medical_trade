@@ -14,10 +14,10 @@ String divisionModelToJson(List<DivisionModel> data) => json.encode(
 class DivisionModel {
   dynamic id;
   String name;
-  int createdBy;
+  dynamic createdBy;
   dynamic updatedBy;
   String ipAddress;
-  int branchId;
+  dynamic branchId;
   dynamic deletedAt;
   DateTime createdAt;
   dynamic updatedAt;
@@ -35,12 +35,12 @@ class DivisionModel {
   });
 
   factory DivisionModel.fromJson(Map<String, dynamic> json) => DivisionModel(
-        id: json["id"] as int,
+        id: json["id"],
         name: json["name"] as String,
-        createdBy: json["created_by"] as int,
+        createdBy: json["created_by"],
         updatedBy: json["updated_by"],
         ipAddress: json["ip_address"] as String,
-        branchId: json["branch_id"] as int,
+        branchId: json["branch_id"],
         deletedAt: json["deleted_at"],
         createdAt: DateTime.parse(json["created_at"] as String),
         updatedAt: json["updated_at"],

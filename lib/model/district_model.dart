@@ -23,10 +23,10 @@ final statusValues = EnumValues({
 class DistrictModel {
   dynamic id;
   String areaName;
-  int createdBy;
+  dynamic createdBy;
   dynamic updatedBy;
   String ipAddress;
-  int branchId;
+  dynamic branchId;
   dynamic deletedAt;
   DateTime createdAt;
   dynamic updatedAt;
@@ -44,12 +44,12 @@ class DistrictModel {
   });
 
   factory DistrictModel.fromJson(Map<String, dynamic> json) => DistrictModel(
-        id: json["id"] as int,
+        id: json["id"],
         areaName: json["area_name"] as String? ?? '',
-        createdBy: json["created_by"] as int? ?? 0,
+        createdBy: json["created_by"],
         updatedBy: json["updated_by"],
         ipAddress: json["ip_address"] as String? ?? '',
-        branchId: json["branch_id"] as int? ?? 0,
+        branchId: json["branch_id"] ,
         deletedAt: json["deleted_at"],
         createdAt: DateTime.parse(json["created_at"] as String),
         updatedAt: json["updated_at"] != null

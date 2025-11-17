@@ -40,7 +40,6 @@ class EngineeringSupportProvider with ChangeNotifier {
     final url = AppUrl.addEngineerSuportEndPoint;
     final box = GetStorage();
     final id = box.read('id');
-
     // Creating the Multipart request
     var request = http.MultipartRequest('POST', Uri.parse(url))
       ..fields['Machine_name'] = machineName
@@ -88,11 +87,11 @@ class EngineeringSupportProvider with ChangeNotifier {
       final responseJson = jsonDecode(response.body);
       print("Parsed JSON response: $responseJson");
 
-      final status = responseJson['status'];
+      final status = responseJson['success'];
       final message = responseJson['message'];
 
       // Check if the status is 'success'
-      if (status == 'success') {
+      if (status == true) {
         CustomToast.show(
           context: context,
           text: message, // Show success message
