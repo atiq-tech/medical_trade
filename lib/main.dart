@@ -103,10 +103,10 @@ class _MyAppState extends State<MyApp> {
           ),
           onGenerateRoute: Routes.generateRoute,
           //initialRoute: RoutesName.categorylist,
-          initialRoute: RoutesName.myWallPost,
-          // initialRoute: GetStorage().read('loginToken') != null
-          //     ? RoutesName.myWallPost
-          //     : RoutesName.splash,
+          // initialRoute: RoutesName.myWallPost,
+          initialRoute: GetStorage().read('loginToken') != null
+              ? RoutesName.myWallPost
+              : RoutesName.splash,
         ),
       ),
     );

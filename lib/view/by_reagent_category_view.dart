@@ -3,8 +3,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 // import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:medical_trade/controller/get_product_api_category.dart';
-import 'package:medical_trade/model/get_categories_model.dart';
 import 'package:medical_trade/model/get_category_product_model.dart';
+import 'package:medical_trade/new_part/model/new_category_model.dart';
 import 'package:medical_trade/utilities/color_manager.dart';
 import 'package:medical_trade/utilities/font_manager.dart';
 import 'package:medical_trade/utilities/values_manager.dart';
@@ -13,7 +13,8 @@ import 'package:medical_trade/view/by_reagent_category_view_details_view.dart';
 import 'package:provider/provider.dart';
 
 class ByReagentCategoryView extends StatefulWidget {
-  final GetCategoryModel item;
+  final NewCategoryModel item;
+  //final GetCategoryModel item;
   const ByReagentCategoryView({super.key, required this.item});
 
   @override
@@ -371,13 +372,9 @@ class _ByReagentCategoryViewState extends State<ByReagentCategoryView> {
                                         width: 24.w,
                                         height: 24.h,
                                         child: CircularProgressIndicator(
-                                          value: loadingProgress
-                                                      .expectedTotalBytes !=
-                                                  null
-                                              ? loadingProgress
-                                                      .cumulativeBytesLoaded /
-                                                  loadingProgress
-                                                      .expectedTotalBytes!
+                                          value: loadingProgress.expectedTotalBytes != null
+                                              ? loadingProgress.cumulativeBytesLoaded /
+                                                  loadingProgress.expectedTotalBytes!
                                               : null,
                                           strokeWidth: 2.0,
                                         ),
@@ -385,8 +382,7 @@ class _ByReagentCategoryViewState extends State<ByReagentCategoryView> {
                                     );
                                   },
                                   errorBuilder: (context, error, stackTrace) =>
-                                      Center(
-                                          child: Icon(Icons.error, size: 24.w)),
+                                      Center(child: Icon(Icons.error, size: 24.w)),
                                 ),
                               ),
                             ),
@@ -424,9 +420,7 @@ class _ByReagentCategoryViewState extends State<ByReagentCategoryView> {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) =>
-                                            ByReagentCategoryViewDetailsView(
-                                                item: product),
+                                        builder: (context) =>ByReagentCategoryViewDetailsView(item: product),
                                       ),
                                     );
                                   },
@@ -437,8 +431,7 @@ class _ByReagentCategoryViewState extends State<ByReagentCategoryView> {
                                       width: 80.w,
                                       decoration: BoxDecoration(
                                         color: ColorManager.black,
-                                        borderRadius:
-                                            BorderRadius.circular(AppSize.s5.r),
+                                        borderRadius: BorderRadius.circular(AppSize.s5.r),
                                       ),
                                       child: Center(
                                         child: Text(

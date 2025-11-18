@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:medical_trade/controller/get_categories_api.dart';
+import 'package:medical_trade/new_part/providers/category_provider.dart';
 import 'package:medical_trade/utilities/color_manager.dart';
 import 'package:medical_trade/utilities/custom_appbar.dart';
 import 'package:medical_trade/utilities/custom_container_by_regant.dart';
@@ -20,8 +20,7 @@ class _ByReagentState extends State<ByReagent> {
   void initState() {
     super.initState();
     Future.microtask(() {
-      // ignore: use_build_context_synchronously
-      Provider.of<GetCategoriesProvider>(context, listen: false).fetchData();
+      Provider.of<CategoryProvider>(context, listen: false).getCategories();
     });
   }
 
@@ -36,9 +35,9 @@ class _ByReagentState extends State<ByReagent> {
         onTap: _onAppBarTitleTap,
         title: "Buy Reagent",
       ),
-      body: Consumer<GetCategoriesProvider>(
+      body: Consumer<CategoryProvider>(
         builder: (context, provider, child) {
-          if (provider.isLoading) {
+          if (CategoryProvider.isAllCategoriesLoading) {
             return Center(
               child: CircularProgressIndicator(
                 valueColor: AlwaysStoppedAnimation<Color>(ColorManager.red),
@@ -46,10 +45,14 @@ class _ByReagentState extends State<ByReagent> {
             );
           }
 
-          final categories = provider.categories;
+          final categories = provider.allCategoriesList;
           final filteredCategories = categories.where((category) {
-            return ["4", "5", "6", "7"].contains(category.id);
+            return ["4", "5", "6", "7"].contains(category.id.toString());
           }).toList();
+
+          // final filteredCategories = categories.where((category) {
+          //   return ["4", "5", "6", "7"].contains(category.id);
+          // }).toList();
 
           if (filteredCategories.isEmpty) {
             return Center(

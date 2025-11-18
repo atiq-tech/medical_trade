@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
-// import 'package:flutter_typeahead/flutter_typeahead.dart';
-import 'package:medical_trade/controller/product_api_id_type.dart';
-import 'package:medical_trade/model/get_categories_model.dart';
-import 'package:medical_trade/model/product_model.dart';
+import 'package:medical_trade/model/get_category_product_model.dart';
+import 'package:medical_trade/new_part/model/new_category_model.dart';
+import 'package:medical_trade/new_part/providers/all_products_provider.dart';
 import 'package:medical_trade/utilities/color_manager.dart';
 import 'package:medical_trade/utilities/font_manager.dart';
 import 'package:medical_trade/utilities/values_manager.dart';
@@ -13,7 +12,8 @@ import 'package:medical_trade/view/detaisl_all_items.dart';
 import 'package:provider/provider.dart';
 
 class Details extends StatefulWidget {
-  final GetCategoryModel item;
+  final NewCategoryModel item;
+  // final GetCategoryModel item;
   final String categoryType;
   const Details({super.key, required this.item, required this.categoryType});
 
@@ -31,13 +31,15 @@ class _DetailsState extends State<Details> {
     super.initState();
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await Provider.of<ProductDetailsProvider>(context, listen: false)
-          .fetchProduct(
-        categoryId: widget.item.id.toString(),
-        categoryType: widget.categoryType,
-      );
+      // await Provider.of<ProductDetailsProvider>(context, listen: false)
+      //     .fetchProduct(
+      //   categoryId: widget.item.id.toString(),
+      //   categoryType: widget.categoryType,
+      // );
+      Provider.of<AllProductsProvider>(context, listen: false).getProducts(widget.item.id.toString(),widget.categoryType);
     });
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -57,108 +59,101 @@ class _DetailsState extends State<Details> {
         title: _isSearching
             ?
             ///=====new myTask TypeAheadField new 
-             Container(
-                height: 35.h,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.all(Radius.circular(30.r)),
-                ),
-                child: TypeAheadField<ProductModel>(
-                  controller: _productController,
-                  /// Builder replaces textFieldConfiguration
-                  builder: (context, controller, focusNode) {
-                    return TextField(
-                      controller: controller,
-                      focusNode: focusNode,
-                      decoration: InputDecoration(
-                        prefixIcon: Padding(
-                          padding: EdgeInsets.only(right: 12.w),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: Colors.orange,
-                              borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(30.r),
-                                bottomLeft: Radius.circular(30.r),
-                              ),
-                            ),
-                            child: Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 8.w),
-                              child: Icon(Icons.search, size: 18.sp, color: Colors.white),
+           Container(
+              height: 35.h,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.all(Radius.circular(30.r)),
+              ),
+              child: TypeAheadField<GetCategoryProductModel>(
+                controller: _productController,
+
+                builder: (context, controller, focusNode) {
+                  return TextField(
+                    controller: controller,
+                    focusNode: focusNode,
+                    decoration: InputDecoration(
+                      prefixIcon: Padding(
+                        padding: EdgeInsets.only(right: 12.w),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.orange,
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(30.r),
+                              bottomLeft: Radius.circular(30.r),
                             ),
                           ),
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 8.w),
+                            child: Icon(Icons.search, size: 18.sp, color: Colors.white),
+                          ),
                         ),
-                        hintText: 'Search In...',
-                        hintStyle: TextStyle(fontSize: 14.sp, color: Colors.grey),
-                        contentPadding: EdgeInsets.only(left: 12.w, top: 2.h, bottom: 2.h),
-                        border: OutlineInputBorder(
-                          borderSide: BorderSide.none,
-                          borderRadius: BorderRadius.circular(30.r),
-                        ),
-                        filled: true,
-                        fillColor: const Color(0xFFFFC107).withOpacity(0.2),
-                        isDense: true,
                       ),
-                    );
-                  },
-
-                  /// Suggestion filter
-                  suggestionsCallback: (pattern) async {
-                    final data = Provider.of<ProductDetailsProvider>(context, listen: false);
-                    final products = data.categories;
-                    return products
-                        .where((product) => product.productName!
-                            .toLowerCase()
-                            .contains(pattern.toLowerCase()))
-                        .toList();
-                  },
-
-                  /// Suggestion list UI
-                  itemBuilder: (context, ProductModel suggestion) {
-                    return Padding(
-                      padding: EdgeInsets.symmetric(vertical: 5.h, horizontal: 10.w),
-                      child: Text(
-                        suggestion.productName.toString(),
-                        style: TextStyle(fontSize: 14.sp),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                      hintText: 'Search In...',
+                      hintStyle: TextStyle(fontSize: 14.sp, color: Colors.grey),
+                      contentPadding: EdgeInsets.only(left: 12.w, top: 2.h, bottom: 2.h),
+                      border: OutlineInputBorder(
+                        borderSide: BorderSide.none,
+                        borderRadius: BorderRadius.circular(30.r),
                       ),
-                    );
-                  },
-
-                  /// When user selects a suggestion
-                  onSelected: (ProductModel suggestion) {
-                    setState(() {
-                      _productController.text = suggestion.productName.toString();
-                    });
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => DetaislAllItems(item: suggestion),
-                      ),
-                    );
-                    _productController.clear();
-                    setState(() {
-                      _isSearching = false;
-                    });
-                  },
-
-                  /// No items found UI
-                  emptyBuilder: (context) => Padding(
-                    padding: EdgeInsets.all(8.h),
-                    child: Text(
-                      'No Products Found',
-                      style: TextStyle(fontSize: 14.sp),
+                      filled: true,
+                      fillColor: const Color(0xFFFFC107).withOpacity(0.2),
+                      isDense: true,
                     ),
-                  ),
+                  );
+                },
 
-                  /// Suggestion box decoration
-                  decorationBuilder: (context, child) => Material(
-                    elevation: 4,
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(10.r),
-                    child: child,
+                /// 🔥 Corrected Suggestion Filter
+                suggestionsCallback: (pattern) async {
+                  final provider = Provider.of<AllProductsProvider>(context, listen: false);
+                  final products = provider.allProductslist;
+                  return products.where((product) =>product.productName!.toLowerCase().contains(pattern.toLowerCase()))
+                      .toList();
+                },
+
+                itemBuilder: (context, GetCategoryProductModel suggestion) {
+                  return Padding(
+                    padding: EdgeInsets.symmetric(vertical: 5.h, horizontal: 10.w),
+                    child: Text(
+                      suggestion.productName.toString(),
+                      style: TextStyle(fontSize: 14.sp),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  );
+                },
+
+                onSelected: (GetCategoryProductModel suggestion) {
+                  setState(() {
+                    _productController.text = suggestion.productName.toString();
+                  });
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => DetaislAllItems(item: suggestion),
+                    ),
+                  );
+                  _productController.clear();
+                  setState(() {
+                    _isSearching = false;
+                  });
+                },
+
+                emptyBuilder: (context) => Padding(
+                  padding: EdgeInsets.all(8.h),
+                  child: Text(
+                    'No Products Found',
+                    style: TextStyle(fontSize: 14.sp),
                   ),
                 ),
-              )
+
+                decorationBuilder: (context, child) => Material(
+                  elevation: 4,
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(10.r),
+                  child: child,
+                ),
+              ),
+            )
 
             //   ///=====old TypeAheadFormField code
             // Container(
@@ -281,13 +276,12 @@ class _DetailsState extends State<Details> {
         padding: EdgeInsets.only(left: 8.w, right: 8.w, top: 8.h, bottom: 20.h),
         child: Padding(
           padding: EdgeInsets.only(right: 12.w, left: 12.w),
-          child: Consumer<ProductDetailsProvider>(
+          child: Consumer<AllProductsProvider>(
               builder: (context, provider, child) {
-            if (provider.isLoading) {
+            if (AllProductsProvider.isAllProductLoading) {
               return const Center(child: CircularProgressIndicator());
             }
-
-            if (provider.categories.isEmpty) {
+            if (provider.allProductslist.isEmpty) {
               return Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -326,9 +320,9 @@ class _DetailsState extends State<Details> {
                 mainAxisSpacing: 4.0.w,
                 childAspectRatio: 0.750,
               ),
-              itemCount: provider.categories.length,
+              itemCount: provider.allProductslist.length,
               itemBuilder: (context, index) {
-                final product = provider.categories[index];
+                final product = provider.allProductslist[index];
                 return Card(
                   elevation: 6,
                   color: Colors.grey.shade200,
@@ -345,7 +339,7 @@ class _DetailsState extends State<Details> {
                               MaterialPageRoute(
                                 builder: (context) => ImageZoomScreen(
                                   imageUrl:
-                                      'https://madicaltrade.com/uploads/products/${product.image}',
+                                      'https://app.medicaltradeltd.com/${product.image}',
                                 ),
                               ),
                             );
@@ -363,7 +357,7 @@ class _DetailsState extends State<Details> {
                                 top: Radius.circular(10.r),
                               ),
                               child: Image.network(
-                                'https://madicaltrade.com/uploads/products/${product.image}',
+                                'https://app.medicaltradeltd.com/${product.image}',
                                 fit: BoxFit.cover,
                                 loadingBuilder: (BuildContext context,
                                     Widget child,
@@ -415,7 +409,7 @@ class _DetailsState extends State<Details> {
                             ),
                             SizedBox(height: 2.h),
                             Text(
-                              "\$ ${product.productSellingPrice}",
+                              "\$ ${product.price}",
                               style: TextStyle(
                                 fontSize: 14.sp,
                                 fontWeight: FontWeight.w500,

@@ -22,4 +22,10 @@ class CategoryProvider extends ChangeNotifier{
     isAllCategoriesLoading = true;
     notifyListeners();
   }
+   // Filter categories by id list
+  List<NewCategoryModel> getFilteredCategories(List<String> ids) {
+    return allCategoriesList
+        .where((category) => ids.contains(category.id.toString()))
+        .toList();
+  }
 }

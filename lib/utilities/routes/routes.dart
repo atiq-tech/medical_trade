@@ -71,9 +71,9 @@ class Routes {
         return MaterialPageRoute(
             builder: (BuildContext context) => const SalesYourOldMachineView());
 
-      case RoutesName.categorylist:
-        return MaterialPageRoute(
-            builder: (BuildContext context) => const CategoryListScreen());
+      // case RoutesName.categorylist:
+      //   return MaterialPageRoute(
+      //       builder: (BuildContext context) => const CategoryListScreen());
 
       // case RoutesName.diagnostic:
       //   return MaterialPageRoute(

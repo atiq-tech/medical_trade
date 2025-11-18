@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:medical_trade/model/get_categories_model.dart';
-import 'package:medical_trade/view/details.dart';
-import 'package:provider/provider.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:medical_trade/new_part/model/new_category_model.dart';
+import 'package:medical_trade/new_part/providers/category_provider.dart';
 import 'package:medical_trade/utilities/assets_manager.dart';
 import 'package:medical_trade/utilities/color_manager.dart';
 import 'package:medical_trade/utilities/custom_appbar.dart';
 import 'package:medical_trade/utilities/custom_container_homepage.dart';
 import 'package:medical_trade/utilities/sizebox_manager.dart';
 import 'package:medical_trade/utilities/values_manager.dart';
-import 'package:medical_trade/controller/get_categories_api.dart';
-
+import 'package:medical_trade/view/details.dart';
+import 'package:provider/provider.dart';
 
 class NewMachine extends StatefulWidget {
   const NewMachine({super.key});
@@ -20,42 +19,28 @@ class NewMachine extends StatefulWidget {
 }
 
 class _NewMachineState extends State<NewMachine> {
+
   @override
   void initState() {
     super.initState();
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      // Fetch the categories when the widget is initialized
-      Provider.of<GetCategoriesProvider>(context, listen: false).fetchData();
-    });
+    CategoryProvider.isAllCategoriesLoading = true;
+    Provider.of<CategoryProvider>(context, listen: false).getCategories();
   }
 
   void _onAppBarTitleTap() {
     Navigator.pop(context);
   }
-
   @override
   Widget build(BuildContext context) {
-    final provider = Provider.of<GetCategoriesProvider>(context);
-    final categories = provider.getFilteredCategories(["1", "2"]);
+    final allCategoriesData = Provider.of<CategoryProvider>(context).allCategoriesList;
+    print("Category length======${allCategoriesData.length}");
 
-    if (categories.isEmpty) {
-      return Scaffold(
-        backgroundColor: ColorManager.white,
-        appBar: CustomAppBar(
-          onTap: _onAppBarTitleTap,
-          title: "New Machine",
-        ),
-        body: const Center(child: CircularProgressIndicator()),
-      );
-    }
-
-    // Clinical Machine
-    final clinicalMachine = categories.firstWhere(
+     // Clinical Machine
+    final clinicalMachine = allCategoriesData.firstWhere(
       (category) => category.id.toString() == "1",
-      orElse: () => GetCategoryModel(
+      orElse: () => NewCategoryModel(
         id: "1",
-        name: "Category 1",
+        name: "Clinical Machine",
         description: "",
         createdBy: "0",
         updatedBy: "0",
@@ -68,11 +53,11 @@ class _NewMachineState extends State<NewMachine> {
     );
 
     // Pathology Machine
-    final pathologyMachine = categories.firstWhere(
+     final pathologyMachine = allCategoriesData.firstWhere(
       (category) => category.id.toString() == "2",
-      orElse: () => GetCategoryModel(
+      orElse: () => NewCategoryModel(
         id: "2",
-        name: "Category 2",
+        name: "Pathology Machine",
         description: "",
         createdBy: "0",
         updatedBy: "0",
@@ -91,8 +76,7 @@ class _NewMachineState extends State<NewMachine> {
         title: "New Machine",
       ),
       body: Padding(
-        padding:
-            EdgeInsets.only(top: AppPadding.p16.h, left: 12.w, right: 12.w),
+        padding:EdgeInsets.only(top: AppPadding.p16.h, left: 12.w, right: 12.w),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
@@ -141,6 +125,7 @@ class _NewMachineState extends State<NewMachine> {
     );
   }
 }
+
 
 
 

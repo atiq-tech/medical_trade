@@ -12,7 +12,7 @@ class AllProductsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => AllProductsProvider()..on()..getProducts(), // provider init + load
+      create: (_) => AllProductsProvider()..on()..getProducts("1","old"), // provider init + load
       child: Scaffold(
         appBar: AppBar(
           title: const Text('All Products'),

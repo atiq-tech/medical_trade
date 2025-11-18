@@ -47,8 +47,8 @@ class AppUrl {
 
   //Sales Your Old Machine Page Api ALl
   static var getClientPostEndPoint = '$baseUrl/get-client-post';
-  static var addClientpostEndPoint = '$baseUrl/add-clientpost';
-  static var generateClientPostCodeEndPoint = '$baseUrl/generate-clientpostcode';
+  static var addClientpostEndPoint = '$baseUrl/add-client-post';
+  static var generateClientPostCodeEndPoint = '$baseUrl/get-client-post-code';
   //end
 
   //extra

@@ -97,13 +97,16 @@ class ApiServiceNew {
 
 
     //========= fetch categories
- static Future<List<GetCategoryProductModel>?> fetchGetProductsApi() async { 
+ static Future<List<GetCategoryProductModel>?> fetchGetProductsApi(String? productCategoryId,String? type) async { 
   try {
     String url = AppUrl.getProductsEndPoint;
     final token = getToken();
 
-    Response response = await Dio().get(
-      url,
+    Response response = await Dio().get(url,
+      data: {
+          "product_category_id": productCategoryId,
+          "type": type
+      },
       options: Options(
         headers: {
           "Content-Type": "application/json",
@@ -114,14 +117,11 @@ class ApiServiceNew {
 
     var data = response.data;
     print("get products data === $data");
-
     // Use fromJson instead of fromMap
-    return List.from(data["data"])
-        .map((e) => GetCategoryProductModel.fromJson(e))
-        .toList();
+    return List.from(data["data"]).map((e) => GetCategoryProductModel.fromJson(e)).toList();
 
   } catch (e) {
-    print("API ERROR fetchCategoryApi === $e");
+    print("API ERROR products === $e");
     return null;
   }
 }

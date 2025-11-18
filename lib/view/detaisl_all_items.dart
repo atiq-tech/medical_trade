@@ -5,6 +5,7 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:medical_trade/controller/contact_api.dart';
 import 'package:medical_trade/controller/customer_product_buy_api.dart';
 import 'package:medical_trade/controller/slider_controller.dart';
+import 'package:medical_trade/model/get_category_product_model.dart';
 import 'package:medical_trade/model/product_model.dart';
 import 'package:medical_trade/utilities/color_manager.dart';
 import 'package:medical_trade/utilities/custom_appbar.dart';
@@ -18,7 +19,8 @@ import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class DetaislAllItems extends StatefulWidget {
-  final ProductModel item;
+  final GetCategoryProductModel item;
+  // final ProductModel item;
   const DetaislAllItems({super.key, required this.item});
 
   @override
@@ -50,58 +52,67 @@ class _DetaislAllItemsState extends State<DetaislAllItems> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            GestureDetector(
-              onTap: () => _openZoomView(context),
-              child: CarouselSlider(
-                items: widget.item.productGallery!.map((item) {
-                  return Builder(
-                    builder: (BuildContext context) {
-                      return Image.network(
-                        width: double.infinity.w,
-                        'https://soft.madicaltrade.com/uploads/product_gallery/${item.productImage}',
-                        fit: BoxFit.cover,
-                        loadingBuilder: (context, child, loadingProgress) {
-                          if (loadingProgress == null) {
-                            return child;
-                          }
-                          return Center(
-                            child: CircularProgressIndicator(
-                              value: loadingProgress.expectedTotalBytes != null
-                                  ? loadingProgress.cumulativeBytesLoaded /
-                                      loadingProgress.expectedTotalBytes!
-                                  : null,
-                              strokeWidth: 2.0,
-                            ),
+           GestureDetector(
+            onTap: () => _openZoomView(context),
+            child: (widget.item.images == null || widget.item.images!.isEmpty)
+                ? Center(
+                    child: Text(
+                      "No Images Available",
+                      style: TextStyle(fontSize: 16, color: Colors.grey),
+                    ),
+                  )
+                : CarouselSlider(
+                    items: widget.item.images!.map((item) {
+                      return Builder(
+                        builder: (BuildContext context) {
+                          return Image.network(
+                            'https://app.medicaltradeltd.com/$item',
+                            width: double.infinity,
+                            fit: BoxFit.cover,
+                            loadingBuilder: (context, child, loadingProgress) {
+                              if (loadingProgress == null) {
+                                return child;
+                              }
+                              return Center(
+                                child: CircularProgressIndicator(
+                                  value: loadingProgress.expectedTotalBytes != null
+                                      ? loadingProgress.cumulativeBytesLoaded /
+                                          loadingProgress.expectedTotalBytes!
+                                      : null,
+                                  strokeWidth: 2.0,
+                                ),
+                              );
+                            },
+                            errorBuilder: (context, error, stackTrace) =>
+                                Icon(Icons.error),
                           );
                         },
-                        errorBuilder: (context, error, stackTrace) =>
-                            const Icon(Icons.error),
                       );
-                    },
-                  );
-                }).toList(),
-                options: CarouselOptions(
-                  autoPlay: false,
-                  enlargeCenterPage: true,
-                  // aspectRatio: 2.0,
-                  viewportFraction: 1.0,
-                  onPageChanged: (index, reason) {
-                    Provider.of<AppProvider>(context, listen: false)
-                        .setCarouselIndex(index);
-                  },
-                ),
-              ),
+                    }).toList(),
+                    options: CarouselOptions(
+                      autoPlay: false,
+                      enlargeCenterPage: true,
+                      viewportFraction: 1.0,
+                      onPageChanged: (index, reason) {
+                        Provider.of<AppProvider>(context, listen: false)
+                            .setCarouselIndex(index);
+                      },
+                    ),
+                  ),
             ),
             Consumer<AppProvider>(builder: (context, provider, _) {
+              final images = widget.item.images;
+              // 🔥 images null বা empty হলে কোন dot দেখাবে না
+              if (images == null || images.isEmpty) {
+                return const SizedBox();
+              }
               return Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: widget.item.productGallery!.map((url) {
-                  int index = widget.item.productGallery!.indexOf(url);
+                children: List.generate(images.length, (index) {
                   return Container(
                     width: 8,
                     height: 8,
-                    margin:
-                        EdgeInsets.symmetric(vertical: 10.h, horizontal: 3.w),
+                    margin: EdgeInsets.symmetric(vertical: 10.h, horizontal: 3.w),
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       color: provider.carouselIndex == index
@@ -109,10 +120,9 @@ class _DetaislAllItemsState extends State<DetaislAllItems> {
                           : const Color.fromRGBO(0, 0, 0, 0.4),
                     ),
                   );
-                }).toList(),
+                }),
               );
             }),
-            SizedBox(height: 40.h),
             Padding(
               padding: EdgeInsets.all(16.0.r),
               child: Column(
@@ -129,7 +139,7 @@ class _DetaislAllItemsState extends State<DetaislAllItems> {
                               MaterialPageRoute(
                                 builder: (context) => ImageZoomScreen(
                                   imageUrl:
-                                      'https://madicaltrade.com/uploads/products/${widget.item.image}',
+                                      'https://app.medicaltradeltd.com/${widget.item.image}',
                                 ),
                               ),
                             );
@@ -143,7 +153,7 @@ class _DetaislAllItemsState extends State<DetaislAllItems> {
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(8.r),
                               child: Image.network(
-                                'https://madicaltrade.com/uploads/products/${widget.item.image}',
+                                'https://app.medicaltradeltd.com/${widget.item.image}',
                                 fit: BoxFit.cover,
                                 loadingBuilder: (BuildContext context,
                                     Widget child,
@@ -196,7 +206,7 @@ class _DetaislAllItemsState extends State<DetaislAllItems> {
                               ),
                               SizedBox(height: 8.h),
                               Text(
-                                "BDT ${widget.item.productSellingPrice}",
+                                "BDT ${widget.item.price}",
                                 textAlign: TextAlign.start,
                                 style: FontManager.headline.copyWith(
                                   color: Colors.green,
@@ -245,8 +255,7 @@ class _DetaislAllItemsState extends State<DetaislAllItems> {
                                   SizedBox(width: 4.w),
                                   Flexible(
                                     child: Text(
-                                      widget.item.productCategoryName
-                                          .toString(),
+                                      widget.item.categoryName.toString(),
                                       textAlign: TextAlign.start,
                                       style: FontManager.headline.copyWith(
                                         color: Colors.green,
@@ -481,7 +490,7 @@ class _DetaislAllItemsState extends State<DetaislAllItems> {
                                                 provider
                                                     .fetchCustomerCodeAndSendOrder(
                                                   wallpostId: widget
-                                                      .item.productSlNo
+                                                      .item.id
                                                       .toString(),
                                                 )
                                                     .then((_) {
@@ -600,28 +609,27 @@ class _DetaislAllItemsState extends State<DetaislAllItems> {
             ],
           ),
           body: PhotoViewGallery.builder(
-            itemCount: widget.item.productGallery?.length ?? 0,
-            pageController: PageController(initialPage: _currentIndex),
-            onPageChanged: (index) => setState(() => _currentIndex = index),
-            builder: (context, index) {
-              return PhotoViewGalleryPageOptions(
-                imageProvider: NetworkImage(
-                  'https://soft.madicaltrade.com/uploads/product_gallery/${widget.item.productGallery?[index].productImage}',
-                ),
-                minScale: PhotoViewComputedScale.contained,
-                maxScale: PhotoViewComputedScale.covered * 2,
-                heroAttributes: PhotoViewHeroAttributes(tag: 'gallery_$index'),
-              );
-            },
-            loadingBuilder: (context, event) => Center(
-              child: CircularProgressIndicator(
-                value: event == null
-                    ? null
-                    : event.cumulativeBytesLoaded /
-                        (event.expectedTotalBytes ?? 1),
+          itemCount: widget.item.images?.length ?? 0,
+          pageController: PageController(initialPage: _currentIndex),
+          onPageChanged: (index) => setState(() => _currentIndex = index),
+          builder: (context, index) {
+            return PhotoViewGalleryPageOptions(
+              imageProvider: NetworkImage(
+                'https://app.medicaltradeltd.com/${widget.item.images?[index]}',
               ),
+              minScale: PhotoViewComputedScale.contained,
+              maxScale: PhotoViewComputedScale.covered * 2,
+              heroAttributes: PhotoViewHeroAttributes(tag: 'gallery_$index'),
+            );
+          },
+          loadingBuilder: (context, event) => Center(
+            child: CircularProgressIndicator(
+              value: event == null
+                  ? null
+                  : event.cumulativeBytesLoaded / (event.expectedTotalBytes ?? 1),
             ),
           ),
+        )
         );
       },
     );

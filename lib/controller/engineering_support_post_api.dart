@@ -42,9 +42,9 @@ class EngineeringSupportProvider with ChangeNotifier {
     final id = box.read('id');
     // Creating the Multipart request
     var request = http.MultipartRequest('POST', Uri.parse(url))
-      ..fields['Machine_name'] = machineName
-      ..fields['Model'] = model
-      ..fields['Origin'] = origin
+      ..fields['machine_name'] = machineName
+      ..fields['model'] = model
+      ..fields['origin'] = origin
       ..fields['mobile'] = mobile
       ..fields['description'] = machineDetails
       ..fields['status'] = 'a'

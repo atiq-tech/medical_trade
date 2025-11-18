@@ -47,6 +47,7 @@ class _CategoryListScreenState extends State<CategoryListScreen> {
   @override
   Widget build(BuildContext context) {
     final allCategoriesData = Provider.of<CategoryProvider>(context).allCategoriesList;
+    print("Category length======${allCategoriesData.length}");
 
     // initialize filtered list initially
     if (filteredCategories.isEmpty && allCategoriesData.isNotEmpty) {

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:medical_trade/controller/get_categories_api.dart';
 import 'package:medical_trade/controller/login_auth.dart';
+import 'package:medical_trade/new_part/providers/category_provider.dart';
 import 'package:medical_trade/view/auth/login_register_auth.dart';
 import 'package:medical_trade/view/by_reagent_category_view.dart';
 import 'package:provider/provider.dart';
@@ -29,7 +30,8 @@ class _CustomDrawerState extends State<CustomDrawer> {
     userName = box.read('userName');
     // Fetch categories when the drawer is initialized
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<GetCategoriesProvider>(context, listen: false).fetchData();
+      //Provider.of<GetCategoriesProvider>(context, listen: false).fetchData();
+      Provider.of<CategoryProvider>(context, listen: false).getCategories();
     });
   }
 
@@ -41,7 +43,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
 
   @override
   Widget build(BuildContext context) {
-    final categoryProvider = Provider.of<GetCategoriesProvider>(context);
+    final categoryProvider = Provider.of<CategoryProvider>(context);
 
     return Drawer(
       shape: RoundedRectangleBorder(
@@ -164,15 +166,14 @@ class _CustomDrawerState extends State<CustomDrawer> {
               ),
             ),
             if (_isByReagentExpanded) ...[
-              if (categoryProvider.isLoading) ...[
+              if (CategoryProvider.isAllCategoriesLoading) ...[
                 Center(
                   child: CircularProgressIndicator(
                     valueColor: AlwaysStoppedAnimation<Color>(ColorManager.red),
                   ),
                 ),
               ] else ...[
-                for (var category in categoryProvider
-                    .getFilteredCategories(["4", "5", "6", "7"])) ...[
+                for (var category in categoryProvider.getFilteredCategories(["4", "5", "6", "7"])) ...[
                   Divider(color: Colors.grey,height: 0.5.h),
                   CustomDrawerSubitem(
                     onTap: () {

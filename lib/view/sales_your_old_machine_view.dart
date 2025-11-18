@@ -8,6 +8,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:medical_trade/controller/get_client_post_api.dart';
 import 'package:medical_trade/controller/get_district_api.dart';
 import 'package:medical_trade/controller/get_division_api.dart';
+import 'package:medical_trade/diagnostic_module/utils/all_textstyle.dart';
+import 'package:medical_trade/diagnostic_module/utils/utils.dart';
 import 'package:medical_trade/model/district_model.dart';
 import 'package:medical_trade/model/division_model.dart';
 import 'package:medical_trade/utilities/custom_appbar.dart';
@@ -42,16 +44,138 @@ class _SalesYourOldMachineViewState extends State<SalesYourOldMachineView> {
   final List<DistrictModel> _selectedDistricts = [];
   final List<DivisionModel> _selectedDivisions = [];
 
+  // final List<XFile> _imagesList = [];
+  // void _pickImage() async {
+  //   final pickedFiles = await ImagePicker().pickMultiImage();
+
+  //   if (pickedFiles.isNotEmpty) {
+  //     setState(() {
+  //       _imagesList.clear(); // Clear previous images
+  //       for (var pickedFile in pickedFiles) {
+  //         _imagesList.add(XFile(pickedFile.path));
+  //       }
+  //     });
+  //   }
+  // }
   final List<XFile> _imagesList = [];
   void _pickImage() async {
-    final pickedFiles = await ImagePicker().pickMultiImage();
+  showDialog(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(15),
+        ),
+        title: Text("Select Image Option"),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: Icon(Icons.camera_alt),
+              title: Text("Camera"),
+              onTap: () async {
+                Navigator.pop(context);
+                final XFile? photo = await ImagePicker().pickImage(
+                  source: ImageSource.camera,
+                );
 
-    if (pickedFiles.isNotEmpty) {
+                if (photo != null) {
+                  setState(() {
+                    // _imagesList.clear(); // চাইলে আগের সব মুছতে পারেন
+                    _imagesList.add(photo);
+                  });
+                }
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.photo_library),
+              title: Text("Gallery"),
+              onTap: () async {
+                Navigator.pop(context);
+                final pickedFiles = await ImagePicker().pickMultiImage();
+
+                if (pickedFiles.isNotEmpty) {
+                  setState(() {
+                    _imagesList.clear();
+                    _imagesList.addAll(pickedFiles);
+                  });
+                }
+              },
+            ),
+          ],
+        ),
+      );
+    },
+  );
+}
+
+// void _pickImage() async {
+//   showModalBottomSheet(
+//     context: context,
+//     builder: (context) {
+//       return SafeArea(
+//         child: Wrap(
+//           children: [
+//             ListTile(
+//               leading: Icon(Icons.camera_alt),
+//               title: Text("Camera"),
+//               onTap: () async {
+//                 Navigator.pop(context);
+//                 final XFile? photo = await ImagePicker().pickImage(
+//                   source: ImageSource.camera,
+//                 );
+
+//                 if (photo != null) {
+//                   setState(() {
+//                     //_imagesList.clear(); // আগের সব ছবি রিমুভ
+//                     _imagesList.add(photo);
+//                   });
+//                 }
+//               },
+//             ),
+//             ListTile(
+//               leading: Icon(Icons.photo_library),
+//               title: Text("Gallery (Multi Image)"),
+//               onTap: () async {
+//                 Navigator.pop(context);
+//                 final pickedFiles = await ImagePicker().pickMultiImage();
+
+//                 if (pickedFiles.isNotEmpty) {
+//                   setState(() {
+//                     _imagesList.clear();
+//                     _imagesList.addAll(pickedFiles);
+//                   });
+//                 }
+//               },
+//             ),
+//           ],
+//         ),
+//       );
+//     },
+//   );
+// }
+
+  String? firstPickedDate;
+  var backEndFirstDate;
+  var backEndSecondtDate;
+
+  var toDay = DateTime.now();
+  void _firstSelectedDate() async {
+    final selectedDate = await showDatePicker(
+        context: context,
+        initialDate: DateTime.now(),
+        firstDate: DateTime(1950),
+        lastDate: DateTime(2050));
+    if (selectedDate != null) {
       setState(() {
-        _imagesList.clear(); // Clear previous images
-        for (var pickedFile in pickedFiles) {
-          _imagesList.add(XFile(pickedFile.path));
-        }
+        firstPickedDate = Utils.formatFrontEndDate(selectedDate);
+        backEndFirstDate = Utils.formatBackEndDate(selectedDate);
+      });
+    }
+    else{
+      setState(() {
+        firstPickedDate = Utils.formatFrontEndDate(toDay);
+        backEndFirstDate = Utils.formatBackEndDate(toDay);
       });
     }
   }
@@ -59,6 +183,8 @@ class _SalesYourOldMachineViewState extends State<SalesYourOldMachineView> {
   @override
   void initState() {
     super.initState();
+    firstPickedDate = Utils.formatFrontEndDate(DateTime.now());
+    backEndFirstDate = Utils.formatBackEndDate(DateTime.now());
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final districtProvider = Provider.of<DistrictProvider>(context, listen: false);
@@ -74,7 +200,7 @@ class _SalesYourOldMachineViewState extends State<SalesYourOldMachineView> {
       // Update divisionsNameMap after fetching divisons
        setState(() {
         divisionNameMap = Map.fromEntries(divisionProvider.divisions.map(
-            (division) =>MapEntry(division.id, division.name)));
+            (division) =>MapEntry(division.id.toString(), division.name)));
       });
       ///===old===
       // setState(() {
@@ -84,7 +210,7 @@ class _SalesYourOldMachineViewState extends State<SalesYourOldMachineView> {
       // Update districtsNameMap after fetching districts
       setState(() {
         districtsNameMap = Map.fromEntries(districtProvider.districts.map(
-            (district) => MapEntry(district.id, district.areaName)));
+            (district) => MapEntry(district.id.toString(), district.areaName)));
       });
       // setState(() {
       //   districtsNameMap = Map.fromEntries(districtProvider.districts.map(
@@ -134,125 +260,244 @@ class _SalesYourOldMachineViewState extends State<SalesYourOldMachineView> {
                   child: Padding(
                       padding: EdgeInsets.only(left: 8.w, right: 8.w, top: 12.h, bottom: 4.h),
                       child: Column(children: [
-                        Padding(
-                          padding: EdgeInsets.only(top: 12.h, bottom: 10.h),
-                          child: Center(
-                            child: GestureDetector(
-                              onTap: _pickImage,
-                              child: Stack(
-                                clipBehavior: Clip.none,
-                                children: [
-                                  Container(
-                                    width: 85.0.w,
-                                    height: 85.0.h,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      border: Border.all(
-                                        color: Colors.grey,
-                                        width: 2.0.w,
-                                      ),
-                                    ),
-                                    child: CircleAvatar(
-                                      radius: 30.0.r,
-                                      backgroundColor: Colors.white,
-                                      child: Padding(
-                                        padding: EdgeInsets.all(12.0.r),
-                                        child: Image.asset(
-                                          "assets/icons/machine.png",
-                                          fit: BoxFit.cover,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  Positioned(
-                                    bottom: 0,
-                                    right: 0,
-                                    child: Container(
-                                      width: 30.0.w,
-                                      height: 30.0.h,
+                           Padding(
+                            padding: EdgeInsets.only(top: 12.h, bottom: 10.h),
+                            child: Center(
+                              child: GestureDetector(
+                                onTap: _pickImage,
+                                child: Stack(
+                                  clipBehavior: Clip.none,
+                                  children: [
+                                    Container(
+                                      width: 85.0.w,
+                                      height: 85.0.h,
                                       decoration: BoxDecoration(
                                         shape: BoxShape.circle,
-                                        color: Colors.white,
                                         border: Border.all(
                                           color: Colors.grey,
-                                          width: 1.0.w,
+                                          width: 2.0.w,
                                         ),
                                       ),
-                                      child: InkWell(
-                                        onTap: _pickImage,
-                                        child: Icon(
-                                          Icons.camera_alt,
-                                          color: Colors.black,
-                                          size: 16.0.sp,
+                                      child: CircleAvatar(
+                                        radius: 30.0.r,
+                                        backgroundColor: Colors.white,
+                                        child: Padding(
+                                          padding: EdgeInsets.all(12.0.r),
+                                          child: Image.asset(
+                                            "assets/icons/machine.png",
+                                            fit: BoxFit.cover,
+                                          ),
                                         ),
                                       ),
                                     ),
-                                  ),
-                                ],
+                                    Positioned(
+                                      bottom: 0,
+                                      right: 0,
+                                      child: Container(
+                                        width: 30.0.w,
+                                        height: 30.0.h,
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          color: Colors.white,
+                                          border: Border.all(
+                                            color: Colors.grey,
+                                            width: 1.0.w,
+                                          ),
+                                        ),
+                                        child: InkWell(
+                                          onTap: _pickImage,
+                                          child: Icon(
+                                            Icons.camera_alt,
+                                            color: Colors.black,
+                                            size: 16.0.sp,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                        ///====my contribute
-                       _imagesList.isEmpty ? SizedBox() : Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 12.w),
-                          child: SizedBox(
-                            height: 80.h,
-                            child: ListView.builder(
-                              scrollDirection: Axis.horizontal,
-                              itemCount: _imagesList.length,
-                              itemBuilder: (context, index) {
-                                final XFile imageFile = _imagesList[index];
-                                final File file = File(imageFile.path);
-                                return Padding(
-                                  padding: EdgeInsets.only(right: 10.w),
-                                  child: Stack(
-                                    children: [
-                                      ClipRRect(
-                                        borderRadius: BorderRadius.circular(5.r),
-                                        child: Image.file(
-                                          file, // Use the images from the list
-                                          height: 80.h,
-                                          width: 80.w,
-                                          fit: BoxFit.cover,
-                                          errorBuilder:
-                                              (context, error, stackTrace) =>
-                                                  const Icon(
-                                            Icons.error,
-                                          ),
-                                        ),
-                                      ),
-                                      Positioned(
-                                        top: 4.0,
-                                        right: 4.0,
-                                        child: GestureDetector(
-                                          onTap: () {
-                                            setState(() {
-                                              _imagesList.removeAt(index);
-                                            });
-                                          },
-                                          child: Container(
-                                            padding: EdgeInsets.all(4.0.r),
-                                            decoration: BoxDecoration(
-                                              color: Colors.grey.shade100,
-                                              shape: BoxShape.circle,
-                                            ),
-                                            child: Icon(
-                                              Icons.close,
-                                              color: Colors.red,
-                                              size: 12.0.sp,
+                          _imagesList.isEmpty ? SizedBox() : Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 12.w),
+                            child: SizedBox(
+                              height: 80.h,
+                              child: ListView.builder(
+                                scrollDirection: Axis.horizontal,
+                                itemCount: _imagesList.length,
+                                itemBuilder: (context, index) {
+                                  final XFile imageFile = _imagesList[index];
+                                  final File file = File(imageFile.path);
+                                  return Padding(
+                                    padding: EdgeInsets.only(right: 10.w),
+                                    child: Stack(
+                                      children: [
+                                        ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(5.r),
+                                          child: Image.file(
+                                            file, // Use the images from the list
+                                            height: 80.h,
+                                            width: 80.w,
+                                            fit: BoxFit.cover,
+                                            errorBuilder:
+                                                (context, error, stackTrace) =>
+                                                    const Icon(
+                                              Icons.error,
                                             ),
                                           ),
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              },
+                                        Positioned(
+                                          top: 4.0,
+                                          right: 4.0,
+                                          child: GestureDetector(
+                                            onTap: () {
+                                              setState(() {
+                                                _imagesList.removeAt(index);
+                                              });
+                                            },
+                                            child: Container(
+                                              padding: EdgeInsets.all(4.0.r),
+                                              decoration: BoxDecoration(
+                                                color: Colors.grey.shade100,
+                                                shape: BoxShape.circle,
+                                              ),
+                                              child: Icon(
+                                                Icons.close,
+                                                color: Colors.red,
+                                                size: 12.0.sp,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                },
+                              ),
                             ),
                           ),
-                        ),
-                        //end image path
+                         
+                      //   Padding(
+                      //     padding: EdgeInsets.only(top: 12.h, bottom: 10.h),
+                      //     child: Center(
+                      //       child: GestureDetector(
+                      //         onTap: _pickImage,
+                      //         child: Stack(
+                      //           clipBehavior: Clip.none,
+                      //           children: [
+                      //             Container(
+                      //               width: 85.0.w,
+                      //               height: 85.0.h,
+                      //               decoration: BoxDecoration(
+                      //                 shape: BoxShape.circle,
+                      //                 border: Border.all(
+                      //                   color: Colors.grey,
+                      //                   width: 2.0.w,
+                      //                 ),
+                      //               ),
+                      //               child: CircleAvatar(
+                      //                 radius: 30.0.r,
+                      //                 backgroundColor: Colors.white,
+                      //                 child: Padding(
+                      //                   padding: EdgeInsets.all(12.0.r),
+                      //                   child: Image.asset(
+                      //                     "assets/icons/machine.png",
+                      //                     fit: BoxFit.cover,
+                      //                   ),
+                      //                 ),
+                      //               ),
+                      //             ),
+                      //             Positioned(
+                      //               bottom: 0,
+                      //               right: 0,
+                      //               child: Container(
+                      //                 width: 30.0.w,
+                      //                 height: 30.0.h,
+                      //                 decoration: BoxDecoration(
+                      //                   shape: BoxShape.circle,
+                      //                   color: Colors.white,
+                      //                   border: Border.all(
+                      //                     color: Colors.grey,
+                      //                     width: 1.0.w,
+                      //                   ),
+                      //                 ),
+                      //                 child: InkWell(
+                      //                   onTap: _pickImage,
+                      //                   child: Icon(
+                      //                     Icons.camera_alt,
+                      //                     color: Colors.black,
+                      //                     size: 16.0.sp,
+                      //                   ),
+                      //                 ),
+                      //               ),
+                      //             ),
+                      //           ],
+                      //         ),
+                      //       ),
+                      //     ),
+                      //   ),
+                      //   ///====my contribute
+                      //  _imagesList.isEmpty ? SizedBox() : Padding(
+                      //     padding: EdgeInsets.symmetric(horizontal: 12.w),
+                      //     child: SizedBox(
+                      //       height: 80.h,
+                      //       child: ListView.builder(
+                      //         scrollDirection: Axis.horizontal,
+                      //         itemCount: _imagesList.length,
+                      //         itemBuilder: (context, index) {
+                      //           final XFile imageFile = _imagesList[index];
+                      //           final File file = File(imageFile.path);
+                      //           return Padding(
+                      //             padding: EdgeInsets.only(right: 10.w),
+                      //             child: Stack(
+                      //               children: [
+                      //                 ClipRRect(
+                      //                   borderRadius: BorderRadius.circular(5.r),
+                      //                   child: Image.file(
+                      //                     file, // Use the images from the list
+                      //                     height: 80.h,
+                      //                     width: 80.w,
+                      //                     fit: BoxFit.cover,
+                      //                     errorBuilder:
+                      //                         (context, error, stackTrace) =>
+                      //                             const Icon(
+                      //                       Icons.error,
+                      //                     ),
+                      //                   ),
+                      //                 ),
+                      //                 Positioned(
+                      //                   top: 4.0,
+                      //                   right: 4.0,
+                      //                   child: GestureDetector(
+                      //                     onTap: () {
+                      //                       setState(() {
+                      //                         _imagesList.removeAt(index);
+                      //                       });
+                      //                     },
+                      //                     child: Container(
+                      //                       padding: EdgeInsets.all(4.0.r),
+                      //                       decoration: BoxDecoration(
+                      //                         color: Colors.grey.shade100,
+                      //                         shape: BoxShape.circle,
+                      //                       ),
+                      //                       child: Icon(
+                      //                         Icons.close,
+                      //                         color: Colors.red,
+                      //                         size: 12.0.sp,
+                      //                       ),
+                      //                     ),
+                      //                   ),
+                      //                 ),
+                      //               ],
+                      //             ),
+                      //           );
+                      //         },
+                      //       ),
+                      //     ),
+                      //   ),
+                      //   //end image path
 
                         SizedBox(height: 10.h),
                         CustomTextfromfieldSalesOldMachine(
@@ -747,21 +992,58 @@ class _SalesYourOldMachineViewState extends State<SalesYourOldMachineView> {
                           title: "Condition",
                           keyboardType: TextInputType.text,
                         ),
-
-                        SizedBox(
-                          height: 4.h,
-                        ),
+                        SizedBox(height: 4.h),
                         CustomTextfromfieldSalesOldMachine(
                           controller: _originController,
                           hintText: "Enter Origin",
                           title: "Origin",
                           keyboardType: TextInputType.text,
                         ),
-
-                        SizedBox(
-                          height: 4.h,
-                        ),
-
+                        SizedBox(height: 4.h),
+                        Row(children: [
+                          Expanded(flex:5, child: Text("Validity Date:",  style: TextStyle(
+                          fontSize: 14.0.sp,
+                          fontWeight: FontWeight.w600),)),
+                           SizedBox(width: 4.w),
+                          SizedBox(
+                            width: 4.w,
+                            child: Text(
+                              ":",
+                              style: TextStyle(color: Colors.black, fontSize: 16.sp),
+                            ),
+                          ),
+                          SizedBox(width: 10.w),
+                          Expanded(
+                            flex: 8,
+                            child: Container(
+                              height: 30.h,
+                              child: GestureDetector(
+                                onTap: (() {
+                                  _firstSelectedDate();
+                                }),
+                                child: TextFormField(
+                                  enabled: false,
+                                  decoration: InputDecoration(contentPadding: EdgeInsets.only(left: 5.w),
+                                    filled: true,
+                                    fillColor: Colors.white,
+                                    suffixIcon: Padding(padding: EdgeInsets.only(left: 20.w),
+                                    child: Icon(Icons.calendar_month, color: Colors.black87,size: 16.r)),
+                                    border: OutlineInputBorder(borderSide: BorderSide(color:  Colors.grey,width: 5.w)),
+                                    hintText: firstPickedDate,
+                                    hintStyle: AllTextStyle.dateFormatStyle
+                                  ),
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return null;
+                                    }
+                                    return null;
+                                  },
+                                ),
+                              ),
+                            ),
+                          ),
+                        ]),
+                        SizedBox(height: 4.h),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.start,
                           crossAxisAlignment: CrossAxisAlignment.center,
@@ -856,8 +1138,7 @@ class _SalesYourOldMachineViewState extends State<SalesYourOldMachineView> {
                               //List<String> selectedDistrictIds = _selectedDistricts.map((district) => district.districtSlNo).toList();
                               List<String> selectedDistrictIds = _selectedDistricts.map((district) => district.id.toString()).toList();
                               // Convert _imagesList (XFile) to a list of File
-                              List<File> images =
-                                  _imagesList.map((e) => File(e.path)).toList();
+                              List<File> images = _imagesList.map((e) => File(e.path)).toList();
 
                               await context
                                   .read<GetClientPostProvider>()
@@ -869,6 +1150,7 @@ class _SalesYourOldMachineViewState extends State<SalesYourOldMachineView> {
                                     condition: _conditionController.text,
                                     origin: _originController.text,
                                     upazila: _upazilaController.text,
+                                    validityDate: firstPickedDate.toString(),
                                     selectedDivisions: selectedDivisionIds,
                                     selectedDistricts: selectedDistrictIds,
                                     mobile: _contactNumberController.text,
@@ -887,6 +1169,8 @@ class _SalesYourOldMachineViewState extends State<SalesYourOldMachineView> {
                                       _selectedDistricts.clear();
                                       _selectedDivisions.clear();
                                       _imagesList.clear();
+                                      firstPickedDate = "";  
+                                      setState(() {});
                                     },
                                   );
                             },

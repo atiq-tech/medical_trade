@@ -5,8 +5,8 @@ import 'package:medical_trade/new_part/api_service.dart';
 class AllProductsProvider extends ChangeNotifier{
   List<GetCategoryProductModel> allProductslist = [];
   static bool isAllProductLoading = false;
-  getProducts() async {
-    allProductslist = (await ApiServiceNew.fetchGetProductsApi())!;
+  getProducts(String? productCategoryId,String? type) async {
+    allProductslist = (await ApiServiceNew.fetchGetProductsApi(productCategoryId,type))!;
   off();
   notifyListeners();
   }

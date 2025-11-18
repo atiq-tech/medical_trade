@@ -39,13 +39,17 @@ class _EngineeringSupportState extends State<EngineeringSupport> {
   // }
 
 final List<XFile> _imagesList = [];
-
 void _pickImage() async {
-  showModalBottomSheet(
+  showDialog(
     context: context,
     builder: (context) {
-      return SafeArea(
-        child: Wrap(
+      return AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(15),
+        ),
+        title: Text("Select Image Option"),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
               leading: Icon(Icons.camera_alt),
@@ -58,7 +62,7 @@ void _pickImage() async {
 
                 if (photo != null) {
                   setState(() {
-                    //_imagesList.clear(); // আগের সব ছবি রিমুভ
+                    // _imagesList.clear(); // চাইলে আগের সব মুছতে পারেন
                     _imagesList.add(photo);
                   });
                 }
@@ -66,7 +70,7 @@ void _pickImage() async {
             ),
             ListTile(
               leading: Icon(Icons.photo_library),
-              title: Text("Gallery (Multi Image)"),
+              title: Text("Gallery"),
               onTap: () async {
                 Navigator.pop(context);
                 final pickedFiles = await ImagePicker().pickMultiImage();
@@ -85,6 +89,7 @@ void _pickImage() async {
     },
   );
 }
+
 
 
   @override
@@ -180,7 +185,7 @@ void _pickImage() async {
                               ),
                             ),
                           ),
-                          Padding(
+                          _imagesList.isEmpty ? SizedBox() : Padding(
                             padding: EdgeInsets.symmetric(horizontal: 12.w),
                             child: SizedBox(
                               height: 80.h,
