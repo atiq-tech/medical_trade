@@ -3,11 +3,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:medical_trade/controller/contact_api.dart';
 import 'package:medical_trade/diagnostic_module/screens/diagnostic_module_screen.dart';
-import 'package:medical_trade/new_part/screens/all_category_screen.dart';
-import 'package:medical_trade/new_part/screens/all_client_post_screen.dart';
-import 'package:medical_trade/new_part/screens/all_product_screen.dart';
-import 'package:medical_trade/new_part/screens/category_old_screen.dart';
-import 'package:medical_trade/new_part/screens/wallpostnew_screen.dart';
 import 'package:medical_trade/utilities/assets_manager.dart';
 import 'package:medical_trade/utilities/color_manager.dart';
 import 'package:medical_trade/utilities/custom_appbar.dart';
@@ -85,8 +80,8 @@ class _HomeViewState extends State<HomeView> {
         'title': 'All Accessories',
         'color': const Color(0xFF9D29B1),
         'icon': ImageAssets.allAccessories,
-        'page': AllProductsScreen(),
-        //'page': const AllAccessories(),
+        //'page': AllProductsScreen(),
+        'page': const AllAccessories(),
       },
       {
         'title': 'Dental Equipment',
@@ -155,9 +150,9 @@ class _HomeViewState extends State<HomeView> {
                   }
                 },
                 child: CustomContainer(
-                  backgroundColor: item['color'],
+                  backgroundColor: Colors.white,
                   text: item['title'],
-                  textColor: ColorManager.white,
+                  textColor: ColorManager.black,
                   iconPath: item['icon'],
                 ),
               );

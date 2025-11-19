@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:medical_trade/controller/get_categories_api.dart';
 import 'package:medical_trade/controller/login_auth.dart';
 import 'package:medical_trade/new_part/providers/category_provider.dart';
 import 'package:medical_trade/view/auth/login_register_auth.dart';

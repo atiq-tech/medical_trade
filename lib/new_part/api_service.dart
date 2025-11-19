@@ -1,6 +1,5 @@
 import 'package:dio/dio.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:http/http.dart' hide Response;
 import 'package:medical_trade/config/app_url.dart';
 import 'package:medical_trade/model/get_category_product_model.dart';
 import 'package:medical_trade/new_part/model/client_post_model.dart';

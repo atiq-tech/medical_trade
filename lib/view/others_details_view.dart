@@ -51,50 +51,62 @@ class _OthersDetailsViewState extends State<OthersDetailsView> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             GestureDetector(
-              onTap: () => _openZoomView(context),
-              child: CarouselSlider(
-                items: widget.item.images!.map((item) {
-                  return Builder(
-                    builder: (BuildContext context) {
-                      return Image.network(
-                        'https://app.medicaltradeltd.com/$item',
-                        width: double.infinity,
-                        fit: BoxFit.cover,
-                        loadingBuilder: (context, child, loadingProgress) {
-                          if (loadingProgress == null) {
-                            return child;
-                          }
-                          return Center(
-                            child: CircularProgressIndicator(
-                              value: loadingProgress.expectedTotalBytes != null
-                                  ? loadingProgress.cumulativeBytesLoaded /
-                                      loadingProgress.expectedTotalBytes!
-                                  : null,
-                              strokeWidth: 2.0,
-                            ),
+            onTap: () => _openZoomView(context),
+            child: (widget.item.images == null || widget.item.images!.isEmpty)
+                ? Center(
+                    child: Text(
+                      "No Images Available",
+                      style: TextStyle(fontSize: 16, color: Colors.grey),
+                    ),
+                  )
+                : CarouselSlider(
+                    items: widget.item.images!.map((item) {
+                      return Builder(
+                        builder: (BuildContext context) {
+                          return Image.network(
+                            'https://app.medicaltradeltd.com/$item',
+                            width: double.infinity,
+                            fit: BoxFit.cover,
+                            loadingBuilder: (context, child, loadingProgress) {
+                              if (loadingProgress == null) {
+                                return child;
+                              }
+                              return Center(
+                                child: CircularProgressIndicator(
+                                  value: loadingProgress.expectedTotalBytes != null
+                                      ? loadingProgress.cumulativeBytesLoaded /
+                                          loadingProgress.expectedTotalBytes!
+                                      : null,
+                                  strokeWidth: 2.0,
+                                ),
+                              );
+                            },
+                            errorBuilder: (context, error, stackTrace) =>
+                                Icon(Icons.error),
                           );
                         },
-                        errorBuilder: (context, error, stackTrace) => Icon(Icons.error),
                       );
-                    },
-                  );
-                }).toList(),
-                options: CarouselOptions(
-                  autoPlay: false,
-                  enlargeCenterPage: true,
-                  viewportFraction: 1.0,
-                  onPageChanged: (index, reason) {
-                    Provider.of<AppProvider>(context, listen: false)
-                        .setCarouselIndex(index);
-                  },
-                ),
-              ),
+                    }).toList(),
+                    options: CarouselOptions(
+                      autoPlay: false,
+                      enlargeCenterPage: true,
+                      viewportFraction: 1.0,
+                      onPageChanged: (index, reason) {
+                        Provider.of<AppProvider>(context, listen: false)
+                            .setCarouselIndex(index);
+                      },
+                    ),
+                  ),
             ),
-
-             Consumer<AppProvider>(builder: (context, provider, _) {
+            Consumer<AppProvider>(builder: (context, provider, _) {
+              final images = widget.item.images;
+              // 🔥 images null বা empty হলে কোন dot দেখাবে না
+              if (images == null || images.isEmpty) {
+                return const SizedBox();
+              }
               return Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(widget.item.images!.length, (index) {
+                children: List.generate(images.length, (index) {
                   return Container(
                     width: 8,
                     height: 8,
@@ -252,7 +264,7 @@ class _OthersDetailsViewState extends State<OthersDetailsView> {
                                   ),
                                   Flexible(
                                     child: Text(
-                                      widget.item.productCategoryId
+                                      widget.item.categoryName
                                           .toString(),
                                       textAlign: TextAlign.start,
                                       style: FontManager.headline.copyWith(
@@ -409,58 +421,58 @@ class _OthersDetailsViewState extends State<OthersDetailsView> {
                         ),
                       ),
 
-                      SizedBox(
-                        height: 16.h,
-                      ),
+                      // SizedBox(
+                      //   height: 16.h,
+                      // ),
 
-                      // Call Button
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(50.r),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black26,
-                              offset: Offset(0, 2),
-                              blurRadius: 6.r,
-                            ),
-                          ],
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Padding(
-                              padding: EdgeInsets.only(
-                                  left: 12.w, top: 8.h, bottom: 8.h),
-                              child: Text(
-                                contactProvider.companyProfile?.phone
-                                        ?.toString() ??
-                                    "",
-                                style: FontManager.headline.copyWith(
-                                  color: Colors.green,
-                                  fontSize: 14.sp,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ),
-                            // InkWell(
-                            //   onTap: () => _launchPhone(contactProvider
-                            //           .contactModel?.contactNumbertwo
-                            //           ?.toString() ??
-                            //       ""),
-                            //   child: Padding(
-                            //     padding:
-                            //         EdgeInsets.only(left: 12.w, right: 12.w),
-                            //     child: Icon(
-                            //       Icons.call,
-                            //       size: 22.sp,
-                            //       color: Colors.green,
-                            //     ),
-                            //   ),
-                            // ),
-                          ],
-                        ),
-                      ),
+                      // // Call Button
+                      // Container(
+                      //   decoration: BoxDecoration(
+                      //     color: Colors.white,
+                      //     borderRadius: BorderRadius.circular(50.r),
+                      //     boxShadow: [
+                      //       BoxShadow(
+                      //         color: Colors.black26,
+                      //         offset: Offset(0, 2),
+                      //         blurRadius: 6.r,
+                      //       ),
+                      //     ],
+                      //   ),
+                      //   child: Row(
+                      //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      //     children: [
+                      //       Padding(
+                      //         padding: EdgeInsets.only(
+                      //             left: 12.w, top: 8.h, bottom: 8.h),
+                      //         child: Text(
+                      //           contactProvider.companyProfile?.phone
+                      //                   ?.toString() ??
+                      //               "",
+                      //           style: FontManager.headline.copyWith(
+                      //             color: Colors.green,
+                      //             fontSize: 14.sp,
+                      //             fontWeight: FontWeight.w600,
+                      //           ),
+                      //         ),
+                      //       ),
+                      //       // InkWell(
+                      //       //   onTap: () => _launchPhone(contactProvider
+                      //       //           .contactModel?.contactNumbertwo
+                      //       //           ?.toString() ??
+                      //       //       ""),
+                      //       //   child: Padding(
+                      //       //     padding:
+                      //       //         EdgeInsets.only(left: 12.w, right: 12.w),
+                      //       //     child: Icon(
+                      //       //       Icons.call,
+                      //       //       size: 22.sp,
+                      //       //       color: Colors.green,
+                      //       //     ),
+                      //       //   ),
+                      //       // ),
+                      //     ],
+                      //   ),
+                      // ),
                     ],
                   ),
                   InkWell(
@@ -468,7 +480,7 @@ class _OthersDetailsViewState extends State<OthersDetailsView> {
                       showDialog(
                         context: context,
                         builder: (context) {
-                          final provider = Provider.of<CustomerProductBuyApi>(
+                          Provider.of<CustomerProductBuyApi>(
                               context,
                               listen: false);
                           return AlertDialog(

@@ -223,7 +223,7 @@ class _SalesYourOldMachineViewState extends State<SalesYourOldMachineView> {
   Widget build(BuildContext context) {
     final districtProvider = Provider.of<DistrictProvider>(context);
     final divisionProvider = Provider.of<DivisionProvider>(context);
-    final registerProvider = Provider.of<GetClientPostProvider>(context);
+    //final registerProvider = Provider.of<GetClientPostProvider>(context);
     // print('Districts: ${districtProvider.districts}');
     // print('District Name Map: $districtsNameMap');
     print("Image _imagesList: ${_imagesList}");

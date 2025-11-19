@@ -1,4 +1,3 @@
-import 'package:carousel_slider/carousel_options.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -7,7 +6,6 @@ import 'package:medical_trade/controller/client_wall_product_buy_api.dart';
 import 'package:medical_trade/controller/contact_api.dart';
 import 'package:medical_trade/controller/slider_controller.dart';
 import 'package:medical_trade/model/wall_post_model.dart';
-import 'package:medical_trade/new_part/model/wall_post_new_model.dart';
 import 'package:medical_trade/utilities/color_manager.dart';
 import 'package:medical_trade/utilities/custom_appbar.dart';
 import 'package:medical_trade/utilities/custom_message.dart';
@@ -37,7 +35,6 @@ class _MyWallProductsDetailsState extends State<MyWallProductsDetails> {
   @override
   Widget build(BuildContext context) {
     final contactProvider = Provider.of<ContactProvider>(context);
-
     // Fetch the contact data if it hasn't been loaded yet
     if (contactProvider.companyProfile == null && !contactProvider.isLoading) {
       contactProvider.fetchContact();
@@ -52,66 +49,76 @@ class _MyWallProductsDetailsState extends State<MyWallProductsDetails> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             GestureDetector(
-              onTap: () => _openZoomView(context),
-              child: CarouselSlider(
-                items: widget.item.images!.map((imagePath) {
-                  return Builder(
-                    builder: (BuildContext context) {
-                      return Image.network(
-                        'https://app.medicaltradeltd.com/$imagePath',
-                        width: double.infinity,
-                        fit: BoxFit.cover,
-                        loadingBuilder: (context, child, loadingProgress) {
-                          if (loadingProgress == null) return child;
-
-                          return Center(
-                            child: CircularProgressIndicator(
-                              value: loadingProgress.expectedTotalBytes != null
-                                  ? loadingProgress.cumulativeBytesLoaded /
-                                      loadingProgress.expectedTotalBytes!
-                                  : null,
-                              strokeWidth: 2.0,
-                            ),
+            onTap: () => _openZoomView(context),
+            child: (widget.item.images == null || widget.item.images!.isEmpty)
+                ? Center(
+                    child: Text(
+                      "No Images Available",
+                      style: TextStyle(fontSize: 16, color: Colors.grey),
+                    ),
+                  )
+                : CarouselSlider(
+                    items: widget.item.images!.map((item) {
+                      return Builder(
+                        builder: (BuildContext context) {
+                          return Image.network(
+                            'https://app.medicaltradeltd.com/$item',
+                            width: double.infinity,
+                            fit: BoxFit.cover,
+                            loadingBuilder: (context, child, loadingProgress) {
+                              if (loadingProgress == null) {
+                                return child;
+                              }
+                              return Center(
+                                child: CircularProgressIndicator(
+                                  value: loadingProgress.expectedTotalBytes != null
+                                      ? loadingProgress.cumulativeBytesLoaded /
+                                          loadingProgress.expectedTotalBytes!
+                                      : null,
+                                  strokeWidth: 2.0,
+                                ),
+                              );
+                            },
+                            errorBuilder: (context, error, stackTrace) =>
+                                Icon(Icons.error),
                           );
                         },
-                        errorBuilder: (context, error, stackTrace) =>
-                            Icon(Icons.error),
                       );
-                    },
+                    }).toList(),
+                    options: CarouselOptions(
+                      autoPlay: false,
+                      enlargeCenterPage: true,
+                      viewportFraction: 1.0,
+                      onPageChanged: (index, reason) {
+                        Provider.of<AppProvider>(context, listen: false)
+                            .setCarouselIndex(index);
+                      },
+                    ),
+                  ),
+            ),
+            Consumer<AppProvider>(builder: (context, provider, _) {
+              final images = widget.item.images;
+              // 🔥 images null বা empty হলে কোন dot দেখাবে না
+              if (images == null || images.isEmpty) {
+                return const SizedBox();
+              }
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List.generate(images.length, (index) {
+                  return Container(
+                    width: 8,
+                    height: 8,
+                    margin: EdgeInsets.symmetric(vertical: 10.h, horizontal: 3.w),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: provider.carouselIndex == index
+                          ? const Color.fromRGBO(0, 0, 0, 0.9)
+                          : const Color.fromRGBO(0, 0, 0, 0.4),
+                    ),
                   );
-                }).toList(),
-                options: CarouselOptions(
-                  autoPlay: false,
-                  enlargeCenterPage: true,
-                  viewportFraction: 1.0,
-                  onPageChanged: (index, reason) {
-                    Provider.of<AppProvider>(context, listen: false)
-                        .setCarouselIndex(index);
-                  },
-                ),
-              ),
-            ),
-            Consumer<AppProvider>(
-              builder: (context, provider, _) {
-                return Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: widget.item.images!.asMap().entries.map((entry) {
-                    int index = entry.key;
-                    return Container(
-                      width: 8,
-                      height: 8,
-                      margin: EdgeInsets.symmetric(vertical: 10.h, horizontal: 3.w),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: provider.carouselIndex == index
-                            ? const Color.fromRGBO(0, 0, 0, 0.9)
-                            : const Color.fromRGBO(0, 0, 0, 0.4),
-                      ),
-                    );
-                  }).toList(),
-                );
-              },
-            ),
+                }),
+              );
+            }),
             SizedBox(height: 12.h),
             Padding(
               padding: EdgeInsets.all(16.0.r),
@@ -405,12 +412,8 @@ class _MyWallProductsDetailsState extends State<MyWallProductsDetails> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Padding(
-                              padding: EdgeInsets.only(
-                                  left: 12.w, top: 8.h, bottom: 8.h),
-                              child: Text(
-                                contactProvider.companyProfile?.name
-                                        ?.toString() ??
-                                    "",
+                              padding: EdgeInsets.only(left: 12.w, top: 8.h, bottom: 8.h),
+                              child: Text(contactProvider.companyProfile?.phone?.toString() ??"",
                                 style: FontManager.headline.copyWith(
                                   color: Colors.green,
                                   fontSize: 14.sp,
@@ -419,13 +422,9 @@ class _MyWallProductsDetailsState extends State<MyWallProductsDetails> {
                               ),
                             ),
                             InkWell(
-                              onTap: () => _launchPhone(contactProvider
-                                      .companyProfile?.phone
-                                      ?.toString() ??
-                                  ""),
+                              onTap: () => _launchPhone(contactProvider.companyProfile?.phone?.toString() ??""),
                               child: Padding(
-                                padding:
-                                    EdgeInsets.only(left: 12.w, right: 12.w),
+                                padding:EdgeInsets.only(left: 12.w, right: 12.w),
                                 child: Icon(
                                   Icons.call,
                                   size: 22.sp,
@@ -437,58 +436,58 @@ class _MyWallProductsDetailsState extends State<MyWallProductsDetails> {
                         ),
                       ),
 
-                      SizedBox(
-                        height: 16.h,
-                      ),
+                      // SizedBox(
+                      //   height: 16.h,
+                      // ),
 
-                      // Call Button
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(50.r),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black26,
-                              offset: Offset(0, 2),
-                              blurRadius: 6.r,
-                            ),
-                          ],
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                             Padding(
-                              padding: EdgeInsets.only(
-                                  left: 12.w, top: 8.h, bottom: 8.h),
-                              child: Text(
-                                contactProvider.companyProfile?.name
-                                        ?.toString() ??
-                                    "",
-                                style: FontManager.headline.copyWith(
-                                  color: Colors.green,
-                                  fontSize: 14.sp,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ),
-                           InkWell(
-                              onTap: () => _launchPhone(contactProvider
-                                      .companyProfile?.phone
-                                      ?.toString() ??
-                                  ""),
-                              child: Padding(
-                                padding:
-                                    EdgeInsets.only(left: 12.w, right: 12.w),
-                                child: Icon(
-                                  Icons.call,
-                                  size: 22.sp,
-                                  color: Colors.green,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                      // // Call Button
+                      // Container(
+                      //   decoration: BoxDecoration(
+                      //     color: Colors.white,
+                      //     borderRadius: BorderRadius.circular(50.r),
+                      //     boxShadow: [
+                      //       BoxShadow(
+                      //         color: Colors.black26,
+                      //         offset: Offset(0, 2),
+                      //         blurRadius: 6.r,
+                      //       ),
+                      //     ],
+                      //   ),
+                      //   child: Row(
+                      //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      //     children: [
+                      //        Padding(
+                      //         padding: EdgeInsets.only(
+                      //             left: 12.w, top: 8.h, bottom: 8.h),
+                      //         child: Text(
+                      //           contactProvider.companyProfile?.name
+                      //                   ?.toString() ??
+                      //               "",
+                      //           style: FontManager.headline.copyWith(
+                      //             color: Colors.green,
+                      //             fontSize: 14.sp,
+                      //             fontWeight: FontWeight.w600,
+                      //           ),
+                      //         ),
+                      //       ),
+                      //      InkWell(
+                      //         onTap: () => _launchPhone(contactProvider
+                      //                 .companyProfile?.phone
+                      //                 ?.toString() ??
+                      //             ""),
+                      //         child: Padding(
+                      //           padding:
+                      //               EdgeInsets.only(left: 12.w, right: 12.w),
+                      //           child: Icon(
+                      //             Icons.call,
+                      //             size: 22.sp,
+                      //             color: Colors.green,
+                      //           ),
+                      //         ),
+                      //       ),
+                      //     ],
+                      //   ),
+                      // ),
                     ],
                   ),
                   InkWell(
@@ -496,6 +495,7 @@ class _MyWallProductsDetailsState extends State<MyWallProductsDetails> {
                       showDialog(
                         context: context,
                         builder: (context) {
+                          // ignore: unused_local_variable
                           final provider =
                               Provider.of<ClientWallProductBuyProvider>(context,
                                   listen: false);
@@ -550,60 +550,54 @@ class _MyWallProductsDetailsState extends State<MyWallProductsDetails> {
                                   Consumer<ClientWallProductBuyProvider>(
                                     builder: (context, provider, child) {
                                       return TextButton(
-                                        onPressed: provider.isLoading
-                                            ? null
-                                            : () {
-                                                // Show loading dialog
-                                                showDialog(
-                                                  context: context,
-                                                  barrierDismissible:
-                                                      false, // Prevent dismissing by tapping outside
-                                                  builder: (context) {
-                                                    return Center(
-                                                      child: SpinKitCircle(
-                                                        color: Colors.red,
-                                                        size: 50.0.sp,
-                                                      ),
-                                                    );
-                                                  },
+                                        onPressed: provider.isLoading ? null
+                                        : () {
+                                            // Show loading dialog
+                                            showDialog(
+                                              context: context,
+                                              barrierDismissible:false, 
+                                              builder: (context) {
+                                                return Center(
+                                                  child: SpinKitCircle(
+                                                    color: Colors.red,
+                                                    size: 50.0.sp,
+                                                  ),
                                                 );
-
-                                                provider.fetchClientCodeAndSendOrder(
-                                                  wallpostId: widget.item.id.toString(),
-                                                )
-                                                    .then((_) {
-                                                  Navigator.pop(context); // Close loading dialog
-                                                  Navigator.pop(context); // Close order confirmation dialog
-                                                  if (provider.errorMessage == null) {
-                                                    CustomToast.show(
-                                                      context: context,
-                                                      text:"Order completed successfully",
-                                                      isSuccess: true,
-                                                    );
-                                                  } else {
-                                                    CustomToast.show(
-                                                      context: context,
-                                                      text: provider.errorMessage ??
-                                                          "An error occurred",
-                                                      isSuccess: false,
-                                                    );
-                                                  }
-                                                }).catchError((error) {
-                                                  Navigator.pop(context); // Close loading dialog
-                                                  CustomToast.show(
-                                                    context: context,
-                                                    text: "Error: $error",
-                                                    isSuccess: false,
-                                                  );
-                                                });
                                               },
+                                            );
+                                            provider.fetchClientCodeAndSendOrder(
+                                              wallpostId: widget.item.id.toString(),
+                                            ).then((_) {
+                                              Navigator.pop(context); 
+                                              Navigator.pop(context); 
+                                              if (provider.errorMessage == null) {
+                                                CustomToast.show(
+                                                  context: context,
+                                                  text:"Order completed successfully",
+                                                  isSuccess: true,
+                                                );
+                                              } else {
+                                                CustomToast.show(
+                                                  context: context,
+                                                  text: provider.errorMessage ?? "An error occurred",
+                                                  isSuccess: false,
+                                                );
+                                              }
+                                            }).catchError((error) {
+                                              Navigator.pop(context); 
+                                              CustomToast.show(
+                                                context: context,
+                                                text: "Error: $error",
+                                                isSuccess: false,
+                                              );
+                                            });
+                                          },
                                         child: Container(
                                           height: 35.h,
                                           width: 90.w,
                                           decoration: BoxDecoration(
                                             color: Colors.red,
-                                            borderRadius:
-                                                BorderRadius.circular(5.r),
+                                            borderRadius: BorderRadius.circular(5.r),
                                           ),
                                           child: Center(
                                             child: Text(

@@ -91,6 +91,7 @@ class LoginAuthProvider extends ChangeNotifier {
           print("User Name stored: $name");
           print("Username stored: $username");
           print("Division stored: $division");
+          print("User Id stored: $id");
 
           _errorMessage = null;
           _setLoading(false);

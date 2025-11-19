@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
-// import 'package:flutter_typeahead/flutter_typeahead.dart';
-import 'package:medical_trade/controller/get_product_api_category.dart';
 import 'package:medical_trade/model/get_category_product_model.dart';
 import 'package:medical_trade/new_part/providers/all_products_provider.dart';
 import 'package:medical_trade/utilities/color_manager.dart';
@@ -20,7 +18,7 @@ class AllAccessories extends StatefulWidget {
 }
 
 bool _isSearching = false;
-final TextEditingController _searchController = TextEditingController();
+//final TextEditingController _searchController = TextEditingController();
 final TextEditingController _productController = TextEditingController();
 
 class _AllAccessoriesState extends State<AllAccessories> {
@@ -28,10 +26,10 @@ class _AllAccessoriesState extends State<AllAccessories> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<GetCategoryProductProvider>(context, listen: false)
-          .fetchDataProduct("3");
+      // Provider.of<GetCategoryProductProvider>(context, listen: false)
+      //     .fetchDataProduct("3");
     });
-    Provider.of<AllProductsProvider>(context, listen: false).getProducts("","");
+    Provider.of<AllProductsProvider>(context, listen: false).getProducts("3","");
   }
 
   @override

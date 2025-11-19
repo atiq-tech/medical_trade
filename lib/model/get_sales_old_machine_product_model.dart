@@ -11,7 +11,7 @@ class GetSalesOldMachineModel {
   String? divisionId;
   String? districtId;
   String? upazila;
-  Null? image;
+  Null image;
   String? validityDate;
   String? status;
   String? addBy;

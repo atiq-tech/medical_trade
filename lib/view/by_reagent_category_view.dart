@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
-// import 'package:flutter_typeahead/flutter_typeahead.dart';
-import 'package:medical_trade/controller/get_product_api_category.dart';
 import 'package:medical_trade/model/get_category_product_model.dart';
 import 'package:medical_trade/new_part/model/new_category_model.dart';
+import 'package:medical_trade/new_part/providers/all_products_provider.dart';
 import 'package:medical_trade/utilities/color_manager.dart';
 import 'package:medical_trade/utilities/font_manager.dart';
 import 'package:medical_trade/utilities/values_manager.dart';
@@ -32,8 +31,8 @@ class _ByReagentCategoryViewState extends State<ByReagentCategoryView> {
     // Fetch the product data for the selected category
     Future.microtask(() {
       // ignore: use_build_context_synchronously
-      Provider.of<GetCategoryProductProvider>(context, listen: false)
-          .fetchDataProduct(widget.item.id.toString());
+      //Provider.of<GetCategoryProductProvider>(context, listen: false).fetchDataProduct(widget.item.id.toString());
+      Provider.of<AllProductsProvider>(context, listen: false).getProducts(widget.item.id.toString(),"");
     });
   }
 
@@ -61,7 +60,8 @@ class _ByReagentCategoryViewState extends State<ByReagentCategoryView> {
                 borderRadius: BorderRadius.all(Radius.circular(30.r)),
               ),
               child: TypeAheadField<GetCategoryProductModel>(
-                controller: _productController, // <-- নতুন সিনট্যাক্স
+                controller: _productController,
+
                 builder: (context, controller, focusNode) {
                   return TextField(
                     controller: controller,
@@ -96,15 +96,15 @@ class _ByReagentCategoryViewState extends State<ByReagentCategoryView> {
                     ),
                   );
                 },
+
+                /// 🔥 Corrected Suggestion Filter
                 suggestionsCallback: (pattern) async {
-                  final data = Provider.of<GetCategoryProductProvider>(context, listen: false);
-                  final products = data.categories;
-                  return products
-                      .where((product) => product.productName!
-                          .toLowerCase()
-                          .contains(pattern.toLowerCase()))
+                  final provider = Provider.of<AllProductsProvider>(context, listen: false);
+                  final products = provider.allProductslist;
+                  return products.where((product) =>product.productName!.toLowerCase().contains(pattern.toLowerCase()))
                       .toList();
                 },
+
                 itemBuilder: (context, GetCategoryProductModel suggestion) {
                   return Padding(
                     padding: EdgeInsets.symmetric(vertical: 5.h, horizontal: 10.w),
@@ -116,21 +116,24 @@ class _ByReagentCategoryViewState extends State<ByReagentCategoryView> {
                     ),
                   );
                 },
+
                 onSelected: (GetCategoryProductModel suggestion) {
                   setState(() {
                     _productController.text = suggestion.productName.toString();
                   });
                   Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ByReagentCategoryViewDetailsView(item: suggestion),
-                    ),
-                  );
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            ByReagentCategoryViewDetailsView(item: suggestion),
+                      ),
+                    );
                   _productController.clear();
                   setState(() {
                     _isSearching = false;
                   });
                 },
+
                 emptyBuilder: (context) => Padding(
                   padding: EdgeInsets.all(8.h),
                   child: Text(
@@ -138,13 +141,15 @@ class _ByReagentCategoryViewState extends State<ByReagentCategoryView> {
                     style: TextStyle(fontSize: 14.sp),
                   ),
                 ),
-                decorationBuilder: (context, child) => Container(
+
+                decorationBuilder: (context, child) => Material(
+                  elevation: 4,
                   color: Colors.white,
+                  borderRadius: BorderRadius.circular(10.r),
                   child: child,
                 ),
               ),
             )
-
             //   ///=====old TypeAheadFormField code
             // Container(
             //     height: 35.h,
@@ -270,192 +275,191 @@ class _ByReagentCategoryViewState extends State<ByReagentCategoryView> {
         padding: EdgeInsets.only(left: 8.w, right: 8.w, top: 8.h, bottom: 20.h),
         child: Padding(
           padding: EdgeInsets.only(right: 12.w, left: 12.w),
-          child: Consumer<GetCategoryProductProvider>(
-            builder: (context, provider, child) {
-              // Show loading indicator while data is being fetched
-              if (provider.isLoading) {
-                return Center(
-                  child: CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(ColorManager.red),
-                  ),
-                );
-              }
-
-              // Show message if no data is available
-              if (provider.categories.isEmpty) {
-                return Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.shopping_bag_outlined,
-                        size: 80.sp,
-                        color: Colors.grey[400],
-                      ),
-                      SizedBox(height: 16.h),
-                      Text(
-                        "No products available",
-                        style: TextStyle(
-                          fontSize: 18.sp,
-                          color: Colors.grey[600],
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      SizedBox(height: 8.h),
-                      Text(
-                        "Check back later!",
-                        style: TextStyle(
-                          fontSize: 14.sp,
-                          color: Colors.grey[500],
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              }
-
-              // Display the GridView with product data
-              return GridView.builder(
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 1,
-                  crossAxisSpacing: 10.0.h,
-                  mainAxisSpacing: 4.0.w,
-                  childAspectRatio: 0.750,
-                ),
-                itemCount: provider.categories.length,
-                itemBuilder: (context, index) {
-                  final product = provider.categories[index];
-                  return Card(
-                    elevation: 6,
-                    color: Colors.grey.shade200,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10.r),
+          child: Consumer<AllProductsProvider>(
+              builder: (context, provider, child) {
+            if (AllProductsProvider.isAllProductLoading) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            if (provider.allProductslist.isEmpty) {
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.shopping_bag_outlined,
+                      size: 80.sp,
+                      color: Colors.grey[400],
                     ),
-                    child: Column(
-                      children: [
-                        Expanded(
-                          child: GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => ImageZoomScreen(
-                                    imageUrl:
-                                        'https://madicaltrade.com/uploads/products/${product.image}',
-                                  ),
+                    SizedBox(height: 16.h),
+                    Text(
+                      "No products available",
+                      style: TextStyle(
+                        fontSize: 18.sp,
+                        color: Colors.grey[600],
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    SizedBox(height: 8.h),
+                    Text(
+                      "Check back later!",
+                      style: TextStyle(
+                        fontSize: 14.sp,
+                        color: Colors.grey[500],
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }
+
+            return GridView.builder(
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 1,
+                crossAxisSpacing: 10.0.h,
+                mainAxisSpacing: 4.0.w,
+                childAspectRatio: 0.750,
+              ),
+              itemCount: provider.allProductslist.length,
+              itemBuilder: (context, index) {
+                final product = provider.allProductslist[index];
+                return Card(
+                  elevation: 6,
+                  color: Colors.grey.shade200,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.r),
+                  ),
+                  child: Column(
+                    children: [
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => ImageZoomScreen(
+                                  imageUrl:
+                                      'https://app.medicaltradeltd.com/${product.image}',
                                 ),
-                              );
-                            },
-                            child: Container(
-                              width: double.infinity,
-                              height: 200.h,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.only(
-                                    topRight: Radius.circular(8.r),
-                                    topLeft: Radius.circular(8.r)),
                               ),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.only(
-                                    topRight: Radius.circular(8.r),
-                                    topLeft: Radius.circular(8.r)),
-                                child: Image.network(
-                                  'https://madicaltrade.com/uploads/products/${product.image}',
-                                  fit: BoxFit.cover,
-                                  loadingBuilder: (BuildContext context,
-                                      Widget child,
-                                      ImageChunkEvent? loadingProgress) {
-                                    if (loadingProgress == null) {
-                                      return child;
-                                    }
-                                    return Center(
-                                      child: SizedBox(
-                                        width: 24.w,
-                                        height: 24.h,
-                                        child: CircularProgressIndicator(
-                                          value: loadingProgress.expectedTotalBytes != null
-                                              ? loadingProgress.cumulativeBytesLoaded /
-                                                  loadingProgress.expectedTotalBytes!
-                                              : null,
-                                          strokeWidth: 2.0,
-                                        ),
+                            );
+                          },
+                          child: Container(
+                            height: 150.h,
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.vertical(
+                                top: Radius.circular(10.r),
+                              ),
+                            ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.vertical(
+                                top: Radius.circular(10.r),
+                              ),
+                              child: Image.network(
+                                'https://app.medicaltradeltd.com/${product.image}',
+                                fit: BoxFit.cover,
+                                loadingBuilder: (BuildContext context,
+                                    Widget child,
+                                    ImageChunkEvent? loadingProgress) {
+                                  if (loadingProgress == null) {
+                                    return child; // Image is loaded
+                                  }
+                                  return Center(
+                                    child: SizedBox(
+                                      width: 24.w,
+                                      height: 24.h,
+                                      child: CircularProgressIndicator(
+                                        value: loadingProgress
+                                                    .expectedTotalBytes !=
+                                                null
+                                            ? loadingProgress
+                                                    .cumulativeBytesLoaded /
+                                                loadingProgress
+                                                    .expectedTotalBytes!
+                                            : null,
+                                        strokeWidth: 2.0,
                                       ),
-                                    );
-                                  },
-                                  errorBuilder: (context, error, stackTrace) =>
-                                      Center(child: Icon(Icons.error, size: 24.w)),
+                                    ),
+                                  );
+                                },
+                                errorBuilder: (context, error, stackTrace) =>
+                                    Center(
+                                  child: Icon(Icons.error, size: 24.w),
                                 ),
                               ),
                             ),
                           ),
                         ),
-                        Padding(
-                          padding:
-                              EdgeInsets.only(top: 6.h, left: 8.w, right: 8.w),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Text(
-                                product.productName.toString(),
-                                style: TextStyle(
-                                  fontSize: 14.sp,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black,
-                                ),
-                                overflow: TextOverflow.ellipsis,
+                      ),
+                      Padding(
+                        padding:
+                            EdgeInsets.only(left: 8.w, right: 8.w, top: 6.h),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Text(
+                              product.productName.toString(),
+                              style: TextStyle(
+                                fontSize: 14.sp,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
                               ),
-                              SizedBox(height: 2.h),
-                              Text(
-                                "\$ ${product.price}",
-                                style: TextStyle(
-                                  fontSize: 14.sp,
-                                  fontWeight: FontWeight.w500,
-                                  color: Colors.green,
-                                ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            SizedBox(height: 2.h),
+                            Text(
+                              "\$ ${product.price}",
+                              style: TextStyle(
+                                fontSize: 14.sp,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.green,
                               ),
-                              SizedBox(height: 8.h),
-                              Align(
-                                alignment: Alignment.center,
-                                child: InkWell(
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>ByReagentCategoryViewDetailsView(item: product),
-                                      ),
-                                    );
-                                  },
-                                  child: Card(
-                                    elevation: 5,
-                                    child: Container(
-                                      height: 25.h,
-                                      width: 80.w,
-                                      decoration: BoxDecoration(
-                                        color: ColorManager.black,
-                                        borderRadius: BorderRadius.circular(AppSize.s5.r),
-                                      ),
-                                      child: Center(
-                                        child: Text(
-                                          "Details",
-                                          style: FontManager.bodyText.copyWith(
-                                              color: ColorManager.white,
-                                              fontSize: 11.sp),
-                                        ),
+                            ),
+                            SizedBox(height: 8.h),
+                            Align(
+                              alignment: Alignment.center,
+                              child: InkWell(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          ByReagentCategoryViewDetailsView(item: product),
+                                    ),
+                                  );
+                                },
+                                child: Card(
+                                  elevation: 5,
+                                  child: Container(
+                                    height: 25.h,
+                                    width: 80.w,
+                                    decoration: BoxDecoration(
+                                      color: ColorManager.black,
+                                      borderRadius:
+                                          BorderRadius.circular(AppSize.s5.r),
+                                    ),
+                                    child: Center(
+                                      child: Text(
+                                        "Details",
+                                        style: FontManager.bodyText.copyWith(
+                                            color: ColorManager.white,
+                                            fontSize: 11.sp),
                                       ),
                                     ),
                                   ),
                                 ),
                               ),
-                              SizedBox(height: 12.h),
-                            ],
-                          ),
+                            ),
+                            SizedBox(height: 12.h),
+                          ],
                         ),
-                      ],
-                    ),
-                  );
-                },
-              );
-            },
-          ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            );
+          }),
         ),
       ),
     );

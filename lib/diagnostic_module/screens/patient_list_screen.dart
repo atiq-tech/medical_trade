@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:medical_trade/diagnostic_module/providers/patients_provider.dart';
+import 'package:medical_trade/utilities/color_manager.dart';
+import 'package:provider/provider.dart';
 
 class PatientListScreen extends StatefulWidget {
   const PatientListScreen({super.key});
@@ -9,45 +12,33 @@ class PatientListScreen extends StatefulWidget {
 }
 
 class _PatientListScreenState extends State<PatientListScreen> {
-  List<Map<String, String>> patientList = [
-    {
-      'id': '101',
-      'name': 'Abdul Karim',
-      'email': 'karim@gmail.com',
-      'address': 'Dhaka, Bangladesh',
-      'phone': '01722-111222',
-    },
-    {
-      'id': '102',
-      'name': 'Nusrat Jahan',
-      'email': 'nusrat@gmail.com',
-      'address': 'Chittagong, Bangladesh',
-      'phone': '01833-222333',
-    },
-    {
-      'id': '103',
-      'name': 'Sabbir Hossain',
-      'email': 'sabbir@gmail.com',
-      'address': 'Sylhet, Bangladesh',
-      'phone': '01944-333444',
-    },
-  ];
-
   Color getColor(Set<MaterialState> states) => const Color.fromARGB(255, 240, 240, 240);
   Color getColors(Set<MaterialState> states) => Colors.white;
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    Provider.of<PatientsProvider>(context, listen: false).getlPatients();
+  }
 
   @override
   Widget build(BuildContext context) {
+    final allPatientsData = Provider.of<PatientsProvider>(context).allPatientList;
     ScreenUtil.init(context);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Patient List'),
-        backgroundColor: Colors.deepPurple,
+        backgroundColor: ColorManager.appbarColor,
+        title: Text(
+          'Patient List',
+          style: TextStyle(fontWeight: FontWeight.w500,fontSize: 16.sp),
+        ),
+        centerTitle: true,
+        elevation: 0,
       ),
       body: Padding(
-        padding: EdgeInsets.all(10.w),
+        padding: EdgeInsets.all(0.w),
         child: Container(
-          height: patientList.isEmpty ? 40.h : 40.h + (patientList.length * 25.0.h),
+          height: allPatientsData.isEmpty ? 40.h : 40.h + (allPatientsData.length * 25.0.h),
           width: double.infinity,
           padding: EdgeInsets.all(10.w),
           child: SingleChildScrollView(
@@ -62,35 +53,33 @@ class _PatientListScreenState extends State<PatientListScreen> {
                 border: TableBorder.all(
                     color: const Color.fromARGB(255, 110, 143, 145), width: 1),
                 columns: const [
-                  DataColumn(label: Center(child: Text('ID', style: TextStyle(color: Colors.white)))),
-                  DataColumn(label: Center(child: Text('Name', style: TextStyle(color: Colors.white)))),
-                  DataColumn(label: Center(child: Text('Email', style: TextStyle(color: Colors.white)))),
-                  DataColumn(label: Center(child: Text('Address', style: TextStyle(color: Colors.white)))),
-                  DataColumn(label: Center(child: Text('Phone', style: TextStyle(color: Colors.white)))),
-                  DataColumn(label: Center(child: Text('Action', style: TextStyle(color: Colors.white)))),
+                  DataColumn(label: Center(child: Text('ID ↕', style: TextStyle(color: Colors.white)))),
+                  DataColumn(label: Center(child: Text('Name ↕', style: TextStyle(color: Colors.white)))),
+                  DataColumn(label: Center(child: Text('Mobile ↕', style: TextStyle(color: Colors.white)))),
+                  DataColumn(label: Center(child: Text('Gender ↕', style: TextStyle(color: Colors.white)))),
+                  DataColumn(label: Center(child: Text('Date of Birth ↕', style: TextStyle(color: Colors.white)))),
+                  //DataColumn(label: Center(child: Text('Age ↕', style: TextStyle(color: Colors.white)))),
+                  DataColumn(label: Center(child: Text('Address ↕', style: TextStyle(color: Colors.white)))),
+                  DataColumn(label: Center(child: Text('NID ↕', style: TextStyle(color: Colors.white)))),
+                  DataColumn(label: Center(child: Text('Remark ↕', style: TextStyle(color: Colors.white)))),
+                  				
                 ],
                 rows: List.generate(
-                  patientList.length,
+                  allPatientsData.length,
                   (index) => DataRow(
                     color: index % 2 == 0
                         ? MaterialStateProperty.resolveWith(getColor)
                         : MaterialStateProperty.resolveWith(getColors),
                     cells: [
-                      DataCell(Center(child: Text(patientList[index]['id']!))),
-                      DataCell(Center(child: Text(patientList[index]['name']!, style: TextStyle(fontSize: 11.sp)))),
-                      DataCell(Center(child: Text(patientList[index]['email']!, style: TextStyle(fontSize: 11.sp)))),
-                      DataCell(Center(child: Text(patientList[index]['address']!, style: TextStyle(fontSize: 11.sp)))),
-                      DataCell(Center(child: Text(patientList[index]['phone']!, style: TextStyle(fontSize: 11.sp)))),
-                      DataCell(Center(
-                        child: GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              patientList.removeAt(index);
-                            });
-                          },
-                          child: Icon(Icons.delete, size: 16.r, color: Colors.deepPurple),
-                        ),
-                      )),
+                      DataCell(Center(child: Text(allPatientsData[index].id.toString()))),
+                      DataCell(Center(child: Text(allPatientsData[index].name??"", style: TextStyle(fontSize: 11.sp)))),
+                      DataCell(Center(child: Text(allPatientsData[index].mobile??"", style: TextStyle(fontSize: 11.sp)))),
+                      DataCell(Center(child: Text(allPatientsData[index].gender??"", style: TextStyle(fontSize: 11.sp)))),
+                      DataCell(Center(child: Text(allPatientsData[index].dateOfBirth??"", style: TextStyle(fontSize: 11.sp)))),
+                      // DataCell(Center(child: Text(allPatientsData[index].))),
+                      DataCell(Center(child: Text(allPatientsData[index].address??"", style: TextStyle(fontSize: 11.sp)))),
+                      DataCell(Center(child: Text(allPatientsData[index].nid??"", style: TextStyle(fontSize: 11.sp)))),
+                      DataCell(Center(child: Text(allPatientsData[index].remark??"", style: TextStyle(fontSize: 11.sp)))),
                     ],
                   ),
                 ),

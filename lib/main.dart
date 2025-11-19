@@ -5,6 +5,7 @@ import 'package:medical_trade/controller/contact_api.dart';
 import 'package:medical_trade/controller/customer_product_buy_api.dart';
 import 'package:medical_trade/controller/slider_controller.dart';
 import 'package:medical_trade/controller/wall_post_api.dart';
+import 'package:medical_trade/diagnostic_module/providers/patients_provider.dart';
 import 'package:medical_trade/new_part/providers/all_products_provider.dart';
 import 'package:medical_trade/new_part/providers/category_provider.dart';
 import 'package:medical_trade/new_part/providers/client_post_provider.dart';
@@ -86,6 +87,8 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider<NewClientPostProvider>(create: (_) => NewClientPostProvider()),
         ChangeNotifierProvider<WallPostNewProvider>(create: (_) => WallPostNewProvider()),
         ChangeNotifierProvider<AllProductsProvider>(create: (_) => AllProductsProvider()),
+        ChangeNotifierProvider<PatientsProvider>(create: (_) => PatientsProvider()),
+        
 
         
         

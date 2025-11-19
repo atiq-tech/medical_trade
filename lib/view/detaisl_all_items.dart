@@ -6,7 +6,6 @@ import 'package:medical_trade/controller/contact_api.dart';
 import 'package:medical_trade/controller/customer_product_buy_api.dart';
 import 'package:medical_trade/controller/slider_controller.dart';
 import 'package:medical_trade/model/get_category_product_model.dart';
-import 'package:medical_trade/model/product_model.dart';
 import 'package:medical_trade/utilities/color_manager.dart';
 import 'package:medical_trade/utilities/custom_appbar.dart';
 import 'package:medical_trade/utilities/custom_message.dart';
@@ -327,7 +326,7 @@ class _DetaislAllItemsState extends State<DetaislAllItems> {
                               padding: EdgeInsets.only(
                                   left: 12.w, top: 8.h, bottom: 8.h),
                               child: Text(
-                                contactProvider.companyProfile?.name
+                                contactProvider.companyProfile?.phone
                                         ?.toString() ??
                                     "",
                                 style: FontManager.headline.copyWith(
@@ -356,58 +355,58 @@ class _DetaislAllItemsState extends State<DetaislAllItems> {
                         ),
                       ),
 
-                      SizedBox(
-                        height: 16.h,
-                      ),
+                      // SizedBox(
+                      //   height: 16.h,
+                      // ),
 
-                      // Call Button
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(50.r),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black26,
-                              offset: Offset(0, 2),
-                              blurRadius: 6.r,
-                            ),
-                          ],
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Padding(
-                              padding: EdgeInsets.only(
-                                  left: 12.w, top: 8.h, bottom: 8.h),
-                              child: Text(
-                                contactProvider.companyProfile?.name
-                                        ?.toString() ??
-                                    "",
-                                style: FontManager.headline.copyWith(
-                                  color: Colors.green,
-                                  fontSize: 14.sp,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ),
-                            // InkWell(
-                            //   onTap: () => _launchPhone(contactProvider
-                            //           .contactModel?.contactNumbertwo
-                            //           ?.toString() ??
-                            //       ""),
-                            //   child: Padding(
-                            //     padding:
-                            //         EdgeInsets.only(left: 12.w, right: 12.w),
-                            //     child: Icon(
-                            //       Icons.call,
-                            //       size: 22.sp,
-                            //       color: Colors.green,
-                            //     ),
-                            //   ),
-                            // ),
-                          ],
-                        ),
-                      ),
+                      // // Call Button
+                      // Container(
+                      //   decoration: BoxDecoration(
+                      //     color: Colors.white,
+                      //     borderRadius: BorderRadius.circular(50.r),
+                      //     boxShadow: [
+                      //       BoxShadow(
+                      //         color: Colors.black26,
+                      //         offset: Offset(0, 2),
+                      //         blurRadius: 6.r,
+                      //       ),
+                      //     ],
+                      //   ),
+                      //   child: Row(
+                      //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      //     children: [
+                      //       Padding(
+                      //         padding: EdgeInsets.only(
+                      //             left: 12.w, top: 8.h, bottom: 8.h),
+                      //         child: Text(
+                      //           contactProvider.companyProfile?.name
+                      //                   ?.toString() ??
+                      //               "",
+                      //           style: FontManager.headline.copyWith(
+                      //             color: Colors.green,
+                      //             fontSize: 14.sp,
+                      //             fontWeight: FontWeight.w600,
+                      //           ),
+                      //         ),
+                      //       ),
+                      //       // InkWell(
+                      //       //   onTap: () => _launchPhone(contactProvider
+                      //       //           .contactModel?.contactNumbertwo
+                      //       //           ?.toString() ??
+                      //       //       ""),
+                      //       //   child: Padding(
+                      //       //     padding:
+                      //       //         EdgeInsets.only(left: 12.w, right: 12.w),
+                      //       //     child: Icon(
+                      //       //       Icons.call,
+                      //       //       size: 22.sp,
+                      //       //       color: Colors.green,
+                      //       //     ),
+                      //       //   ),
+                      //       // ),
+                      //     ],
+                      //   ),
+                      // ),
                     ],
                   ),
                   InkWell(
@@ -415,6 +414,7 @@ class _DetaislAllItemsState extends State<DetaislAllItems> {
                       showDialog(
                         context: context,
                         builder: (context) {
+                          // ignore: unused_local_variable
                           final provider = Provider.of<CustomerProductBuyApi>(
                               context,
                               listen: false);

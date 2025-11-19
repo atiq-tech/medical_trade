@@ -13,12 +13,12 @@ class AppUrl {
   //end
 // My Wall  Api
   static var myWallEndPint = '$baseUrl/get-wall-post';
-  static var clientWallOrderEndPint = '$baseUrl/customer-addwallorder';
-  static var generateWallOrderCodeEndPint = '$baseUrl/generate-customerwallordercode';
+  static var clientWallOrderEndPint = '$baseUrl/add-wall-order';
+  static var generateWallOrderCodeEndPint = '$baseUrl/get-wall-order-code';
   //end
   // Customer Order   Api
-  static var customerOrderEndPint = '$baseUrl/customer-addorder';
-  static var generateCustomerOrderCodeEndPint = '$baseUrl/generate-customerordercode';
+  static var customerOrderEndPint = '$baseUrl/add-customer-order';
+  static var generateCustomerOrderCodeEndPint = '$baseUrl/get-customer-order-code';
   //end
 
   //Register Api All
@@ -49,6 +49,11 @@ class AppUrl {
   static var getClientPostEndPoint = '$baseUrl/get-client-post';
   static var addClientpostEndPoint = '$baseUrl/add-client-post';
   static var generateClientPostCodeEndPoint = '$baseUrl/get-client-post-code';
+  //end
+
+  
+  //Diagnostic All Api 
+  static var getPatientEndPoint = '$baseUrl/get-patient';
   //end
 
   //extra

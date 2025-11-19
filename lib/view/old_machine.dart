@@ -82,7 +82,7 @@ class _OldMachineState extends State<OldMachine> {
           children: [
             Expanded(
               child: CustomContainer(
-                backgroundColor: ColorManager.homeContainerSix,
+                backgroundColor: Colors.white,
                 onTap: () {
                   Navigator.push(
                     context,
@@ -95,14 +95,14 @@ class _OldMachineState extends State<OldMachine> {
                   );
                 },
                 text: clinicalMachine.name,
-                textColor: ColorManager.white,
+                textColor: ColorManager.black,
                 iconPath: ImageAssets.diagnostic,
               ),
             ),
             SizedBoxManager.width(AppMargin.m8),
             Expanded(
               child: CustomContainer(
-                backgroundColor: const Color.fromARGB(255, 152, 201, 154),
+                backgroundColor: Colors.white,
                 onTap: () {
                   Navigator.push(
                     context,
@@ -115,7 +115,7 @@ class _OldMachineState extends State<OldMachine> {
                   );
                 },
                 text: pathologyMachine.name,
-                textColor: ColorManager.white,
+                textColor: ColorManager.black,
                 iconPath: ImageAssets.pathology,
               ),
             ),

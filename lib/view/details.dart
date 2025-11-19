@@ -66,7 +66,6 @@ class _DetailsState extends State<Details> {
               ),
               child: TypeAheadField<GetCategoryProductModel>(
                 controller: _productController,
-
                 builder: (context, controller, focusNode) {
                   return TextField(
                     controller: controller,
