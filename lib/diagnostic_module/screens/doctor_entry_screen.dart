@@ -2,6 +2,7 @@ library;
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
+import 'package:medical_trade/diagnostic_module/models/slot_model.dart';
 import 'package:medical_trade/diagnostic_module/utils/all_textstyle.dart';
 import 'package:medical_trade/diagnostic_module/utils/common_textfield.dart';
 import 'package:medical_trade/diagnostic_module/utils/utils.dart';
@@ -59,8 +60,37 @@ class _DoctorEntryScreenState extends State<DoctorEntryScreen> {
   String userName = "";
   String userType = "";
 
+// TimeOfDay? startTime;
+// TimeOfDay? endTime;
+
+// String formatTime(TimeOfDay? time) {
+//   if (time == null) return "--:--";
+//   final now = DateTime.now();
+//   final dt = DateTime(now.year, now.month, now.day, time.hour, time.minute);
+//   return DateFormat("hh:mm a").format(dt);
+// }
+
+// Future<void> pickTime(bool isStart) async {
+//   TimeOfDay? picked = await showTimePicker(
+//     context: context,
+//     initialTime: TimeOfDay.now(),
+//   );
+
+//   if (picked != null) {
+//     setState(() {
+//       if (isStart) {
+//         startTime = picked;
+//       } else {
+//         endTime = picked;
+//       }
+//     });
+//   }
+// }
+
 TimeOfDay? startTime;
 TimeOfDay? endTime;
+
+List<SlotModel> slotList = [];
 
 String formatTime(TimeOfDay? time) {
   if (time == null) return "--:--";
@@ -85,6 +115,17 @@ Future<void> pickTime(bool isStart) async {
     });
   }
 }
+
+void addSlot() {
+  if (startTime != null && endTime != null) {
+    setState(() {
+      slotList.add(SlotModel(start: startTime!, end: endTime!));
+      startTime = null;
+      endTime = null;
+    });
+  }
+}
+
 
 
   String? firstPickedDate;
@@ -307,73 +348,114 @@ void _calculateCommissionFromAmount() {
                       hintText: "Enter Remark",
                     ),
                     SizedBox(height: 4.0.h),
-                    Row(
-                     children: [
-                      Expanded(flex:6, child: Text("Slot(S/E)", style:AllTextStyle.textFieldHeadStyle)),
-                      const Expanded(flex: 1, child: Text(":")),
-                      Expanded(
-                        flex: 8,
-                        child: Container(
-                          height: 25.h,
-                          margin: EdgeInsets.only(bottom: 4.h),
-                          child: GestureDetector(
-                            onTap: (() {
-                              pickTime(true);
-                            }),
-                            child: TextFormField(
-                              enabled: false,
-                              decoration: InputDecoration(contentPadding: EdgeInsets.only(left: 0.w),
-                                filled: true,
-                                fillColor: Colors.white,
-                                suffixIcon: Padding(padding: EdgeInsets.only(left: 20.w),
-                                child: Icon(Icons.alarm_on, color: Colors.black87,size: 16.r)),
-                                border: OutlineInputBorder(borderSide: BorderSide(color:  Colors.grey,width: 5.w)),
-                                hintText: startTime == null ? "Pick Start Time" : formatTime(startTime),
-                                hintStyle: AllTextStyle.dateFormatStyle
+                     /// ---- Slot Input Row (আপনার কোড) ----
+                      Row(
+                        children: [
+                          Expanded(child: Text("Slot(S/E)", style:AllTextStyle.textFieldHeadStyle)),
+                          Expanded(flex: 0, child: Text(": ")),
+                          Expanded(
+                            flex: 2,
+                            child: GestureDetector(
+                              onTap: () => pickTime(true),
+                              child: Container(
+                                height: 25.h,
+                                decoration: ContDecoration.contDecoration,
+                                child: TextFormField(
+                                  enabled: false,
+                                  decoration: InputDecoration(
+                                    contentPadding: EdgeInsets.only(left: 5.w, bottom: 13.h),
+                                    hintStyle: TextStyle(fontSize: 11.sp, color: Colors.black54),
+                                    hintText: startTime == null ? "00:00AM": formatTime(startTime),
+                                    suffixIcon: Padding(padding: EdgeInsets.only(left: 20.w),
+                                   child: Icon(Icons.alarm_on, color: Colors.black87,size: 16.r)),
+                                  ),
+                                ),
                               ),
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return null;
-                                }
-                                return null;
-                              },
                             ),
                           ),
-                        ),
-                      ),
-                      SizedBox(width:5.w),
-                      Expanded(
-                        flex: 8,
-                        child: Container(
-                          height: 25.h,
-                          margin: EdgeInsets.only(bottom: 4.h),
-                          child: GestureDetector(
-                            onTap: (() {
-                              pickTime(false);
-                            }),
-                            child: TextFormField(
-                              enabled: false,
-                              decoration: InputDecoration(contentPadding: EdgeInsets.only(left: 0.w),
-                                filled: true,
-                                fillColor: Colors.white,
-                                suffixIcon: Padding(padding: EdgeInsets.only(left: 20.w),
-                                child: Icon(Icons.alarm_on, color: Colors.black87,size: 16.r)),
-                                border: OutlineInputBorder(borderSide: BorderSide(color:  Colors.grey,width: 5.w)),
-                                hintText: endTime == null ? "Pick End Time" : formatTime(endTime),
-                                hintStyle: AllTextStyle.dateFormatStyle
+                          SizedBox(width:2.w),
+                          Expanded(
+                            flex: 2,
+                            child: GestureDetector(
+                              onTap: () => pickTime(false),
+                              child: Container(
+                                height: 25.h,
+                                decoration: ContDecoration.contDecoration,
+                                child: TextFormField(
+                                  enabled: false,
+                                  decoration: InputDecoration(
+                                    contentPadding: EdgeInsets.only(left: 5.w, bottom: 13.h),
+                                    hintStyle: TextStyle(fontSize: 11.sp, color: Colors.black54),
+                                    hintText: endTime == null ? "00:00AM" : formatTime(endTime),
+                                    suffixIcon: Padding(padding: EdgeInsets.only(left: 20.w),
+                                   child: Icon(Icons.alarm_on, color: Colors.black87,size: 16.r)),
+                                  ),
+                                ),
                               ),
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return null;
-                                }
-                                return null;
-                              },
                             ),
                           ),
-                        ),
+                          GestureDetector(
+                          onTap: addSlot,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.blue.shade800,
+                              borderRadius: BorderRadius.circular(5.r),
+                            ),
+                            height: 25.h,
+                            width: 25.h,
+                            child: Icon(Icons.add, color: Colors.white, size: 16.r))),
+                        ],
                       ),
-                     ],
-                   ),
+                      Container(
+                      padding: EdgeInsets.symmetric(horizontal: 4.w),
+                      margin: EdgeInsets.symmetric(horizontal: 4.w,vertical: 4.h),
+                      color: const Color.fromARGB(255, 71, 114, 255),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text("Slot No", style: TextStyle(fontSize: 12.sp, fontWeight: FontWeight.bold)),
+                          Text("Start Time", style: TextStyle(fontSize: 12.sp,fontWeight: FontWeight.bold)),
+                          Text("End Time", style: TextStyle(fontSize: 12.sp,fontWeight: FontWeight.bold)),
+                          Text("Action", style: TextStyle(fontSize: 12.sp,fontWeight: FontWeight.bold)),
+                        ],
+                      ),
+                    ),
+                    // ------- List Row --------
+                    Container(
+                      color: const Color.fromARGB(255, 156, 253, 216),
+                      child: ListView.builder(
+                        shrinkWrap: true,
+                        physics: NeverScrollableScrollPhysics(),
+                        itemCount: slotList.length,
+                        itemBuilder: (context, index) {
+                          final slot = slotList[index];
+                          return Container(
+                            height: 20.h,
+                            padding: EdgeInsets.symmetric(horizontal: 5.h),
+                            decoration: BoxDecoration(
+                              border: Border(bottom: BorderSide(color: Colors.grey.shade300)),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                              Text("Slot ${index + 1}",style: TextStyle(fontSize: 12.sp, fontWeight: FontWeight.bold)),
+                              Text(formatTime(slot.start),style: TextStyle(fontSize: 12.sp, fontWeight: FontWeight.bold)),
+                              Text(formatTime(slot.end),style: TextStyle(fontSize: 12.sp, fontWeight: FontWeight.bold)),
+                              GestureDetector(
+                               onTap: () {
+                                  setState(() {
+                                   slotList.removeAt(index);
+                                });
+                              },
+                              child: Container(
+                              padding: EdgeInsets.only(right: 10.w),
+                              child: Icon(Icons.delete, color: Colors.blue.shade800, size: 16.r))),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                    ),
                     CommonTextFieldRow(
                       label: "Address",
                       controller: _addressController,
@@ -447,171 +529,7 @@ void _calculateCommissionFromAmount() {
                         ),
                       ],
                     ),
-
-                    // SizedBox(height: 4.0.h),
-                    // Row(
-                    //   children: [
-                    //     Expanded(
-                    //       flex: 6,
-                    //       child: Text("Day", style: AllTextStyle.textFieldHeadStyle),
-                    //     ),
-                    //     const Expanded(flex: 1, child: Text(":")),
-                    //     Expanded(
-                    //       flex: 16,
-                    //       child: DropdownButtonHideUnderline(
-                    //         child: DropdownButton2<String>(
-                    //           isExpanded: true,
-                    //           hint: Text(
-                    //             _selectedDays.isEmpty ? 'Select days' : _selectedDays.join(','),
-                    //             style: TextStyle(
-                    //               fontSize: 12.sp,
-                    //               color: _selectedDays.isEmpty ? Colors.grey : const Color.fromARGB(221, 83, 83, 83),
-                    //             ),
-                    //           ),
-                    //           items: _allDays.map((day) {
-                    //               return DropdownMenuItem<String>(
-                    //                 value: day,
-                    //                 child: StatefulBuilder(
-                    //                   builder: (context, setStateCheckbox) {
-                    //                     final isSelected = _selectedDays.contains(day);
-                    //                     return GestureDetector(
-                    //                       onTap: () {
-                    //                         setState(() {
-                    //                           if (isSelected) {
-                    //                             _selectedDays.remove(day);
-                    //                           } else {
-                    //                             _selectedDays.add(day);
-                    //                           }
-                    //                           _dayController.text = _selectedDays.join(', ');
-                    //                         });
-                    //                         setStateCheckbox(() {});
-                    //                       },
-                    //                       child: Row(
-                    //                         children: [
-                    //                           SizedBox(
-                    //                             width: 20.w,
-                    //                             height: 20.h,
-                    //                             child: Checkbox(
-                    //                               value: isSelected,
-                    //                               onChanged: (checked) {
-                    //                                 setState(() {
-                    //                                   if (checked == true) {
-                    //                                     _selectedDays.add(day);
-                    //                                   } else {
-                    //                                     _selectedDays.remove(day);
-                    //                                   }
-                    //                                   _dayController.text = _selectedDays.join(', ');
-                    //                                 });
-                    //                                 setStateCheckbox(() {});
-                    //                               },
-                    //                               materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    //                               visualDensity: const VisualDensity(horizontal: -4, vertical: -4),
-                    //                               activeColor: const Color.fromARGB(255, 2, 123, 223),
-                    //                             ),
-                    //                           ),
-                    //                           const SizedBox(width: 4),
-                    //                           Text(
-                    //                             day,
-                    //                             style: TextStyle(fontSize: 12.sp),
-                    //                           ),
-                    //                         ],
-                    //                       ),
-                    //                     );
-                    //                   },
-                    //                 ),
-                    //               );
-                    //             }).toList(),      value: null,
-                    //           onChanged: (_) {},
-                    //           buttonStyleData: ButtonStyleData(
-                    //             height: 35.h,
-                    //             decoration: BoxDecoration(
-                    //               borderRadius: BorderRadius.circular(5.r),
-                    //               border: Border.all(color: Colors.grey),
-                    //               color: Colors.white,
-                    //             ),
-                    //           ),
-                    //           iconStyleData: IconStyleData(
-                    //             icon: const Icon(Icons.arrow_drop_down),
-                    //             iconSize: 24.r,
-                    //           ),
-                    //           dropdownStyleData: DropdownStyleData(
-                    //             maxHeight: 250.h,
-                    //             decoration: BoxDecoration(
-                    //               borderRadius: BorderRadius.circular(5.r),
-                    //               color: Colors.white,
-                    //             ),
-                    //           ),
-                    //           menuItemStyleData: MenuItemStyleData(
-                    //             height: 32.h,
-                    //             padding: EdgeInsets.symmetric(horizontal: 5.0),
-                    //           ),
-                    //         ),
-                    //       ),
-                    //     ),
-                    //   ],
-                    // ),
-                   
                     SizedBox(height: 4.0.h),
-                  //   Row(
-                  //   mainAxisAlignment: MainAxisAlignment.start,
-                  //   children: [
-                  //     Text("Gender             :  ", style: AllTextStyle.textFieldHeadStyle),
-                  //     GestureDetector(
-                  //       onTap: () {
-                  //         setState(() {
-                  //           customerType="male";
-                  //         });
-                  //       },
-                  //       child: Row(
-                  //         children: [
-                  //           Transform.scale(
-                  //             scale: 0.8,
-                  //             child: Radio(
-                  //                 materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  //                 visualDensity: const VisualDensity(horizontal: -4, vertical: -4),
-                  //                 fillColor:MaterialStateColor.resolveWith((states) => const Color.fromARGB(255, 5, 114, 165)),
-                  //                 value: "male",
-                  //                 groupValue: customerType,
-                  //                 onChanged: (value) {
-                  //                   setState(() {
-                  //                     customerType = value.toString();
-                  //                });
-                  //                 }),
-                  //           ),
-                  //           const Text("Male"),
-                  //         ],
-                  //       ),
-                  //     ),
-                  //     SizedBox(width: 10.w),
-                  //       GestureDetector(
-                  //       onTap: () {
-                  //         setState(() {
-                  //           customerType="female";
-                  //           });
-                  //       },
-                  //       child: Row(
-                  //         children: [
-                  //           Transform.scale(
-                  //             scale: 0.8,
-                  //             child: Radio(
-                  //                 materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  //                 visualDensity: const VisualDensity(horizontal: -4, vertical: -4),
-                  //                 fillColor:MaterialStateColor.resolveWith((states) => const Color.fromARGB(255, 5, 114, 165)),
-                  //                 value: "female",
-                  //                 groupValue: customerType,
-                  //                 onChanged: (value) {
-                  //                   setState(() {
-                  //                     customerType = value.toString();
-                  //                  });
-                  //                 }),
-                  //           ),
-                  //           const Text("Female"),
-                  //         ],
-                  //       ),
-                  //     ),
-                  //   ],
-                  // ),
-                  
                   CommonTextFieldRow(
                     label: "Edu.Level",
                     controller: _educationLevelController,

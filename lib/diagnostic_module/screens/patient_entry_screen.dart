@@ -1,10 +1,18 @@
 library;
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get_storage/get_storage.dart';
+import 'package:medical_trade/config/app_url.dart';
+import 'package:medical_trade/diagnostic_module/providers/patients_provider.dart';
+import 'package:medical_trade/diagnostic_module/screens/patient_list_screen.dart';
 import 'package:medical_trade/diagnostic_module/utils/all_textstyle.dart';
+import 'package:medical_trade/diagnostic_module/utils/animation_snackbar.dart';
 import 'package:medical_trade/diagnostic_module/utils/common_textfield.dart';
 import 'package:medical_trade/diagnostic_module/utils/utils.dart';
 import 'package:medical_trade/utilities/color_manager.dart';
+import 'package:medical_trade/view/auth/login_register_auth.dart';
+import 'package:provider/provider.dart';
 class PatientEntryScreen extends StatefulWidget {
   const PatientEntryScreen({super.key,});
   @override
@@ -22,102 +30,141 @@ class _PatientEntryScreenState extends State<PatientEntryScreen> {
   final _patientIDController = TextEditingController();
   final _patientNameController = TextEditingController();
   final _mobileController = TextEditingController();
-  final _ageController = TextEditingController();
   final _addressController = TextEditingController();
   final _nidNoController = TextEditingController();
   final _remarkController = TextEditingController();
-  
-  // SharedPreferences? sharedPreferences;
-  // Future<void> _initializeData() async {
-  //   sharedPreferences = await SharedPreferences.getInstance();
-  //   userEmployeeId = "${sharedPreferences?.getString('employeeId')}";
-  //   userName = "${sharedPreferences?.getString('userName')}";
-  //   userType = "${sharedPreferences?.getString('userType')}";
-  //   print("userEmployeeId==== $userEmployeeId");
-  //   print("userName==== $userName");
-  //   print("userType==== $userType");
-  // }
+  final yearController = TextEditingController();
+  final monthController = TextEditingController();
+  final dayController = TextEditingController();
 
-  String? customerType = "";
+  final birthdayController = TextEditingController();
+  String? dob = "";
+  void calculateAgeFromBirthday(DateTime birthday) {
+    DateTime now = DateTime.now();
+
+    int years = now.year - birthday.year;
+    int months = now.month - birthday.month;
+    int days = now.day - birthday.day;
+
+    if (days < 0) {
+      months -= 1;
+      days += DateTime(now.year, now.month, 0).day;
+    }
+    if (months < 0) {
+      years -= 1;
+      months += 12;
+    }
+
+    yearController.text = years.toString();
+    monthController.text = months.toString();
+    dayController.text = days.toString();
+  }
+
+  void calculateBirthdayFromAge() {
+    if (yearController.text.isEmpty ||monthController.text.isEmpty || dayController.text.isEmpty) return;
+    int y = int.tryParse(yearController.text) ?? 0;
+    int m = int.tryParse(monthController.text) ?? 0;
+    int d = int.tryParse(dayController.text) ?? 0;
+    DateTime now = DateTime.now();
+    DateTime birthday = DateTime(now.year - y, now.month - m, now.day - d);
+    String mm = birthday.month.toString().padLeft(2, '0');
+    String dd = birthday.day.toString().padLeft(2, '0');
+    String yyyy = birthday.year.toString();
+    birthdayController.text = "$mm-$dd-$yyyy";
+    dob= "$yyyy-$mm-$dd";
+  }
+
+  Future<void> pickBirthday() async {
+    DateTime now = DateTime.now();
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: now,
+      firstDate: DateTime(1900),
+      lastDate: now,
+    );
+    if (picked != null) {
+      String mm = picked.month.toString().padLeft(2, '0');
+      String dd = picked.day.toString().padLeft(2, '0');
+      String yyyy = picked.year.toString();
+      birthdayController.text = "$mm-$dd-$yyyy";
+      dob = "$yyyy-$mm-$dd";
+      calculateAgeFromBirthday(picked);
+    }
+  }
+
+  String? gender = "";
   String? employeeSlNo;
   String? employeeId = "";
   String? userEmployeeId = "";
   String userName = "";
   String userType = "";
 
-String? firstPickedDate;
-  var backEndFirstDate;
-  var backEndSecondtDate;
-
-  var toDay = DateTime.now();
-  void _firstSelectedDate() async {
-    final selectedDate = await showDatePicker(
-        context: context,
-        initialDate: DateTime.now(),
-        firstDate: DateTime(1950),
-        lastDate: DateTime(2050));
-    if (selectedDate != null) {
-      setState(() {
-        firstPickedDate = Utils.formatFrontEndDate(selectedDate);
-        backEndFirstDate = Utils.formatBackEndDate(selectedDate);
-      });
-    }
-    else{
-      setState(() {
-        firstPickedDate = Utils.formatFrontEndDate(toDay);
-        backEndFirstDate = Utils.formatBackEndDate(toDay);
-      });
-    }
+  static String getToken() {
+    final box = GetStorage();
+    return box.read('loginToken') ?? "";
   }
+
+String? patientId = "";
+getPatientCode() async {
+  try {
+    String link = AppUrl.getPatientCodeEndPoint;
+    final token = getToken();
+
+    var response = await Dio().get(
+      link,
+      options: Options(
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
+        },
+        validateStatus: (status) {
+          return status! < 500;
+        },
+      ),
+    );
+
+    print("Response =====> ${response.data}");
+    if (response.statusCode == 401) {
+      Utils.showTopSnackBar(context, "Session expired. Please log in again.");
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const LoginView(
+            isLogin: true,
+          ),
+        ),
+      );
+      return;
+    }
+    setState(() {
+      patientId = response.data["data"].toString();
+    });
+    CustomSnackBar.showTopSnackBar(context, "${response.data["message"]}");
+    print("Patient ID =========> $patientId");
+
+  } catch (e) {
+    print("getPatientCode ERROR =======> $e");
+  }
+}
 
   @override
   void initState() {
-    // TODO: implement initState
+    DateTime now = DateTime.now();
+    String mm = now.month.toString().padLeft(2, '0');
+    String dd = now.day.toString().padLeft(2, '0');
+    String yyyy = now.year.toString();
+    birthdayController.text = "$mm-$dd-$yyyy";
+    calculateAgeFromBirthday(now);
+    getPatientCode();
     super.initState();
-    //_initializeData();
-    firstPickedDate = Utils.formatFrontEndDate(DateTime.now());
-    backEndFirstDate = Utils.formatBackEndDate(DateTime.now());
-  }
-
-  ScrollController mainScrollController = ScrollController();
-  late final ScrollController _listViewScrollController = ScrollController()
-    ..addListener(listViewScrollListener);
-  ScrollPhysics _physics = const ScrollPhysics();
-
-  void listViewScrollListener() {
-    if (_listViewScrollController.offset >=
-        _listViewScrollController.position.maxScrollExtent &&
-        !_listViewScrollController.position.outOfRange) {
-      if (mainScrollController.offset == 0) {
-        mainScrollController.animateTo(50,
-            duration: const Duration(milliseconds: 200), curve: Curves.linear);
-      }
-      setState(() {
-        _physics = const NeverScrollableScrollPhysics();
-      });
-      print("bottom");
-    }
-  }
-  void mainScrollListener() {
-    if (mainScrollController.offset <=
-        mainScrollController.position.minScrollExtent &&
-        !mainScrollController.position.outOfRange) {
-      setState(() {
-        if (_physics is NeverScrollableScrollPhysics) {
-          _physics = const ScrollPhysics();
-          _listViewScrollController.animateTo(
-              _listViewScrollController.position.maxScrollExtent - 50,
-              duration: const Duration(milliseconds: 200),
-              curve: Curves.linear);
-        }
-      });
-      print("top");
-    }
+    yearController.text = "";
+    monthController.text = "";
+    dayController.text = "";
   }
 
   @override
   Widget build(BuildContext context) {
-    mainScrollController.addListener(mainScrollListener);
     return Scaffold(
       appBar:AppBar(
       backgroundColor: ColorManager.appbarColor,
@@ -137,7 +184,6 @@ String? firstPickedDate;
       centerTitle: true,
     ),
       body: SingleChildScrollView(
-        controller: mainScrollController,
         child: Column(
           children: [
             Container(
@@ -159,12 +205,25 @@ String? firstPickedDate;
                 ),
                 child: Column(
                   children: [
-                    CommonTextFieldRow(
-                      label: "Patient ID",
-                      controller: _patientIDController,
-                      hintText: "P00001",
+                    Row(
+                      children: [
+                        Expanded(flex: 6,child: Text("Patient ID",style: AllTextStyle.textFieldHeadStyle)),
+                        const Expanded(flex: 1,child: Text(":")),
+                        Expanded(
+                          flex: 16,
+                          child: Container(
+                            height: 25.h,
+                            decoration: ContDecoration.contDecoration,
+                            child: Padding(
+                              padding: EdgeInsets.only(left: 5.w, right: 5.w,top: 3.h),
+                              child: Text(patientId.toString(),
+                                style: AllTextStyle.dropDownlistStyle
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-
                     SizedBox(height: 4.0.h),
                     CommonTextFieldRow(
                       label: "Name",
@@ -180,53 +239,96 @@ String? firstPickedDate;
                     ),
 
                     SizedBox(height: 4.0.h),
-                    CommonTextFieldRow(
-                      label: "Age",
-                      controller: _ageController,
-                      hintText: "Enter Age",
-                    ),
-
-                    SizedBox(height: 4.0.h),
+                     Row(
+                        children: [
+                          Expanded(flex:6, child: Text("Age", style:AllTextStyle.textFieldHeadStyle)),
+                          const Expanded(flex: 1, child: Text(":")),
+                          Expanded(
+                            flex:5,
+                            child: Container(
+                            height: 25.h,
+                            decoration: ContDecoration.contDecoration,
+                              child: TextField(
+                                controller: yearController,
+                                keyboardType: TextInputType.number,
+                                style: AllTextStyle.dropDownlistStyle,
+                                decoration: InputDecoration(
+                                  contentPadding: EdgeInsets.symmetric(vertical: 7.h, horizontal: 5.w),
+                                  hintStyle: AllTextStyle.dropDownlistStyle,
+                                  hintText: "Year"),
+                                onChanged: (v) => calculateBirthdayFromAge(),
+                              ),
+                            ),
+                          ),
+                          SizedBox(width: 10),
+                          Expanded(
+                            flex:5,
+                            child: Container(
+                            height: 25.h,
+                            decoration: ContDecoration.contDecoration,
+                              child: TextField(
+                                controller: monthController,
+                                keyboardType: TextInputType.number,
+                                style: AllTextStyle.dropDownlistStyle,
+                                decoration: InputDecoration(
+                                  contentPadding: EdgeInsets.symmetric(vertical: 7.h, horizontal: 5.w),
+                                  hintStyle: AllTextStyle.dropDownlistStyle,
+                                  hintText: "Month"),
+                                onChanged: (v) => calculateBirthdayFromAge(),
+                              ),
+                            ),
+                          ),
+                          SizedBox(width: 10),
+                          Expanded(
+                            flex:5,
+                            child: Container(
+                            height: 25.h,
+                            decoration: ContDecoration.contDecoration,
+                              child: TextField(
+                                controller: dayController,
+                                keyboardType: TextInputType.number,
+                                style: AllTextStyle.dropDownlistStyle,
+                                decoration: InputDecoration(
+                                  contentPadding: EdgeInsets.symmetric(vertical: 7.h, horizontal: 5.w),
+                                  hintStyle: AllTextStyle.dropDownlistStyle,
+                                  hintText: "Day"
+                                  ),
+                                onChanged: (v) => calculateBirthdayFromAge(),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 3.h),
+                      Row(
+                        children: [
+                          Expanded(flex:6, child: Text("Date of Birth", style:AllTextStyle.textFieldHeadStyle)),
+                          const Expanded(flex: 1, child: Text(":")),
+                          Expanded(
+                            flex: 16,
+                            child: Container(
+                            height: 25.h,
+                            decoration: ContDecoration.contDecoration,
+                              child: TextField(
+                                controller: birthdayController,
+                                readOnly: true,
+                                style: AllTextStyle.dropDownlistStyle,
+                                decoration: InputDecoration(
+                                  contentPadding: EdgeInsets.only(left: 5.w, bottom: 14.h),
+                                  suffixIcon: Icon(Icons.calendar_month, color: Colors.black87,size: 16.r),
+                                ),
+                                onTap: pickBirthday,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 4.0.h),
                     CommonTextFieldRow(
                       label: "NID No",
                       controller: _nidNoController,
                       hintText: "Enter NID Number",
                     ),
-                    SizedBox(height: 4.0.h),
-                    Row(children: [
-                      Expanded(flex:6, child: Text("Date of Birth", style:AllTextStyle.textFieldHeadStyle)),
-                      const Expanded(flex: 1, child: Text(":")),
-                      Expanded(
-                        flex: 16,
-                        child: Container(
-                          height: 25.h,
-                          child: GestureDetector(
-                            onTap: (() {
-                              //FocusScope.of(context).requestFocus(quantityFocusNode);
-                              _firstSelectedDate();
-                            }),
-                            child: TextFormField(
-                              enabled: false,
-                              decoration: InputDecoration(contentPadding: EdgeInsets.only(left: 5.w),
-                                filled: true,
-                                fillColor: Colors.white,
-                                suffixIcon: Padding(padding: EdgeInsets.only(left: 20.w),
-                                child: Icon(Icons.calendar_month, color: Colors.black87,size: 16.r)),
-                                border: OutlineInputBorder(borderSide: BorderSide(color:  Colors.grey,width: 5.w)),
-                                hintText: firstPickedDate,
-                                hintStyle: AllTextStyle.dateFormatStyle
-                              ),
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return null;
-                                }
-                                return null;
-                              },
-                            ),
-                          ),
-                        ),
-                      ),
-                    ]),
                     SizedBox(height: 4.0.h),
                     CommonTextFieldRow(
                       label: "Remark",
@@ -247,7 +349,7 @@ String? firstPickedDate;
                       GestureDetector(
                         onTap: () {
                           setState(() {
-                            customerType="male";
+                            gender="Male";
                           });
                         },
                         child: Row(
@@ -258,11 +360,11 @@ String? firstPickedDate;
                                   materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                                   visualDensity: const VisualDensity(horizontal: -4, vertical: -4),
                                   fillColor:MaterialStateColor.resolveWith((states) => const Color.fromARGB(255, 5, 114, 165)),
-                                  value: "male",
-                                  groupValue: customerType,
+                                  value: "Male",
+                                  groupValue: gender,
                                   onChanged: (value) {
                                     setState(() {
-                                      customerType = value.toString();
+                                      gender = value.toString();
                                  });
                                   }),
                             ),
@@ -274,7 +376,7 @@ String? firstPickedDate;
                         GestureDetector(
                         onTap: () {
                           setState(() {
-                            customerType="female";
+                            gender="Female";
                             });
                         },
                         child: Row(
@@ -285,11 +387,11 @@ String? firstPickedDate;
                                   materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                                   visualDensity: const VisualDensity(horizontal: -4, vertical: -4),
                                   fillColor:MaterialStateColor.resolveWith((states) => const Color.fromARGB(255, 5, 114, 165)),
-                                  value: "female",
-                                  groupValue: customerType,
+                                  value: "Female",
+                                  groupValue: gender,
                                   onChanged: (value) {
                                     setState(() {
-                                      customerType = value.toString();
+                                      gender = value.toString();
                                    });
                                   }),
                             ),
@@ -301,7 +403,7 @@ String? firstPickedDate;
                         GestureDetector(
                         onTap: () {
                           setState(() {
-                            customerType="other";
+                            gender="Other";
                             });
                         },
                         child: Row(
@@ -312,11 +414,11 @@ String? firstPickedDate;
                                   materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                                   visualDensity: const VisualDensity(horizontal: -4, vertical: -4),
                                   fillColor:MaterialStateColor.resolveWith((states) => const Color.fromARGB(255, 5, 114, 165)),
-                                  value: "other",
-                                  groupValue: customerType,
+                                  value: "Other",
+                                  groupValue: gender,
                                   onChanged: (value) {
                                     setState(() {
-                                      customerType = value.toString();
+                                      gender = value.toString();
                                    });
                                   }),
                             ),
@@ -330,48 +432,32 @@ String? firstPickedDate;
                   alignment: Alignment.bottomRight,
                   child: InkWell(
                     onTap: () async {
-                      // Utils.closeKeyBoard(context);
-                      // print("Tapped Save");
-                      // if (_customerNameController.text == '') {
-                      //   Utils.showTopSnackBar(context, "Customer name is required");
-                      //   return;
-                      // }
-                      // if (_regionController.text == '') {
-                      //   Utils.showTopSnackBar(context, "Please Select Region");
-                      //   return;
-                      // }
-                      // if (_territoryController.text == '') {
-                      //   Utils.showTopSnackBar(context, "Please Select Territory");
-                      //   return;
-                      // }
-                      // if (_ownerMobileController.text == '') {
-                      //   Utils.showTopSnackBar(context, "Owner Mobile field is required");
-                      //   return;
-                      // }
-                      // if (_bankNameController.text == '') {
-                      //   Utils.showTopSnackBar(context, "Bank Name field is required");
-                      //   return;
-                      // }
-                      // if (_checkNoController.text == '') {
-                      //   Utils.showTopSnackBar(context, "Check No. field is required");
-                      //   return;
-                      // }
-                      // if (_bankBranchNameController.text == '') {
-                      //   Utils.showTopSnackBar(context, "Bank Branch field is required");
-                      //   return;
-                      // }
-                      // if (_accountNoController.text == '') {
-                      //   Utils.showTopSnackBar(context, "Account No. field is required");
-                      //   return;
-                      // }
-                      // setState(() {
-                      //   customerEntryBtnClk = true;
-                      // });
-                      // var result = await customerEntry(context);
-                      // if (result == "true") {
-                      //   Provider.of<CustomerListProvider>(context, listen: false).getCustomerList("", "", "");
-                      // }
-                      // setState(() {});
+                      Utils.closeKeyBoard(context);
+                      print("Tapped Save");
+                      if (_patientNameController.text == '') {
+                        Utils.showTopSnackBar(context, "Patient name is required");
+                        return;
+                      }
+                      if (_mobileController.text == '') {
+                        Utils.showTopSnackBar(context, "Mobile Number is required");
+                        return;
+                      }
+                      if (_addressController.text == '') {
+                        Utils.showTopSnackBar(context, "Address is required");
+                        return;
+                      }
+                      if (gender == '') {
+                        Utils.showTopSnackBar(context, "Please select gender");
+                        return;
+                      }
+                      setState(() {
+                        patientEntryBtnClk = true;
+                      });
+                      var result = await patientEntry(context);
+                      if (result == "true") {
+                        Provider.of<PatientsProvider>(context, listen: false).getlPatients();
+                      }
+                      setState(() {});
                     },
                     child: Container(
                       height: 28.0.h,
@@ -389,7 +475,7 @@ String? firstPickedDate;
                         ],
                       ),
                       child: Center(
-                        child: customerEntryBtnClk
+                        child: patientEntryBtnClk
                             ? SizedBox(
                                 height: 20.0.h,
                                 width: 20.0.w,
@@ -405,160 +491,79 @@ String? firstPickedDate;
                 ),
               ),
             ),
-            // SizedBox(height: 4.0.h),
-            // CustomerListProvider.isCustomerTypeChange
-            //     ? SizedBox(
-            //     height: MediaQuery.of(context).size.height / 1.43,
-            //     child: _buildShimmerEffect(allCustomerList.length))
-            //     : Container(
-            //   height: MediaQuery.of(context).size.height / 1.43,
-            //   width: double.infinity,
-            //   padding: const EdgeInsets.only(left: 8.0, right: 8.0),
-            //   child: SizedBox(
-            //     width: double.infinity,
-            //     height: double.infinity,
-            //     child: SingleChildScrollView(
-            //       controller: _listViewScrollController,
-            //       physics: _physics,
-            //       scrollDirection: Axis.vertical,
-            //       child: SingleChildScrollView(
-            //         scrollDirection: Axis.horizontal,
-            //         child: DataTable(
-            //           headingRowHeight: 20.0,
-            //           dataRowHeight: 20.0,
-            //           headingRowColor: WidgetStateColor.resolveWith((states) => Colors.blue.shade900),
-            //           showCheckboxColumn: true,
-            //           border: TableBorder.all(color: Colors.grey.shade400, width: 1),
-            //           columns: [
-            //             DataColumn(label: Expanded(child: Center(child: Text('Sl.',style: AllTextStyle.tableHeadTextStyle)))),
-            //             DataColumn(label: Expanded(child: Center(child: Text('Customer Id',style: AllTextStyle.tableHeadTextStyle)))),
-            //             DataColumn(label: Expanded(child: Center(child: Text('Customer Name',style: AllTextStyle.tableHeadTextStyle)))),
-            //             DataColumn(label: Expanded(child: Center(child: Text('Owner Name',style: AllTextStyle.tableHeadTextStyle)))),
-            //             DataColumn(label: Expanded(child: Center(child: Text('Area',style: AllTextStyle.tableHeadTextStyle)))),
-            //             DataColumn(label: Expanded(child: Center(child: Text('Contact Number',style: AllTextStyle.tableHeadTextStyle)))),
-            //             DataColumn(label: Expanded(child: Center(child: Text('Employee Name',style: AllTextStyle.tableHeadTextStyle)))),
-            //             DataColumn(label: Expanded(child: Center(child: Text('Customer Type',style: AllTextStyle.tableHeadTextStyle)))),
-            //             DataColumn(label: Expanded(child: Center(child: Text('Credit Limit',style: AllTextStyle.tableHeadTextStyle)))),
-            //           ],
-            //           rows: List.generate(
-            //            allCustomerList.length,
-            //                 (int index) => DataRow(
-            //               color: index % 2 == 0 ? WidgetStateProperty.resolveWith(getColor) : WidgetStateProperty.resolveWith(getColors),
-            //               cells: <DataCell>[
-            //                 DataCell(Center(child: Text('${index +1}'))),
-            //                 DataCell(Center(child: Text('${allCustomerList[index].customerCode??""}'))),
-            //                 DataCell(Center(child: Text('${allCustomerList[index].customerName??""}'))),
-            //                 DataCell(Center(child: Text('${allCustomerList[index].ownerName??""}'))),
-            //                 DataCell(Center(child: Text('${allCustomerList[index].unitAreaName??""}'))),
-            //                 DataCell(Center(child: Text('${allCustomerList[index].customerMobile??""}'))),
-            //                 DataCell(Center(child: Text('${allCustomerList[index].addBy??""}'))),
-            //                 DataCell(Center(child: Text('${allCustomerList[index].customerType??""}'))),
-            //                 DataCell(Center(child: Text('${allCustomerList[index].customerCreditLimit??""}'))),
-            //               ],
-            //             ),
-            //           ),
-            //         ),
-            //       ),
-            //     ),
-            //   ),
-            // ),
-            // SizedBox(height: 15.0.h),
-          ],
+           ],
         ),
       ),
     );
   }
-  // Widget _buildShimmerEffect(int length) {
-  //   return ListView.builder(
-  //     itemCount: length+1,
-  //     itemBuilder: (context, index) {
-  //       return Padding(
-  //         padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 2.h),
-  //         child: Shimmer.fromColors(
-  //           baseColor: Colors.grey.shade300,
-  //           highlightColor: Colors.grey.shade100,
-  //           child: Container(
-  //             height: 15.h,
-  //             decoration: BoxDecoration(color: Colors.white,borderRadius: BorderRadius.circular(2.r)),
-  //           ),
-  //         ),
-  //       );
-  //     },
-  //   );
-  // }
-  void emptyMethod() {
+void emptyMethod() {
   setState(() {
     _patientIDController.text = "";
     _patientNameController.text = "";
     _mobileController.text = "";
-    _ageController.text = "";
     _addressController.text = "";
-    //_image = null;
+    _nidNoController.text = "";
+    _remarkController.text = "";
+    yearController.text = "";
+    monthController.text = "";
+    dayController.text = "";
+    DateTime now = DateTime.now();
+    String mm = now.month.toString().padLeft(2, '0');
+    String dd = now.day.toString().padLeft(2, '0');
+    String yyyy = now.year.toString();
+    birthdayController.text = "$mm-$dd-$yyyy";
+    calculateAgeFromBirthday(now);
   });
 }
-bool customerEntryBtnClk = false;
-// Future<String> customerEntry(BuildContext context) async {
-//   String link = "${baseUrl}add_customer";
-//   SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-//   try {
-//     var response = await Dio().post(link,
-//       data:{
-//         "Customer_SlNo": 0,
-//         "Customer_Code": "",
-//         "Customer_Name": _customerNameController.text.trim(),
-//         "Customer_Type": customerType.toString().trim(),
-//         "Customer_Phone": '',
-//         "Customer_Mobile": _ownerMobileController.text.trim(),
-//         "cheque_number": _chequeDetailsController.text.trim(),
-//         "Customer_Email": _emailController.text.trim(),
-//         "Customer_OfficePhone": _pMMobileController.text.trim(),
-//         "Customer_Address": _deliveryAddressController.text.trim(),
-//         "Customer_Address_Others": _officeAddressController.text.trim(),
-//         "owner_name": _ownerNameController.text.trim(),
-//         "bank_name": _bankNameController.text.trim(),
-//         "check_no": _checkNoController.text.trim(),
-//         "brunch_name": _bankBranchNameController.text.trim(),
-//         "account_no": _accountNoController.text.trim(),
-//         "unit_area_id": regionId.toString().trim(),
-//         "territory_id": territoriesId.toString().trim(),
-//         "Customer_Credit_Limit": _creditLimitController.text.trim(),
-//         "previous_due": _previousDueController.text.trim(),
-//       },
-//       options: Options(
-//         headers: {
-//           "Content-Type": "application/json",
-//           'Cookie': 'ci_session=${sharedPreferences.getString("sessionId")}',
-//           "Authorization": "Bearer ${sharedPreferences.getString("token")}",
-//         },
-//       ),
-//     );
+bool patientEntryBtnClk = false;
+Future<String> patientEntry(BuildContext context) async {
+  String link = AppUrl.addPatientEndPoint;
+  try {
+    final token = getToken();
+    var response = await Dio().post(link,
+      data:{
+          "patient_code": "$patientId",
+          "name": _patientNameController.text.trim(),
+          "mobile": _mobileController.text.trim(),
+          "address": _addressController.text.trim(),
+          "nid": _nidNoController.text.trim(),
+          "gender": "$gender",
+          "date_of_birth": "$dob",
+          "remark": _remarkController.text.trim(),
+        },
+      options: Options(
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
+        },
+      ),
+    );
 
-//     var item = response.data;
-//     print("API Response: $item");
+    var item = response.data;
+    print("API Response: $item");
 
-//     if (item["success"] == true) {
-//       setState(() {
-//         customerEntryBtnClk = false;
-//       });
-//       emptyMethod();
-//       CustomSnackBar.showTopSnackBar(context, "${item["message"]}");
-//       Navigator.push(context,MaterialPageRoute(builder:(context) => const CustomerEntryScreen()));
-//       return "true";
-//     } else {
-//       setState(() {
-//         customerEntryBtnClk = false;
-//       });
-//       Utils.showTopSnackBar(context,"${item["message"]}");
-//       return "false";
-//     }
-//   } catch (e) {
-//     setState(() {
-//       customerEntryBtnClk = false;
-//     });
-//     print("Exception caught: $e");
-//     Utils.showTopSnackBar(context, "Something went wrong: $e");
-//     return "false";
-//   }
-// }
- 
+    if (item["success"] == true) {
+      setState(() {
+        patientEntryBtnClk = false;
+      });
+      emptyMethod();
+      CustomSnackBar.showTopSnackBar(context, "${item["message"]}");
+      Navigator.push(context,MaterialPageRoute(builder:(context) => const PatientListScreen()));
+      return "true";
+    } else {
+      setState(() {
+        patientEntryBtnClk = false;
+      });
+      Utils.showTopSnackBar(context,"${item["message"]}");
+      return "false";
+    }
+  } catch (e) {
+    setState(() {
+      patientEntryBtnClk = false;
+    });
+    print("Exception caught: $e");
+    Utils.showTopSnackBar(context, "Something went wrong: $e");
+    return "false";
+  }
+ }
 }

@@ -54,6 +54,8 @@ class AppUrl {
   
   //Diagnostic All Api 
   static var getPatientEndPoint = '$baseUrl/get-patient';
+  static var getPatientCodeEndPoint = '$baseUrl/get-patient-code';
+  static var addPatientEndPoint = '$baseUrl/add-patient';
   //end
 
   //extra

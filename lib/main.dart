@@ -89,10 +89,6 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider<AllProductsProvider>(create: (_) => AllProductsProvider()),
         ChangeNotifierProvider<PatientsProvider>(create: (_) => PatientsProvider()),
         
-
-        
-        
-        
       ],
       child: ScreenUtilInit(
         designSize: const Size(360, 690),

@@ -51,7 +51,7 @@ class CommonTextFieldRow extends StatelessWidget {
               onChanged: onChanged,   // ✅ Added here
               decoration: InputDecoration(
                 hintText: hintText,
-                hintStyle: AllTextStyle.textValueStyle,
+                hintStyle: AllTextStyle.dropDownlistStyle,
                 contentPadding: EdgeInsets.only(left: 5.w, top: 4.h),
                 filled: true,
                 fillColor: Colors.white,
