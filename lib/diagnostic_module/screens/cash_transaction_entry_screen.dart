@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_typeahead/flutter_typeahead.dart';
+import 'package:medical_trade/diagnostic_module/models/bank_account_model.dart';
+import 'package:medical_trade/diagnostic_module/providers/bank_account_provider.dart';
 import 'package:medical_trade/diagnostic_module/utils/all_textstyle.dart';
 import 'package:medical_trade/diagnostic_module/utils/utils.dart';
 import 'package:medical_trade/utilities/color_manager.dart';
+import 'package:provider/provider.dart';
 
 class CashTransactionEntryScreen extends StatefulWidget {
   const CashTransactionEntryScreen({super.key});
@@ -240,7 +244,7 @@ final LayerLink _pTypeLayerLink = LayerLink();
   }
 
 
-  //String? _selectedAccount;
+  String? _selectedBankAccount;
   String? firstPickedDate;
   var backEndFirstDate;
   var toDay = DateTime.now();
@@ -306,7 +310,7 @@ final LayerLink _pTypeLayerLink = LayerLink();
     // // ACCOUNTS
     // CashTransactionProvider.isCashTransactionLoading = true;
     // Provider.of<CashTransactionProvider>(context, listen: false).cashTransactionList = [];
-    // Provider.of<AccountProvider>(context, listen: false).getAccountList();
+    Provider.of<BankAccountProvider>(context, listen: false).getBankAccount();
     // Provider.of<CashTransactionProvider>(context, listen: false).getCashTransactionApi("",Utils.formatBackEndDate(DateTime.now()),Utils.formatBackEndDate(DateTime.now()),"");
     super.initState();
   }
@@ -355,7 +359,7 @@ final LayerLink _pTypeLayerLink = LayerLink();
     // int totalPages = allCashTransaction.length <= _itemsPerPage ? 1 : (allCashTransaction.length / _itemsPerPage).ceil();
     // int displayPageCount = totalPages > 20 ? 20 : totalPages;
     // /// account
-    // final allAccountList = Provider.of<AccountProvider>(context).accountList;
+    final allBankAccountList = Provider.of<BankAccountProvider>(context).allBankAccountList;
     return 
     //RefreshIndicator(
       // onRefresh: () async {
@@ -535,58 +539,57 @@ final LayerLink _pTypeLayerLink = LayerLink();
                                   width: MediaQuery.of(context).size.width / 2,
                                   margin: EdgeInsets.only(bottom: 4.h),
                                   decoration: ContDecoration.contDecoration,
-                                  // child: TypeAheadField<BankAccountModel>(
-                                  // controller: bankAccountController,
-                                  // builder: (context, controller, focusNode) {
-                                  // return TextField(
-                                  // controller: controller,
-                                  // focusNode: focusNode,
-                                  // style: TextStyle(fontSize: 13, color: Colors.grey.shade800, overflow: TextOverflow.ellipsis),
-                                  // decoration: InputDecoration(contentPadding: EdgeInsets.only(left: 5.0, top: 4.0),
-                                  //   isDense: true,
-                                  //   hintText: 'Select Account',
-                                  //   hintStyle: TextStyle(fontSize: 13),
-                                  //   suffixIcon: _selectedBankAccount == '' || _selectedBankAccount == 'null' || _selectedBankAccount == null || controller.text == '' ? null
-                                  //       : GestureDetector(
-                                  //     onTap: () {
-                                  //       setState(() {
-                                  //         bankAccountController.clear();
-                                  //         controller.clear();
-                                  //         _selectedBankAccount = null;
-                                  //       });
-                                  //     },
-                                  //     child: Padding(padding: EdgeInsets.all(5), child: Icon(Icons.close, size: 16)),
-                                  //   ),
-                                  //   suffixIconConstraints: BoxConstraints(maxHeight: 30),
-                                  //   filled: false,
-                                  //   fillColor: Colors.white,
-                                  //   border: InputBorder.none,
-                                  // ),
-                                  // );
-                                  // },
-                                  // suggestionsCallback: (pattern) async {
-                                  // return Future.delayed(const Duration(seconds: 1), () {
-                                  //   return allBankAccountList
-                                  //   .where((element) => element.name.toLowerCase().contains(pattern.toLowerCase()))
-                                  //   .toList().cast<BankAccountModel>(); 
-                                  //   });
-                                  //   },                    
-                                  // itemBuilder: (context, BankAccountModel suggestion) {
-                                  //   return Padding(
-                                  // padding: EdgeInsets.symmetric(horizontal: 6,vertical: 4),
-                                  // child: Text("${suggestion.name} - ${suggestion.number} (${suggestion.bankName})",
-                                  //   style: TextStyle(fontSize: 12), maxLines: 1, overflow: TextOverflow.ellipsis,
-                                  // ),
-                                  // );
-                                  // },
-                                  // onSelected: (BankAccountModel suggestion) {
-                                  // setState(() {
-                                  //   bankAccountController.text = "${suggestion.name} - ${suggestion.number} (${suggestion.bankName})";
-                                  //   _selectedBankAccount = suggestion.id.toString();
-                                  // });  
-                                  // },
-                                  // ),
-                              
+                                  child: TypeAheadField<BankAccountModel>(
+                                    controller: bankAccountController,
+                                    builder: (context, controller, focusNode) {
+                                    return TextField(
+                                    controller: controller,
+                                    focusNode: focusNode,
+                                    style: TextStyle(fontSize: 13, color: Colors.grey.shade800, overflow: TextOverflow.ellipsis),
+                                    decoration: InputDecoration(contentPadding: EdgeInsets.only(left: 5.0, top: 4.0),
+                                      isDense: true,
+                                      hintText: 'Select Account',
+                                      hintStyle: TextStyle(fontSize: 13),
+                                      suffixIcon: _selectedBankAccount == '' || _selectedBankAccount == 'null' || _selectedBankAccount == null || controller.text == '' ? null
+                                          : GestureDetector(
+                                        onTap: () {
+                                          setState(() {
+                                            bankAccountController.clear();
+                                            controller.clear();
+                                            _selectedBankAccount = null;
+                                          });
+                                        },
+                                        child: Padding(padding: EdgeInsets.all(5), child: Icon(Icons.close, size: 16)),
+                                      ),
+                                      suffixIconConstraints: BoxConstraints(maxHeight: 30),
+                                      filled: false,
+                                      fillColor: Colors.white,
+                                      border: InputBorder.none,
+                                    ),
+                                    );
+                                    },
+                                    suggestionsCallback: (pattern) async {
+                                    return Future.delayed(const Duration(seconds: 1), () {
+                                      return allBankAccountList
+                                      .where((element) => element.accountName.toLowerCase().contains(pattern.toLowerCase()))
+                                      .toList().cast<BankAccountModel>(); 
+                                      });
+                                      },                    
+                                    itemBuilder: (context, BankAccountModel suggestion) {
+                                      return Padding(
+                                    padding: EdgeInsets.symmetric(horizontal: 6,vertical: 4),
+                                    child: Text("${suggestion.accountName} - ${suggestion.accountNumber} (${suggestion.bankName})",
+                                      style: TextStyle(fontSize: 12), maxLines: 1, overflow: TextOverflow.ellipsis,
+                                    ),
+                                    );
+                                    },
+                                    onSelected: (BankAccountModel suggestion) {
+                                    setState(() {
+                                      bankAccountController.text = "${suggestion.accountName} - ${suggestion.accountNumber} (${suggestion.bankName})";
+                                      _selectedBankAccount = suggestion.id.toString();
+                                    });  
+                                    },
+                                    ),
                                 ),
                               ),
                             ],

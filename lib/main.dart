@@ -5,7 +5,12 @@ import 'package:medical_trade/controller/contact_api.dart';
 import 'package:medical_trade/controller/customer_product_buy_api.dart';
 import 'package:medical_trade/controller/slider_controller.dart';
 import 'package:medical_trade/controller/wall_post_api.dart';
+import 'package:medical_trade/diagnostic_module/providers/agents_provider.dart';
+import 'package:medical_trade/diagnostic_module/providers/bank_account_provider.dart';
+import 'package:medical_trade/diagnostic_module/providers/doctors_provider.dart';
 import 'package:medical_trade/diagnostic_module/providers/patients_provider.dart';
+import 'package:medical_trade/diagnostic_module/providers/specimens_provider.dart';
+import 'package:medical_trade/diagnostic_module/providers/test_entry_provider.dart';
 import 'package:medical_trade/new_part/providers/all_products_provider.dart';
 import 'package:medical_trade/new_part/providers/category_provider.dart';
 import 'package:medical_trade/new_part/providers/client_post_provider.dart';
@@ -83,11 +88,18 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider(create: (_) => GetEngineerSupportProductProvider()),
         ChangeNotifierProvider(create: (_) => GetSalesOldMachineProvider()),
         ///======new part
+        
+        ChangeNotifierProvider<AgentsProvider>(create: (_) => AgentsProvider()),
+        ChangeNotifierProvider<DoctorsProvider>(create: (_) => DoctorsProvider()),
         ChangeNotifierProvider<CategoryProvider>(create: (_) => CategoryProvider()),
-        ChangeNotifierProvider<NewClientPostProvider>(create: (_) => NewClientPostProvider()),
+        ChangeNotifierProvider<PatientsProvider>(create: (_) => PatientsProvider()),
+        ChangeNotifierProvider<TestEntryProvider>(create: (_) => TestEntryProvider()),
+        ChangeNotifierProvider<SpecimensProvider>(create: (_) => SpecimensProvider()),
+        ChangeNotifierProvider<BankAccountProvider>(create: (_) => BankAccountProvider()),
         ChangeNotifierProvider<WallPostNewProvider>(create: (_) => WallPostNewProvider()),
         ChangeNotifierProvider<AllProductsProvider>(create: (_) => AllProductsProvider()),
-        ChangeNotifierProvider<PatientsProvider>(create: (_) => PatientsProvider()),
+        ChangeNotifierProvider<NewClientPostProvider>(create: (_) => NewClientPostProvider()),
+        
         
       ],
       child: ScreenUtilInit(

@@ -56,13 +56,23 @@ class AppUrl {
   static var getPatientEndPoint = '$baseUrl/get-patient';
   static var getPatientCodeEndPoint = '$baseUrl/get-patient-code';
   static var addPatientEndPoint = '$baseUrl/add-patient';
-  //end
 
-  //extra
-  // static var getProductEngineeringEndPoint = '$baseUrl/get-engineersuport';
-  //   static String getCategoryProduct(String productId) {
-  //   return '$baseUrl/get-products/$productId';
-  // }
+  static var getDoctorEndPoint = '$baseUrl/get-doctor';
+  static var getDoctorCodeEndPoint = '$baseUrl/get-doctor-code';
+  static var addDoctorEndPoint = '$baseUrl/add-doctor';
+  
+  static var getSpecimensEndPoint = '$baseUrl/get-specimens';
+  static var getTestEntryEndPoint = '$baseUrl/get-test-entry';
+  static var getTestCodeEndPoint = '$baseUrl/get-test-code';
+  static var addTestEntryEndPoint = '$baseUrl/add-test-entry';
+
+  static var getCommissionPayEndPoint = '$baseUrl/get-commission-payment';
+  static var getCommissionPayCodeEndPoint = '$baseUrl/get-commission-payment-code';
+  static var getBankAccountEndPoint = '$baseUrl/get-bank-accounts';
+  static var getAgentsEndPoint = '$baseUrl/get-agents';
+  static var addCommissionPayEndPoint = '$baseUrl/add-commission-payment';
+
+  //end
 }
 
 

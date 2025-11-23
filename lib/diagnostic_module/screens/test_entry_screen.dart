@@ -1,9 +1,20 @@
 library;
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_typeahead/flutter_typeahead.dart';
+import 'package:get_storage/get_storage.dart';
+import 'package:medical_trade/config/app_url.dart';
+import 'package:medical_trade/diagnostic_module/models/specimens_model.dart';
+import 'package:medical_trade/diagnostic_module/providers/specimens_provider.dart';
+import 'package:medical_trade/diagnostic_module/providers/test_entry_provider.dart';
 import 'package:medical_trade/diagnostic_module/utils/all_textstyle.dart';
+import 'package:medical_trade/diagnostic_module/utils/animation_snackbar.dart';
 import 'package:medical_trade/diagnostic_module/utils/common_textfield.dart';
+import 'package:medical_trade/diagnostic_module/utils/utils.dart';
 import 'package:medical_trade/utilities/color_manager.dart';
+import 'package:medical_trade/view/auth/login_register_auth.dart';
+import 'package:provider/provider.dart';
 class TestEntryScreen extends StatefulWidget {
   const TestEntryScreen({super.key,});
   @override
@@ -12,7 +23,7 @@ class TestEntryScreen extends StatefulWidget {
 
 class _TestEntryScreenState extends State<TestEntryScreen> {
   Color getColor(Set<WidgetState> states) {
-    return Colors.blue.shade200;
+    return const Color.fromARGB(255, 255, 239, 195);
   }
 
   Color getColors(Set<WidgetState> states) {
@@ -38,7 +49,8 @@ class _TestEntryScreenState extends State<TestEntryScreen> {
   //   print("userName==== $userName");
   //   print("userType==== $userType");
   // }
-
+  
+  String? specimensId;
   String? customerType = "";
   String? employeeSlNo;
   String? employeeId = "";
@@ -48,9 +60,12 @@ class _TestEntryScreenState extends State<TestEntryScreen> {
 
   @override
   void initState() {
+    getTestCode();
     // TODO: implement initState
     super.initState();
     //_initializeData();
+    Provider.of<SpecimensProvider>(context, listen: false).getSpecimens();
+    Provider.of<TestEntryProvider>(context, listen: false).getTestEntry();
   }
 
   ScrollController mainScrollController = ScrollController();
@@ -88,9 +103,58 @@ class _TestEntryScreenState extends State<TestEntryScreen> {
       print("top");
     }
   }
+  static String getToken() {
+    final box = GetStorage();
+    return box.read('loginToken') ?? "";
+  }
+  String? testId = "";
+  getTestCode() async {
+    try {
+      String link = AppUrl.getTestCodeEndPoint;
+      final token = getToken();
+
+      var response = await Dio().get(
+        link,
+        options: Options(
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer $token",
+          },
+          validateStatus: (status) {
+            return status! < 500;
+          },
+        ),
+      );
+
+      print("Response =====> ${response.data}");
+      if (response.statusCode == 401) {
+        Utils.showTopSnackBar(context, "Session expired. Please log in again.");
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const LoginView(
+              isLogin: true,
+            ),
+          ),
+        );
+        return;
+      }
+      setState(() {
+        testId = response.data["data"].toString();
+      });
+      CustomSnackBar.showTopSnackBar(context, "${response.data["message"]}");
+      print("testId ID =========> $testId");
+
+    } catch (e) {
+      print("getPatientCode ERROR =======> $e");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    final allTestData = Provider.of<TestEntryProvider>(context).allTestEntryList;
+    final allSpecimensData = Provider.of<SpecimensProvider>(context).allSpecimensList;
     mainScrollController.addListener(mainScrollListener);
     return Scaffold(
       appBar:AppBar(
@@ -133,27 +197,125 @@ class _TestEntryScreenState extends State<TestEntryScreen> {
                 ),
                 child: Column(
                   children: [
-                    CommonTextFieldRow(
-                      label: "Test ID",
-                      controller: _testIDController,
-                      hintText: "P00001",
+                    Row(
+                      children: [
+                        Expanded(flex: 6,child: Text("Test ID",style: AllTextStyle.textFieldHeadStyle)),
+                        const Expanded(flex: 1,child: Text(":")),
+                        Expanded(
+                          flex: 16,
+                          child: Container(
+                            height: 25.h,
+                            decoration: ContDecoration.contDecoration,
+                            child: Padding(
+                              padding: EdgeInsets.only(left: 5.w, right: 5.w,top: 3.h),
+                              child: Text(testId.toString(),
+                                style: AllTextStyle.dropDownlistStyle
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-
                     SizedBox(height: 4.0.h),
                     CommonTextFieldRow(
                       label: "Name",
                       controller: _testNameController,
                       hintText: "Enter Test Name",
                     ),
-
-                    SizedBox(height: 4.0.h),
-                     CommonTextFieldRow(
-                      label: "Specimen",
-                      controller: _specimenController,
-                      hintText: "Select Specimen",
+                     Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                      Expanded(flex: 6, child: Text("Specimen",style:AllTextStyle.textFieldHeadStyle)),
+                      Expanded(flex: 1,child: Text(":   ",style:AllTextStyle.textFieldHeadStyle)),
+                      Expanded(
+                      flex: 16,
+                      child: Container(
+                        margin: EdgeInsets.only(top: 3.h, bottom: 3.h),
+                        height: 25.0.h,
+                        decoration: ContDecoration.contDecoration,
+                        child: TypeAheadField<SpecimensModel>(
+                            controller: _specimenController,
+                            builder: (context, controller, focusNode) {
+                              return TextField(
+                                controller: controller,
+                                focusNode: focusNode,
+                                style: AllTextStyle.textValueStyle,
+                                decoration: InputDecoration(
+                                  contentPadding: EdgeInsets.only(left: 5.w, top: 2.5.h),
+                                  isDense: true,
+                                  hintText: 'Select Specimen',
+                                  hintStyle: TextStyle(fontSize: 13.sp),
+                                  suffixIcon: specimensId == '' || specimensId == 'null' || specimensId == null || controller.text == ''
+                                      ? null
+                                      : GestureDetector(
+                                          onTap: () {
+                                            setState(() {
+                                              _specimenController.clear();
+                                              controller.clear();
+                                              specimensId = null;
+                                            });
+                                            // Clear করার পর নতুনভাবে customer লোড
+                                            Provider.of<SpecimensProvider>(context, listen: false).getSpecimens(); 
+                                          },
+                                          child: Padding(
+                                            padding: EdgeInsets.all(5.r),
+                                            child: Icon(Icons.close, size: 16.r),
+                                          ),
+                                        ),
+                                  suffixIconConstraints: BoxConstraints(maxHeight: 30.h),
+                                  filled: false,
+                                  fillColor: Colors.white,
+                                  border: InputBorder.none,
+                                ),
+                                onTap: () {
+                                  // কার্সর রাখলেই নতুনভাবে লোড হবে
+                                  Provider.of<SpecimensProvider>(context, listen: false).getSpecimens(); 
+                                  // আগের সিলেকশন থাকলে clear হবে
+                                  if (specimensId != null &&
+                                      specimensId != '' &&
+                                      specimensId != 'null') {
+                                    setState(() {
+                                      _specimenController.clear();
+                                      controller.clear();
+                                      specimensId = null;
+                                    });
+                                  }
+                                },
+                              );
+                            },
+                            suggestionsCallback: (pattern) async {
+                              return Future.delayed(const Duration(seconds: 1), () {
+                                return allSpecimensData
+                                    .where((element) => element.specimenName
+                                        .toLowerCase()
+                                        .contains(pattern.toLowerCase()))
+                                    .toList()
+                                    .cast<SpecimensModel>();
+                              });
+                            },
+                            itemBuilder: (context, SpecimensModel suggestion) {
+                              return Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 4.h),
+                                child: Text(
+                                  "${suggestion.specimenName}",
+                                  style: TextStyle(fontSize: 12.sp),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              );
+                            },
+                            onSelected: (SpecimensModel suggestion) {
+                              _specimenController.text = "${suggestion.specimenName}";
+                              setState(() {
+                                specimensId = suggestion.id.toString();
+                              });
+                            },
+                          ),
+                      )
+                      )
+                      ],
                     ),
                     
-                    SizedBox(height: 4.0.h),
                     CommonTextFieldRow(
                       label: "Room No",
                       controller: _roomNoController,
@@ -246,49 +408,29 @@ class _TestEntryScreenState extends State<TestEntryScreen> {
                   alignment: Alignment.bottomRight,
                   child: InkWell(
                     onTap: () async {
-                      // Utils.closeKeyBoard(context);
-                      // print("Tapped Save");
+                      Utils.closeKeyBoard(context);
+                      print("Tapped Save");
 
-                      // if (_customerNameController.text == '') {
-                      //   Utils.showTopSnackBar(context, "Customer name is required");
-                      //   return;
-                      // }
-                      // if (_regionController.text == '') {
-                      //   Utils.showTopSnackBar(context, "Please Select Region");
-                      //   return;
-                      // }
-                      // if (_territoryController.text == '') {
-                      //   Utils.showTopSnackBar(context, "Please Select Territory");
-                      //   return;
-                      // }
-                      // if (_ownerMobileController.text == '') {
-                      //   Utils.showTopSnackBar(context, "Owner Mobile field is required");
-                      //   return;
-                      // }
-                      // if (_bankNameController.text == '') {
-                      //   Utils.showTopSnackBar(context, "Bank Name field is required");
-                      //   return;
-                      // }
-                      // if (_checkNoController.text == '') {
-                      //   Utils.showTopSnackBar(context, "Check No. field is required");
-                      //   return;
-                      // }
-                      // if (_bankBranchNameController.text == '') {
-                      //   Utils.showTopSnackBar(context, "Bank Branch field is required");
-                      //   return;
-                      // }
-                      // if (_accountNoController.text == '') {
-                      //   Utils.showTopSnackBar(context, "Account No. field is required");
-                      //   return;
-                      // }
-                      // setState(() {
-                      //   customerEntryBtnClk = true;
-                      // });
-                      // var result = await customerEntry(context);
-                      // if (result == "true") {
-                      //   Provider.of<CustomerListProvider>(context, listen: false).getCustomerList("", "", "");
-                      // }
-                      // setState(() {});
+                      if (_testNameController.text == '') {
+                        Utils.showTopSnackBar(context, "Test name is required");
+                        return;
+                      }
+                      if (_specimenController.text == '') {
+                        Utils.showTopSnackBar(context, "Please Select Specimen");
+                        return;
+                      }
+                      if (_priceController.text == '') {
+                        Utils.showTopSnackBar(context, "Price is required");
+                        return;
+                      }
+                      setState(() {
+                        testEntryBtnClk = true;
+                      });
+                      var result = await testEntry(context);
+                      if (result == "true") {
+                        Provider.of<TestEntryProvider>(context, listen: false).getTestEntry();
+                      }
+                      setState(() {});
                     },
                     child: Container(
                       height: 28.0.h,
@@ -306,7 +448,7 @@ class _TestEntryScreenState extends State<TestEntryScreen> {
                         ],
                       ),
                       child: Center(
-                        child: customerEntryBtnClk
+                        child: testEntryBtnClk
                             ? SizedBox(
                                 height: 20.0.h,
                                 width: 20.0.w,
@@ -322,64 +464,61 @@ class _TestEntryScreenState extends State<TestEntryScreen> {
                 ),
               ),
             ),
-            // SizedBox(height: 4.0.h),
-            // CustomerListProvider.isCustomerTypeChange
-            //     ? SizedBox(
-            //     height: MediaQuery.of(context).size.height / 1.43,
-            //     child: _buildShimmerEffect(allCustomerList.length))
-            //     : Container(
-            //   height: MediaQuery.of(context).size.height / 1.43,
-            //   width: double.infinity,
-            //   padding: const EdgeInsets.only(left: 8.0, right: 8.0),
-            //   child: SizedBox(
-            //     width: double.infinity,
-            //     height: double.infinity,
-            //     child: SingleChildScrollView(
-            //       controller: _listViewScrollController,
-            //       physics: _physics,
-            //       scrollDirection: Axis.vertical,
-            //       child: SingleChildScrollView(
-            //         scrollDirection: Axis.horizontal,
-            //         child: DataTable(
-            //           headingRowHeight: 20.0,
-            //           dataRowHeight: 20.0,
-            //           headingRowColor: WidgetStateColor.resolveWith((states) => Colors.blue.shade900),
-            //           showCheckboxColumn: true,
-            //           border: TableBorder.all(color: Colors.grey.shade400, width: 1),
-            //           columns: [
-            //             DataColumn(label: Expanded(child: Center(child: Text('Sl.',style: AllTextStyle.tableHeadTextStyle)))),
-            //             DataColumn(label: Expanded(child: Center(child: Text('Customer Id',style: AllTextStyle.tableHeadTextStyle)))),
-            //             DataColumn(label: Expanded(child: Center(child: Text('Customer Name',style: AllTextStyle.tableHeadTextStyle)))),
-            //             DataColumn(label: Expanded(child: Center(child: Text('Owner Name',style: AllTextStyle.tableHeadTextStyle)))),
-            //             DataColumn(label: Expanded(child: Center(child: Text('Area',style: AllTextStyle.tableHeadTextStyle)))),
-            //             DataColumn(label: Expanded(child: Center(child: Text('Contact Number',style: AllTextStyle.tableHeadTextStyle)))),
-            //             DataColumn(label: Expanded(child: Center(child: Text('Employee Name',style: AllTextStyle.tableHeadTextStyle)))),
-            //             DataColumn(label: Expanded(child: Center(child: Text('Customer Type',style: AllTextStyle.tableHeadTextStyle)))),
-            //             DataColumn(label: Expanded(child: Center(child: Text('Credit Limit',style: AllTextStyle.tableHeadTextStyle)))),
-            //           ],
-            //           rows: List.generate(
-            //            allCustomerList.length,
-            //                 (int index) => DataRow(
-            //               color: index % 2 == 0 ? WidgetStateProperty.resolveWith(getColor) : WidgetStateProperty.resolveWith(getColors),
-            //               cells: <DataCell>[
-            //                 DataCell(Center(child: Text('${index +1}'))),
-            //                 DataCell(Center(child: Text('${allCustomerList[index].customerCode??""}'))),
-            //                 DataCell(Center(child: Text('${allCustomerList[index].customerName??""}'))),
-            //                 DataCell(Center(child: Text('${allCustomerList[index].ownerName??""}'))),
-            //                 DataCell(Center(child: Text('${allCustomerList[index].unitAreaName??""}'))),
-            //                 DataCell(Center(child: Text('${allCustomerList[index].customerMobile??""}'))),
-            //                 DataCell(Center(child: Text('${allCustomerList[index].addBy??""}'))),
-            //                 DataCell(Center(child: Text('${allCustomerList[index].customerType??""}'))),
-            //                 DataCell(Center(child: Text('${allCustomerList[index].customerCreditLimit??""}'))),
-            //               ],
-            //             ),
-            //           ),
-            //         ),
-            //       ),
-            //     ),
-            //   ),
-            // ),
-            // SizedBox(height: 15.0.h),
+            SizedBox(height: 4.0.h),
+            TestEntryProvider.isTestEntryLoading
+                ? SizedBox(
+                height: MediaQuery.of(context).size.height / 1.43,
+                child: CircularProgressIndicator())
+                : Container(
+              height: MediaQuery.of(context).size.height / 1.43,
+              width: double.infinity,
+              padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+              child: SizedBox(
+                width: double.infinity,
+                height: double.infinity,
+                child: SingleChildScrollView(
+                  controller: _listViewScrollController,
+                  physics: _physics,
+                  scrollDirection: Axis.vertical,
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: DataTable(
+                      headingRowHeight: 20.0,
+                      dataRowHeight: 20.0,
+                      headingRowColor: WidgetStateColor.resolveWith((states) => Colors.blue.shade900),
+                      showCheckboxColumn: true,
+                      border: TableBorder.all(color: Colors.grey.shade400, width: 1),
+                      columns: [
+                        DataColumn(label: Expanded(child: Center(child: Text('ID ↕',style: AllTextStyle.tableHeadTextStyle)))),
+                        DataColumn(label: Expanded(child: Center(child: Text('Name ↕',style: AllTextStyle.tableHeadTextStyle)))),
+                        DataColumn(label: Expanded(child: Center(child: Text('Room ↕',style: AllTextStyle.tableHeadTextStyle)))),
+                        DataColumn(label: Expanded(child: Center(child: Text('Price ↕',style: AllTextStyle.tableHeadTextStyle)))),
+                        DataColumn(label: Expanded(child: Center(child: Text('Specimen ↕',style: AllTextStyle.tableHeadTextStyle)))),
+                        DataColumn(label: Expanded(child: Center(child: Text('Delivery Time ↕',style: AllTextStyle.tableHeadTextStyle)))),
+                        DataColumn(label: Expanded(child: Center(child: Text('Remark ↕',style: AllTextStyle.tableHeadTextStyle)))),
+                     					
+                      ],
+                      rows: List.generate(
+                       allTestData.length,
+                            (int index) => DataRow(
+                          color: index % 2 == 0 ? WidgetStateProperty.resolveWith(getColor) : WidgetStateProperty.resolveWith(getColors),
+                          cells: <DataCell>[
+                            DataCell(Center(child: Text('${allTestData[index].testCode??""}'))),
+                            DataCell(Center(child: Text('${allTestData[index].name??""}'))),
+                            DataCell(Center(child: Text('${allTestData[index].roomNumber??""}'))),
+                            DataCell(Center(child: Text('${allTestData[index].price??""}'))),
+                            DataCell(Center(child: Text('${allTestData[index].specimenId??""}'))),
+                            DataCell(Center(child: Text('${allTestData[index].day??""}Days'))),
+                            DataCell(Center(child: Text('${allTestData[index].remark??""}'))),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(height: 15.0.h),
           ],
         ),
       ),
@@ -414,71 +553,60 @@ class _TestEntryScreenState extends State<TestEntryScreen> {
     _remarkController.text = "";
     _hourController.text = "";
     _minuteController.text = "";
+    specimensId = "";
   });
 }
-bool customerEntryBtnClk = false;
-// Future<String> customerEntry(BuildContext context) async {
-//   String link = "${baseUrl}add_customer";
-//   SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-//   try {
-//     var response = await Dio().post(link,
-//       data:{
-//         "Customer_SlNo": 0,
-//         "Customer_Code": "",
-//         "Customer_Name": _customerNameController.text.trim(),
-//         "Customer_Type": customerType.toString().trim(),
-//         "Customer_Phone": '',
-//         "Customer_Mobile": _ownerMobileController.text.trim(),
-//         "cheque_number": _chequeDetailsController.text.trim(),
-//         "Customer_Email": _emailController.text.trim(),
-//         "Customer_OfficePhone": _pMMobileController.text.trim(),
-//         "Customer_Address": _deliveryAddressController.text.trim(),
-//         "Customer_Address_Others": _officeAddressController.text.trim(),
-//         "owner_name": _ownerNameController.text.trim(),
-//         "bank_name": _bankNameController.text.trim(),
-//         "check_no": _checkNoController.text.trim(),
-//         "brunch_name": _bankBranchNameController.text.trim(),
-//         "account_no": _accountNoController.text.trim(),
-//         "unit_area_id": regionId.toString().trim(),
-//         "territory_id": territoriesId.toString().trim(),
-//         "Customer_Credit_Limit": _creditLimitController.text.trim(),
-//         "previous_due": _previousDueController.text.trim(),
-//       },
-//       options: Options(
-//         headers: {
-//           "Content-Type": "application/json",
-//           'Cookie': 'ci_session=${sharedPreferences.getString("sessionId")}',
-//           "Authorization": "Bearer ${sharedPreferences.getString("token")}",
-//         },
-//       ),
-//     );
 
-//     var item = response.data;
-//     print("API Response: $item");
+bool testEntryBtnClk = false;
+Future<String> testEntry(BuildContext context) async {
+  String link = AppUrl.addTestEntryEndPoint;
+  try {
+    final token = getToken();
+    var response = await Dio().post(link,
+      data: {
+        "test_code": testId.toString(),
+        "room_number": _roomNoController.text.trim(),
+        "name": _testNameController.text.trim(),
+        "specimen_id": specimensId.toString(),
+        "price": _priceController.text.trim(),
+        "day": _dayController.text.trim(),
+        "hour": _hourController.text.trim(),
+        "minute": _minuteController.text.trim(),
+        "remark": _remarkController.text.trim(),
+      },
+      options: Options(
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
+        },
+      ),
+    );
 
-//     if (item["success"] == true) {
-//       setState(() {
-//         customerEntryBtnClk = false;
-//       });
-//       emptyMethod();
-//       CustomSnackBar.showTopSnackBar(context, "${item["message"]}");
-//       Navigator.push(context,MaterialPageRoute(builder:(context) => const CustomerEntryScreen()));
-//       return "true";
-//     } else {
-//       setState(() {
-//         customerEntryBtnClk = false;
-//       });
-//       Utils.showTopSnackBar(context,"${item["message"]}");
-//       return "false";
-//     }
-//   } catch (e) {
-//     setState(() {
-//       customerEntryBtnClk = false;
-//     });
-//     print("Exception caught: $e");
-//     Utils.showTopSnackBar(context, "Something went wrong: $e");
-//     return "false";
-//   }
-// }
- 
+    var item = response.data;
+    print("API Response: $item");
+
+    if (item["success"] == true) {
+      setState(() {
+        testEntryBtnClk = false;
+      });
+      emptyMethod();
+      CustomSnackBar.showTopSnackBar(context, "${item["message"]}");
+      getTestCode();
+      return "true";
+    } else {
+      setState(() {
+        testEntryBtnClk = false;
+      });
+      Utils.showTopSnackBar(context,"${item["message"]}");
+      return "false";
+    }
+  } catch (e) {
+    setState(() {
+      testEntryBtnClk = false;
+    });
+    print("Exception caught: $e");
+    Utils.showTopSnackBar(context, "Something went wrong: $e");
+    return "false";
+  }
+ }
 }

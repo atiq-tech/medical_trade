@@ -1,8 +1,19 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_typeahead/flutter_typeahead.dart';
+import 'package:get_storage/get_storage.dart';
+import 'package:medical_trade/config/app_url.dart';
+import 'package:medical_trade/diagnostic_module/models/agents_model.dart';
+import 'package:medical_trade/diagnostic_module/models/bank_account_model.dart';
+import 'package:medical_trade/diagnostic_module/providers/agents_provider.dart';
+import 'package:medical_trade/diagnostic_module/providers/bank_account_provider.dart';
 import 'package:medical_trade/diagnostic_module/utils/all_textstyle.dart';
+import 'package:medical_trade/diagnostic_module/utils/animation_snackbar.dart';
 import 'package:medical_trade/diagnostic_module/utils/utils.dart';
 import 'package:medical_trade/utilities/color_manager.dart';
+import 'package:medical_trade/view/auth/login_register_auth.dart';
+import 'package:provider/provider.dart';
 
 class CommissionPaymentEntryScreen extends StatefulWidget {
   const CommissionPaymentEntryScreen({super.key});
@@ -266,7 +277,9 @@ final LayerLink _pTypeLayerLink = LayerLink();
 
 
  
-  // String? _selectedBankAccount;
+  String? _selectedBankAccount;
+  String? _agentId;
+  
   // String? _selectedSupplier;
   // final int _itemsPerPage = 2;
   // int _currentPage = 1;
@@ -292,8 +305,52 @@ final LayerLink _pTypeLayerLink = LayerLink();
   //   print("role=====  $role");
   // }
 
+static String getToken() {
+  final box = GetStorage();
+  return box.read('loginToken') ?? "";
+}
+
+String? commissionPayCode = "";
+getCommissionPayCode() async {
+  try {
+    String link = AppUrl.getPatientCodeEndPoint;
+    final token = getToken();
+
+    var response = await Dio().get(
+      link,
+      options: Options(
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
+        },
+        validateStatus: (status) {
+          return status! < 500;
+        },
+      ),
+    );
+
+    print("Response =====> ${response.data}");
+    if (response.statusCode == 401) {
+      Utils.showTopSnackBar(context, "Session expired. Please log in again.");
+      Navigator.pushReplacement(context,
+        MaterialPageRoute(builder: (context) => const LoginView(isLogin: true)),
+      );
+      return;
+    }
+    setState(() {
+      commissionPayCode = response.data["data"].toString();
+    });
+    CustomSnackBar.showTopSnackBar(context, "${response.data["message"]}");
+    print("Patient ID =========> $commissionPayCode");
+
+  } catch (e) {
+    print("getPatientCode ERROR =======> $e");
+  }
+}
+
   @override
   void initState() {
+    getCommissionPayCode();
     //WidgetsBinding.instance.addPostFrameCallback(_getTrTypeDropdownSize);
     WidgetsBinding.instance.addPostFrameCallback(_getPTypeDropdownSize);
     // _initializeData();
@@ -303,9 +360,9 @@ final LayerLink _pTypeLayerLink = LayerLink();
     getPaymentType = "cash";
     // SupplierPaymentProvider.isSupplierPaymentLoading = true;
     // Provider.of<SupplierPaymentProvider>(context,listen: false).supplierPaymentList = [];
-    // Provider.of<SupplierDueProvider>(context,listen: false).getSupplierDue(context, "","");
+    Provider.of<AgentsProvider>(context,listen: false).getAgents();
     // Provider.of<SupplierPaymentProvider>(context,listen: false).getSupplierPayment("",Utils.formatBackEndDate(DateTime.now()),"${Utils.formatBackEndDate(DateTime.now())}");
-    // Provider.of<BankAccountProvider>(context,listen: false).getBankAccount();
+    Provider.of<BankAccountProvider>(context,listen: false).getBankAccount();
     super.initState();
   }
 
@@ -318,7 +375,8 @@ final LayerLink _pTypeLayerLink = LayerLink();
     // int totalPages = allGetSupplierPaymentData.length <= _itemsPerPage ? 1 : (allGetSupplierPaymentData.length / _itemsPerPage).ceil();
     // int displayPageCount = totalPages > 20 ? 20 : totalPages;
     // ///bank account
-    // final allBankAccountList = Provider.of<BankAccountProvider>(context).bankAccountList;
+    final allAgentsData = Provider.of<AgentsProvider>(context).allAgentsList;
+    final allBankAccountData = Provider.of<BankAccountProvider>(context).allBankAccountList;
     return
     //  RefreshIndicator(
     //   onRefresh: () async {
@@ -388,6 +446,25 @@ final LayerLink _pTypeLayerLink = LayerLink();
                           padding: EdgeInsets.only(left: 4.w, right: 4.w,bottom: 4.h),
                           child: Column(
                               children: [
+                                Row(
+                                  children: [
+                                    Expanded(flex: 6,child: Text("Transaction No.",style: AllTextStyle.textFieldHeadStyle)),
+                                    const Expanded(flex: 1,child: Text(":")),
+                                    Expanded(
+                                      flex: 11,
+                                      child: Container(
+                                        height: 25.h,
+                                        decoration: ContDecoration.contDecoration,
+                                        child: Padding(
+                                          padding: EdgeInsets.only(left: 5.w, right: 5.w,top: 3.h),
+                                          child: Text(commissionPayCode.toString(),
+                                            style: AllTextStyle.dropDownlistStyle
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
                                 Row(
                                   children: [
                                     Expanded(flex: 6,child:Text("Payment Date",style:AllTextStyle.textFieldHeadStyle)),
@@ -499,57 +576,57 @@ final LayerLink _pTypeLayerLink = LayerLink();
                                          width: MediaQuery.of(context).size.width / 2,
                                          margin: EdgeInsets.only(bottom: 3.h),
                                          decoration: ContDecoration.contDecoration,
-                                          // child: TypeAheadField<BankAccountModel>(
-                                          // controller: bankAccountController,
-                                          // builder: (context, controller, focusNode) {
-                                          // return TextField(
-                                          // controller: controller,
-                                          // focusNode: focusNode,
-                                          // style: TextStyle(fontSize: 13, color: Colors.grey.shade800, overflow: TextOverflow.ellipsis),
-                                          // decoration: InputDecoration(contentPadding: EdgeInsets.only(left: 5.0, top: 4.0),
-                                          //   isDense: true,
-                                          //   hintText: 'Select Account',
-                                          //   hintStyle: TextStyle(fontSize: 13),
-                                          //   suffixIcon: _selectedBankAccount == '' || _selectedBankAccount == 'null' || _selectedBankAccount == null || controller.text == '' ? null
-                                          //       : GestureDetector(
-                                          //     onTap: () {
-                                          //       setState(() {
-                                          //         bankAccountController.clear();
-                                          //         controller.clear();
-                                          //         _selectedBankAccount = null;
-                                          //       });
-                                          //     },
-                                          //     child: Padding(padding: EdgeInsets.all(5), child: Icon(Icons.close, size: 16)),
-                                          //   ),
-                                          //   suffixIconConstraints: BoxConstraints(maxHeight: 30),
-                                          //   filled: false,
-                                          //   fillColor: Colors.white,
-                                          //   border: InputBorder.none,
-                                          // ),
-                                          // );
-                                          // },
-                                          // suggestionsCallback: (pattern) async {
-                                          // return Future.delayed(const Duration(seconds: 1), () {
-                                          //   return allBankAccountList
-                                          //   .where((element) => element.name.toLowerCase().contains(pattern.toLowerCase()))
-                                          //   .toList().cast<BankAccountModel>(); 
-                                          //   });
-                                          //   },                    
-                                          // itemBuilder: (context, BankAccountModel suggestion) {
-                                          //   return Padding(
-                                          // padding: EdgeInsets.symmetric(horizontal: 6,vertical: 4),
-                                          // child: Text("${suggestion.name} - ${suggestion.number} (${suggestion.bankName})",
-                                          //   style: TextStyle(fontSize: 12), maxLines: 1, overflow: TextOverflow.ellipsis,
-                                          // ),
-                                          // );
-                                          // },
-                                          // onSelected: (BankAccountModel suggestion) {
-                                          // setState(() {
-                                          //   bankAccountController.text = "${suggestion.name} - ${suggestion.number} (${suggestion.bankName})";
-                                          //   _selectedBankAccount = suggestion.id.toString();
-                                          // });  
-                                          // },
-                                          // ),
+                                          child: TypeAheadField<BankAccountModel>(
+                                          controller: bankAccountController,
+                                          builder: (context, controller, focusNode) {
+                                          return TextField(
+                                          controller: controller,
+                                          focusNode: focusNode,
+                                          style: TextStyle(fontSize: 13, color: Colors.grey.shade800, overflow: TextOverflow.ellipsis),
+                                          decoration: InputDecoration(contentPadding: EdgeInsets.only(left: 5.0, top: 4.0),
+                                            isDense: true,
+                                            hintText: 'Select Account',
+                                            hintStyle: TextStyle(fontSize: 13),
+                                            suffixIcon: _selectedBankAccount == '' || _selectedBankAccount == 'null' || _selectedBankAccount == null || controller.text == '' ? null
+                                                : GestureDetector(
+                                              onTap: () {
+                                                setState(() {
+                                                  bankAccountController.clear();
+                                                  controller.clear();
+                                                  _selectedBankAccount = null;
+                                                });
+                                              },
+                                              child: Padding(padding: EdgeInsets.all(5), child: Icon(Icons.close, size: 16)),
+                                            ),
+                                            suffixIconConstraints: BoxConstraints(maxHeight: 30),
+                                            filled: false,
+                                            fillColor: Colors.white,
+                                            border: InputBorder.none,
+                                          ),
+                                          );
+                                          },
+                                          suggestionsCallback: (pattern) async {
+                                          return Future.delayed(const Duration(seconds: 1), () {
+                                            return allBankAccountData
+                                            .where((element) => element.accountName.toLowerCase().contains(pattern.toLowerCase()))
+                                            .toList().cast<BankAccountModel>(); 
+                                            });
+                                            },                    
+                                          itemBuilder: (context, BankAccountModel suggestion) {
+                                            return Padding(
+                                          padding: EdgeInsets.symmetric(horizontal: 6,vertical: 4),
+                                          child: Text("${suggestion.accountName} - ${suggestion.accountNumber} (${suggestion.bankName})",
+                                            style: TextStyle(fontSize: 12), maxLines: 1, overflow: TextOverflow.ellipsis,
+                                          ),
+                                          );
+                                          },
+                                          onSelected: (BankAccountModel suggestion) {
+                                          setState(() {
+                                            bankAccountController.text = "${suggestion.accountName} - ${suggestion.accountNumber} (${suggestion.bankName})";
+                                            _selectedBankAccount = suggestion.id.toString();
+                                          });  
+                                          },
+                                          ),
                                       
                                        ),
                                      ),
@@ -566,61 +643,60 @@ final LayerLink _pTypeLayerLink = LayerLink();
                                         height: 25.h,
                                         width: MediaQuery.of(context).size.width / 2,
                                         decoration: ContDecoration.contDecoration,
-                                      //     child: TypeAheadField<SupplierDueModel>(
-                                      //     controller: supplierController,
-                                      //     builder: (context, controller, focusNode) {
-                                      //     return TextField(
-                                      //       controller: controller,
-                                      //       focusNode: focusNode,
-                                      //       style: TextStyle(fontSize: 13, color: Colors.grey.shade800, overflow: TextOverflow.ellipsis),
-                                      //       decoration: InputDecoration(contentPadding: EdgeInsets.only(left: 5.0, top: 4.0),
-                                      //         isDense: true,
-                                      //         hintText: 'Select Supplier',
-                                      //         hintStyle: TextStyle(fontSize: 13),
-                                      //         suffixIcon: _selectedSupplier == '' || _selectedSupplier == 'null' || _selectedSupplier == null || controller.text == '' ? null
-                                      //             : GestureDetector(
-                                      //           onTap: () {
-                                      //             setState(() {
-                                      //               supplierController.clear();
-                                      //               controller.clear();
-                                      //               _selectedSupplier = null;
-                                      //               previousDueController.clear();
-                                      //             });
-                                      //           },
-                                      //           child: Padding(padding: EdgeInsets.all(5), child: Icon(Icons.close, size: 16)),
-                                      //         ),
-                                      //         suffixIconConstraints: BoxConstraints(maxHeight: 30),
-                                      //         filled: false,
-                                      //         fillColor: Colors.white,
-                                      //         border: InputBorder.none,
-                                      //       ),
-                                      //     );
-                                      //   },
-                                      //   suggestionsCallback: (pattern) async {
-                                      //     return Future.delayed(const Duration(seconds: 1), () {
-                                      //   return allSuppliersData
-                                      //     .where((element) => element.name.toLowerCase().contains(pattern.toLowerCase()))
-                                      //   .toList().cast<SupplierDueModel>(); 
-                                      //     });
-                                      //     },
+                                          child: TypeAheadField<AgentsModel>(
+                                          controller: agentController,
+                                          builder: (context, controller, focusNode) {
+                                          return TextField(
+                                            controller: controller,
+                                            focusNode: focusNode,
+                                            style: TextStyle(fontSize: 13, color: Colors.grey.shade800, overflow: TextOverflow.ellipsis),
+                                            decoration: InputDecoration(contentPadding: EdgeInsets.only(left: 5.0, top: 4.0),
+                                              isDense: true,
+                                              hintText: 'Select Agent',
+                                              hintStyle: TextStyle(fontSize: 13),
+                                              suffixIcon: _agentId == '' || _agentId == 'null' || _agentId == null || controller.text == '' ? null
+                                                  : GestureDetector(
+                                                onTap: () {
+                                                  setState(() {
+                                                    agentController.clear();
+                                                    controller.clear();
+                                                    _agentId = null;
+                                                    previousDueController.clear();
+                                                  });
+                                                },
+                                                child: Padding(padding: EdgeInsets.all(5), child: Icon(Icons.close, size: 16)),
+                                              ),
+                                              suffixIconConstraints: BoxConstraints(maxHeight: 30),
+                                              filled: false,
+                                              fillColor: Colors.white,
+                                              border: InputBorder.none,
+                                            ),
+                                          );
+                                        },
+                                        suggestionsCallback: (pattern) async {
+                                          return Future.delayed(const Duration(seconds: 1), () {
+                                        return allAgentsData
+                                          .where((element) => element.name.toLowerCase().contains(pattern.toLowerCase()))
+                                        .toList().cast<AgentsModel>(); 
+                                          });
+                                          },
                                       
-                                      //   itemBuilder: (context, SupplierDueModel suggestion) {
-                                      //     return Padding(
-                                      //       padding: EdgeInsets.symmetric(horizontal: 6.w,vertical: 4.h),
-                                      //       child: Text("${suggestion.name} ${suggestion.code != "" ? " - ${suggestion.code}" : ""} ${suggestion.phone != "" ? " - ${suggestion.phone}" : ""}",
-                                      //         style: TextStyle(fontSize: 12), maxLines: 1, overflow: TextOverflow.ellipsis,
-                                      //       ),
-                                      //     );
-                                      //   },
-                                      //   onSelected: (SupplierDueModel suggestion) {
-                                      //         supplierController.text = "${suggestion.name} ${suggestion.code != "" ? " - ${suggestion.code}" : ""} ${suggestion.phone != "" ? " - ${suggestion.phone}" : ""}";
-                                      //           setState(() {
-                                      //             _selectedSupplier = suggestion.id.toString();
-                                      //             previousDueController.text = suggestion.due;
-                                      //           });
-                                      //   },
-                                      // ),
-                                     
+                                        itemBuilder: (context, AgentsModel suggestion) {
+                                          return Padding(
+                                            padding: EdgeInsets.symmetric(horizontal: 6.w,vertical: 4.h),
+                                            child: Text("${suggestion.agentCode} ${suggestion.name != "" ? " - ${suggestion.name}" : ""}",
+                                              style: TextStyle(fontSize: 12), maxLines: 1, overflow: TextOverflow.ellipsis,
+                                            ),
+                                          );
+                                        },
+                                        onSelected: (AgentsModel suggestion) {
+                                              agentController.text = "${suggestion.agentCode} ${suggestion.name != "" ? " - ${suggestion.name}" : ""}";
+                                                setState(() {
+                                                  _agentId = suggestion.id.toString();
+                                                 // previousDueController.text = suggestion.dueAmount.toString();
+                                                });
+                                        },
+                                      ),
                                       ),
                                     ),
                                   ],

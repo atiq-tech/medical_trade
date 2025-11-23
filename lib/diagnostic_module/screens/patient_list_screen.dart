@@ -18,7 +18,7 @@ class _PatientListScreenState extends State<PatientListScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    Provider.of<PatientsProvider>(context, listen: false).getlPatients();
+    Provider.of<PatientsProvider>(context, listen: false).getPatients();
   }
 
   @override
@@ -38,7 +38,7 @@ class _PatientListScreenState extends State<PatientListScreen> {
       body: Padding(
         padding: EdgeInsets.all(0.w),
         child: Container(
-          height: allPatientsData.isEmpty ? 40.h : 40.h + (allPatientsData.length * 25.0.h),
+          height: double.infinity,
           width: double.infinity,
           padding: EdgeInsets.all(10.w),
           child: SingleChildScrollView(
@@ -47,6 +47,7 @@ class _PatientListScreenState extends State<PatientListScreen> {
               scrollDirection: Axis.horizontal,
               child: DataTable(
                 headingRowHeight: 22.h,
+                //dataRowMaxHeight:double.infinity,
                 dataRowHeight: 22.h,
                 headingRowColor: MaterialStateColor.resolveWith(
                     (states) => const Color.fromARGB(255, 70, 54, 141)),

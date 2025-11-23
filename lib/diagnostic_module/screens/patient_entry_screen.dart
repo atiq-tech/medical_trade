@@ -455,7 +455,7 @@ getPatientCode() async {
                       });
                       var result = await patientEntry(context);
                       if (result == "true") {
-                        Provider.of<PatientsProvider>(context, listen: false).getlPatients();
+                        Provider.of<PatientsProvider>(context, listen: false).getPatients();
                       }
                       setState(() {});
                     },

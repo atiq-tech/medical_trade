@@ -5,7 +5,7 @@ import 'package:medical_trade/diagnostic_module/models/patients_model.dart';
 class PatientsProvider extends ChangeNotifier{
   List<PatientsModel> allPatientList = [];
   static bool isAllPatientsLoading = false;
-  getlPatients() async {
+  getPatients() async {
     allPatientList = await DiagnosticeApiservice.fetchAllPatients();
   off();
   notifyListeners();
