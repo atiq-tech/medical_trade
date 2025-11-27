@@ -3,6 +3,7 @@ import 'package:get_storage/get_storage.dart';
 import 'package:medical_trade/config/app_url.dart';
 import 'package:medical_trade/diagnostic_module/models/agents_model.dart';
 import 'package:medical_trade/diagnostic_module/models/bank_account_model.dart';
+import 'package:medical_trade/diagnostic_module/models/department_module.dart';
 import 'package:medical_trade/diagnostic_module/models/doctors_model.dart';
 import 'package:medical_trade/diagnostic_module/models/patients_model.dart';
 import 'package:medical_trade/diagnostic_module/models/specimens_model.dart';
@@ -147,4 +148,25 @@ class DiagnosticeApiservice {
     return null;
   }
   
+   //==================get-Agents List =======================
+  static fetchDepartment(String? useFor) async {
+    String link = AppUrl.getDepartmentEndPoint;
+    final token = getToken();
+    try {
+      Response response = await Dio().post(link,
+         data: {
+              "use_for": "$useFor"
+          },
+          options: Options(headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer $token",
+          }));
+      var item = response.data;
+      print("All get-Departments Data======$item");
+      return List.from(item).map((e) => DepartmentModel.fromMap(e)).toList();
+    } catch (e) {
+      print(e);
+    }
+    return null;
+  }
 }

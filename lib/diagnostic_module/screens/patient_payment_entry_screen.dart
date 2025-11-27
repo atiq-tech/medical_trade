@@ -1,8 +1,19 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_typeahead/flutter_typeahead.dart';
+import 'package:get_storage/get_storage.dart';
+import 'package:medical_trade/config/app_url.dart';
+import 'package:medical_trade/diagnostic_module/models/bank_account_model.dart';
+import 'package:medical_trade/diagnostic_module/models/patients_model.dart';
+import 'package:medical_trade/diagnostic_module/providers/bank_account_provider.dart';
+import 'package:medical_trade/diagnostic_module/providers/patients_provider.dart';
 import 'package:medical_trade/diagnostic_module/utils/all_textstyle.dart';
+import 'package:medical_trade/diagnostic_module/utils/animation_snackbar.dart';
 import 'package:medical_trade/diagnostic_module/utils/utils.dart';
 import 'package:medical_trade/utilities/color_manager.dart';
+import 'package:medical_trade/view/auth/login_register_auth.dart';
+import 'package:provider/provider.dart';
 
 class PatientPaymentEntryScreen extends StatefulWidget {
   const PatientPaymentEntryScreen({super.key});
@@ -150,10 +161,10 @@ class _PatientPaymentEntryScreenState extends State<PatientPaymentEntryScreen> {
        setState(() {
          _selectedType = selectedValue;
        if (selectedValue == "Received") {
-          paymentType = "In Cash";
+          paymentType = "Received";
         }
        if (selectedValue == "Payment") {
-          paymentType = "Out Cash";
+          paymentType = "Payment";
         }
     });
   }
@@ -256,10 +267,10 @@ final LayerLink _pTypeLayerLink = LayerLink();
      setState(() {
       _paymentType = selectValue;
       if (selectValue == "Cash") {
-        getPaymentType = "cash";
+        getPaymentType = "Cash";
       }
       if (selectValue == "Bank") {
-        getPaymentType = "bank";
+        getPaymentType = "Bank";
       }
       _paymentType == "Bank" ? isBankListClicked = true : isBankListClicked = false;
      });
@@ -267,8 +278,8 @@ final LayerLink _pTypeLayerLink = LayerLink();
 
 
  
-  // String? _selectedBankAccount;
-  // String? _selectedSupplier;
+  String? _selectedBankAccount;
+  String? _selectedPatientId;
   // final int _itemsPerPage = 2;
   // int _currentPage = 1;
   // List<dynamic> _getPaginatedData(List<dynamic> allGetSupplierPaymentData) {
@@ -292,35 +303,112 @@ final LayerLink _pTypeLayerLink = LayerLink();
   //   print("Action=====  $actionList");
   //   print("role=====  $role");
   // }
+static String getToken() {
+  final box = GetStorage();
+  return box.read('loginToken') ?? "";
+}
 
+String? patientPayCode = "";
+getPatientPayCode() async {
+  try {
+    String link = AppUrl.getPatientPayCodeEndPoint;
+    final token = getToken();
+
+    var response = await Dio().get(
+      link,
+      options: Options(
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
+        },
+        validateStatus: (status) {
+          return status! < 500;
+        },
+      ),
+    );
+
+    print("Response =====> ${response.data}");
+    if (response.statusCode == 401) {
+      Utils.showTopSnackBar(context, "Session expired. Please log in again.");
+      Navigator.pushReplacement(context,
+        MaterialPageRoute(builder: (context) => const LoginView(isLogin: true)),
+      );
+      return;
+    }
+    setState(() {
+      patientPayCode = response.data["data"].toString();
+    });
+    CustomSnackBar.showTopSnackBar(context, "${response.data["message"]}");
+    print("Patient ID =========> $patientPayCode");
+
+  } catch (e) {
+    print("patientPayCode ERROR =======> $e");
+  }
+}
+
+String? dueAmmount = "";
+getMadicinePatientDue(String? patientId) async {
+  try {
+    String link = AppUrl.getMadicinePatientDueEndPoint;
+    final token = getToken();
+
+    var response = await Dio().post(link,
+      data: {
+        "patientId": "$patientId",
+      },
+      options: Options(
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
+        },
+        validateStatus: (status) {
+          return status! < 500;
+        },
+      ),
+    );
+
+    print("Response =====> ${response.data}");
+    if (response.statusCode == 401) {
+      Utils.showTopSnackBar(context, "Session expired. Please log in again.");
+      Navigator.pushReplacement(context,
+        MaterialPageRoute(builder: (context) => const LoginView(isLogin: true)),
+      );
+      return;
+    }
+    setState(() {
+      dueAmmount = response.data["due"].toString();
+    });
+    CustomSnackBar.showTopSnackBar(context, "${response.data["message"]}");
+    print("dueAmmount  =========> $dueAmmount");
+
+  } catch (e) {
+    print("dueAmmount ERROR =======> $e");
+  }
+}
   
   @override
   void initState() {
+    getPatientPayCode();
     WidgetsBinding.instance.addPostFrameCallback(_getDropdownSize);
     WidgetsBinding.instance.addPostFrameCallback(_getPTypeDropdownSize);
     // _initializeData();
     firstPickedDate = Utils.formatFrontEndDate(DateTime.now());
     backEndFirstDate = Utils.formatBackEndDate(DateTime.now());
     //getTransactionType = 'CP';
-    getPaymentType = "cash";
+    getPaymentType = "Cash";
     // SupplierPaymentProvider.isSupplierPaymentLoading = true;
     // Provider.of<SupplierPaymentProvider>(context,listen: false).supplierPaymentList = [];
     // Provider.of<SupplierDueProvider>(context,listen: false).getSupplierDue(context, "","");
     // Provider.of<SupplierPaymentProvider>(context,listen: false).getSupplierPayment("",Utils.formatBackEndDate(DateTime.now()),"${Utils.formatBackEndDate(DateTime.now())}");
-    // Provider.of<BankAccountProvider>(context,listen: false).getBankAccount();
+    Provider.of<BankAccountProvider>(context,listen: false).getBankAccount();
+    Provider.of<PatientsProvider>(context,listen: false).getPatients();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    // /// Suppliers due $ Supplier list
-    // final allSuppliersData = Provider.of<SupplierDueProvider>(context).supplierDuelist;
-    // ///Get Supplier Payment
-    // final allGetSupplierPaymentData = Provider.of<SupplierPaymentProvider>(context).supplierPaymentList;
-    // int totalPages = allGetSupplierPaymentData.length <= _itemsPerPage ? 1 : (allGetSupplierPaymentData.length / _itemsPerPage).ceil();
-    // int displayPageCount = totalPages > 20 ? 20 : totalPages;
-    // ///bank account
-    // final allBankAccountList = Provider.of<BankAccountProvider>(context).bankAccountList;
+    final allBankAccountData = Provider.of<BankAccountProvider>(context).allBankAccountList;
+    final allPatientData = Provider.of<PatientsProvider>(context).allPatientList;
     return
     //  RefreshIndicator(
     //   onRefresh: () async {
@@ -390,6 +478,25 @@ final LayerLink _pTypeLayerLink = LayerLink();
                           padding: EdgeInsets.only(left: 4.w, right: 4.w,bottom: 4.h),
                           child: Column(
                               children: [
+                                 Row(
+                                  children: [
+                                    Expanded(flex: 6,child: Text("Transaction No.",style: AllTextStyle.textFieldHeadStyle)),
+                                    const Expanded(flex: 1,child: Text(":")),
+                                    Expanded(
+                                      flex: 11,
+                                      child: Container(
+                                        height: 25.h,
+                                        decoration: ContDecoration.contDecoration,
+                                        child: Padding(
+                                          padding: EdgeInsets.only(left: 5.w, right: 5.w,top: 3.h),
+                                          child: Text(patientPayCode.toString(),
+                                            style: AllTextStyle.dropDownlistStyle
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
                                 Row(
                                   children: [
                                     Expanded(flex: 6,child:Text("Payment Date",style:AllTextStyle.textFieldHeadStyle)),
@@ -500,57 +607,57 @@ final LayerLink _pTypeLayerLink = LayerLink();
                                          width: MediaQuery.of(context).size.width / 2,
                                          margin: EdgeInsets.only(bottom: 3.h),
                                          decoration: ContDecoration.contDecoration,
-                                          // child: TypeAheadField<BankAccountModel>(
-                                          // controller: bankAccountController,
-                                          // builder: (context, controller, focusNode) {
-                                          // return TextField(
-                                          // controller: controller,
-                                          // focusNode: focusNode,
-                                          // style: TextStyle(fontSize: 13, color: Colors.grey.shade800, overflow: TextOverflow.ellipsis),
-                                          // decoration: InputDecoration(contentPadding: EdgeInsets.only(left: 5.0, top: 4.0),
-                                          //   isDense: true,
-                                          //   hintText: 'Select Account',
-                                          //   hintStyle: TextStyle(fontSize: 13),
-                                          //   suffixIcon: _selectedBankAccount == '' || _selectedBankAccount == 'null' || _selectedBankAccount == null || controller.text == '' ? null
-                                          //       : GestureDetector(
-                                          //     onTap: () {
-                                          //       setState(() {
-                                          //         bankAccountController.clear();
-                                          //         controller.clear();
-                                          //         _selectedBankAccount = null;
-                                          //       });
-                                          //     },
-                                          //     child: Padding(padding: EdgeInsets.all(5), child: Icon(Icons.close, size: 16)),
-                                          //   ),
-                                          //   suffixIconConstraints: BoxConstraints(maxHeight: 30),
-                                          //   filled: false,
-                                          //   fillColor: Colors.white,
-                                          //   border: InputBorder.none,
-                                          // ),
-                                          // );
-                                          // },
-                                          // suggestionsCallback: (pattern) async {
-                                          // return Future.delayed(const Duration(seconds: 1), () {
-                                          //   return allBankAccountList
-                                          //   .where((element) => element.name.toLowerCase().contains(pattern.toLowerCase()))
-                                          //   .toList().cast<BankAccountModel>(); 
-                                          //   });
-                                          //   },                    
-                                          // itemBuilder: (context, BankAccountModel suggestion) {
-                                          //   return Padding(
-                                          // padding: EdgeInsets.symmetric(horizontal: 6,vertical: 4),
-                                          // child: Text("${suggestion.name} - ${suggestion.number} (${suggestion.bankName})",
-                                          //   style: TextStyle(fontSize: 12), maxLines: 1, overflow: TextOverflow.ellipsis,
-                                          // ),
-                                          // );
-                                          // },
-                                          // onSelected: (BankAccountModel suggestion) {
-                                          // setState(() {
-                                          //   bankAccountController.text = "${suggestion.name} - ${suggestion.number} (${suggestion.bankName})";
-                                          //   _selectedBankAccount = suggestion.id.toString();
-                                          // });  
-                                          // },
-                                          // ),
+                                          child: TypeAheadField<BankAccountModel>(
+                                          controller: bankAccountController,
+                                          builder: (context, controller, focusNode) {
+                                          return TextField(
+                                          controller: controller,
+                                          focusNode: focusNode,
+                                          style: TextStyle(fontSize: 13, color: Colors.grey.shade800, overflow: TextOverflow.ellipsis),
+                                          decoration: InputDecoration(contentPadding: EdgeInsets.only(left: 5.0, top: 4.0),
+                                            isDense: true,
+                                            hintText: 'Select Account',
+                                            hintStyle: TextStyle(fontSize: 13),
+                                            suffixIcon: _selectedBankAccount == '' || _selectedBankAccount == 'null' || _selectedBankAccount == null || controller.text == '' ? null
+                                                : GestureDetector(
+                                              onTap: () {
+                                                setState(() {
+                                                  bankAccountController.clear();
+                                                  controller.clear();
+                                                  _selectedBankAccount = null;
+                                                });
+                                              },
+                                              child: Padding(padding: EdgeInsets.all(5), child: Icon(Icons.close, size: 16)),
+                                            ),
+                                            suffixIconConstraints: BoxConstraints(maxHeight: 30),
+                                            filled: false,
+                                            fillColor: Colors.white,
+                                            border: InputBorder.none,
+                                          ),
+                                          );
+                                          },
+                                          suggestionsCallback: (pattern) async {
+                                          return Future.delayed(const Duration(seconds: 1), () {
+                                            return allBankAccountData
+                                            .where((element) => element.accountName.toLowerCase().contains(pattern.toLowerCase()))
+                                            .toList().cast<BankAccountModel>(); 
+                                            });
+                                            },                    
+                                          itemBuilder: (context, BankAccountModel suggestion) {
+                                            return Padding(
+                                          padding: EdgeInsets.symmetric(horizontal: 6,vertical: 4),
+                                          child: Text("${suggestion.accountName} - ${suggestion.accountNumber} (${suggestion.bankName})",
+                                            style: TextStyle(fontSize: 12), maxLines: 1, overflow: TextOverflow.ellipsis,
+                                          ),
+                                          );
+                                          },
+                                          onSelected: (BankAccountModel suggestion) {
+                                          setState(() {
+                                            bankAccountController.text = "${suggestion.accountName} - ${suggestion.accountNumber} (${suggestion.bankName})";
+                                            _selectedBankAccount = suggestion.id.toString();
+                                          });  
+                                          },
+                                          ),
                                        ),
                                      ),
                                    ],
@@ -566,61 +673,62 @@ final LayerLink _pTypeLayerLink = LayerLink();
                                         height: 25.h,
                                         width: MediaQuery.of(context).size.width / 2,
                                         decoration: ContDecoration.contDecoration,
-                                      //     child: TypeAheadField<SupplierDueModel>(
-                                      //     controller: patientController,
-                                      //     builder: (context, controller, focusNode) {
-                                      //     return TextField(
-                                      //       controller: controller,
-                                      //       focusNode: focusNode,
-                                      //       style: TextStyle(fontSize: 13, color: Colors.grey.shade800, overflow: TextOverflow.ellipsis),
-                                      //       decoration: InputDecoration(contentPadding: EdgeInsets.only(left: 5.0, top: 4.0),
-                                      //         isDense: true,
-                                      //         hintText: 'Select Supplier',
-                                      //         hintStyle: TextStyle(fontSize: 13),
-                                      //         suffixIcon: _selectedSupplier == '' || _selectedSupplier == 'null' || _selectedSupplier == null || controller.text == '' ? null
-                                      //             : GestureDetector(
-                                      //           onTap: () {
-                                      //             setState(() {
-                                      //               supplierController.clear();
-                                      //               controller.clear();
-                                      //               _selectedSupplier = null;
-                                      //               previousDueController.clear();
-                                      //             });
-                                      //           },
-                                      //           child: Padding(padding: EdgeInsets.all(5), child: Icon(Icons.close, size: 16)),
-                                      //         ),
-                                      //         suffixIconConstraints: BoxConstraints(maxHeight: 30),
-                                      //         filled: false,
-                                      //         fillColor: Colors.white,
-                                      //         border: InputBorder.none,
-                                      //       ),
-                                      //     );
-                                      //   },
-                                      //   suggestionsCallback: (pattern) async {
-                                      //     return Future.delayed(const Duration(seconds: 1), () {
-                                      //   return allSuppliersData
-                                      //     .where((element) => element.name.toLowerCase().contains(pattern.toLowerCase()))
-                                      //   .toList().cast<SupplierDueModel>(); 
-                                      //     });
-                                      //     },
+                                          child: TypeAheadField<PatientsModel>(
+                                          controller: patientController,
+                                          builder: (context, controller, focusNode) {
+                                          return TextField(
+                                            controller: controller,
+                                            focusNode: focusNode,
+                                            style: TextStyle(fontSize: 13, color: Colors.grey.shade800, overflow: TextOverflow.ellipsis),
+                                            decoration: InputDecoration(contentPadding: EdgeInsets.only(left: 5.0, top: 4.0),
+                                              isDense: true,
+                                              hintText: 'Select Patient',
+                                              hintStyle: TextStyle(fontSize: 13),
+                                              suffixIcon: _selectedPatientId == '' || _selectedPatientId == 'null' || _selectedPatientId == null || controller.text == '' ? null
+                                                  : GestureDetector(
+                                                onTap: () {
+                                                  setState(() {
+                                                    patientController.clear();
+                                                    controller.clear();
+                                                    _selectedPatientId = null;
+                                                    previousDueController.clear();
+                                                  });
+                                                },
+                                                child: Padding(padding: EdgeInsets.all(5), child: Icon(Icons.close, size: 16)),
+                                              ),
+                                              suffixIconConstraints: BoxConstraints(maxHeight: 30),
+                                              filled: false,
+                                              fillColor: Colors.white,
+                                              border: InputBorder.none,
+                                            ),
+                                          );
+                                        },
+                                        suggestionsCallback: (pattern) async {
+                                          return Future.delayed(const Duration(seconds: 1), () {
+                                        return allPatientData
+                                          .where((element) => element.name.toLowerCase().contains(pattern.toLowerCase()))
+                                        .toList().cast<PatientsModel>(); 
+                                          });
+                                          },
                                       
-                                      //   itemBuilder: (context, SupplierDueModel suggestion) {
-                                      //     return Padding(
-                                      //       padding: EdgeInsets.symmetric(horizontal: 6.w,vertical: 4.h),
-                                      //       child: Text("${suggestion.name} ${suggestion.code != "" ? " - ${suggestion.code}" : ""} ${suggestion.phone != "" ? " - ${suggestion.phone}" : ""}",
-                                      //         style: TextStyle(fontSize: 12), maxLines: 1, overflow: TextOverflow.ellipsis,
-                                      //       ),
-                                      //     );
-                                      //   },
-                                      //   onSelected: (SupplierDueModel suggestion) {
-                                      //         supplierController.text = "${suggestion.name} ${suggestion.code != "" ? " - ${suggestion.code}" : ""} ${suggestion.phone != "" ? " - ${suggestion.phone}" : ""}";
-                                      //           setState(() {
-                                      //             _selectedSupplier = suggestion.id.toString();
-                                      //             previousDueController.text = suggestion.due;
-                                      //           });
-                                      //   },
-                                      // ),
-                                     
+                                        itemBuilder: (context, PatientsModel suggestion) {
+                                          return Padding(
+                                            padding: EdgeInsets.symmetric(horizontal: 6.w,vertical: 4.h),
+                                            child: Text("${suggestion.name} - ${suggestion.mobile} - ${suggestion.patientCode}",
+                                              style: TextStyle(fontSize: 12), maxLines: 1, overflow: TextOverflow.ellipsis,
+                                            ),
+                                          );
+                                        },
+                                        onSelected: (PatientsModel suggestion) {
+                                          patientController.text = "${suggestion.name} - ${suggestion.mobile} - ${suggestion.patientCode}";
+                                            setState(() {
+                                              _selectedPatientId = suggestion.id.toString();
+                                              getMadicinePatientDue(_selectedPatientId);
+                                            });
+                                            print("_selectedPatientId ======>>> $_selectedPatientId");
+                                            print("dueAmmount ======>>> $dueAmmount");
+                                          },
+                                        ),
                                       ),
                                     ),
                                   ],
@@ -775,43 +883,30 @@ final LayerLink _pTypeLayerLink = LayerLink();
                                     // ),
                                     // SizedBox(width: 10.w),
                                     InkWell(
-                                      onTap: () {
-                                        // if(supplierController.text == ''){
-                                        //   Utils.errorSnackBar(context, "Supplier is required");
+                                      onTap: () async {
+                                        Utils.closeKeyBoard(context);
+                                        print("Tapped Save");
+
+                                        if (patientController.text == '') {
+                                          Utils.showTopSnackBar(context, "Please Select Patient");
+                                          return;
+                                        }
+                                        // if (_specimenController.text == '') {
+                                        //   Utils.showTopSnackBar(context, "Please Select Specimen");
+                                        //   return;
                                         // }
-                                        // else if (_paymentType == "Bank" && bankAccountController.text == '') {
-                                        //   Utils.errorSnackBar( context, "Bank account is required");
+                                        // if (_amountController.text == '') {
+                                        //   Utils.showTopSnackBar(context, "Amount is required");
+                                        //   return;
                                         // }
-                                        // else if( _amountController.text == ''){
-                                        //   Utils.errorSnackBar(context, "Amount is required");
-                                        // }
-                                        // else{
-                                        //   setState(() {
-                                        //     isBtnLoading = true;
-                                        //   });
-                                        //   getApiAllAddSupplierPayment(context,
-                                        //     _amountController.text,
-                                        //    _selectedBankAccount,
-                                        //     backEndFirstDate,
-                                        //     getPaymentType,
-                                        //     _descriptionController.text,
-                                        //     _selectedSupplier,
-                                        //     getTransactionType,
-                                        //   ).then((value){
-                                        //     if(value=='true'){
-                                        //       setState(() {
-                                        //         isBtnLoading = false;
-                                        //       });
-                                        //       _descriptionController.text = "";
-                                        //       supplierController.text = '';
-                                        //       _amountController.text = "";
-                                        //       Provider.of<SupplierPaymentProvider>(context,listen: false).getSupplierPayment("",Utils.formatBackEndDate(DateTime.now()),Utils.formatBackEndDate(DateTime.now()));
-                                        //       Provider.of<SupplierDueProvider>(context,listen: false).getSupplierDue(context, "","");
-                                        //       setState(() {
-                                        //       });
-                                        //     }
-                                        //   });
-                                        // }
+                                        setState(() {
+                                          patientPayBtnClk = true;
+                                        });
+                                        var result = await patientPayEntry(context);
+                                        if (result == "true") {
+                                         // Provider.of<TestEntryProvider>(context, listen: false).getTestEntry();
+                                        }
+                                        setState(() {});
                                       },
                                       child: Container(
                                         height: 28.h,
@@ -989,7 +1084,7 @@ final LayerLink _pTypeLayerLink = LayerLink();
     );
   }
 
-  emtyMethod() {
+  emptyMethod() {
     setState(() {
       _descriptionController.text = "";
       patientController.text = "";
@@ -998,93 +1093,64 @@ final LayerLink _pTypeLayerLink = LayerLink();
       bankAccountController.text = "";
     });
   }
-  // Future<String>getApiAllAddSupplierPayment(context,
-  //     String? amount,
-  //      bankAccountId,
-  //     String? date,
-  //     String? method,
-  //     String? note,
-  //      supplierId,
-  //     String? type,
-  //     ) async {
-        
-  //   SharedPreferences? sharedPreferences;
-  //   sharedPreferences = await SharedPreferences.getInstance();
-  //   String Link = "${sharedPreferences.getString("BaseUrl")}/create-supplierpayment";
-  //   try {
-  //     Response response = await Dio().post(Link,
-  //         data: {
-  //           "amount": amount,
-  //           "bank_account_id": bankAccountId ?? "",
-  //           "date": date,
-  //           "method": method,
-  //           "note": note,
-  //           "supplier_id": supplierId,
-  //           "type": type,
-  //         },
-  //         options: Options(headers: {
-  //           "Content-Type": "application/json",
-  //           "Authorization": "Bearer ${sharedPreferences.getString("token")}",
-  //           "Cookie": "laravel_session=${sharedPreferences.getString('sessionId')}",
-  //         }));
-  //     var data = response.data;
-  //     if(data['status'] == true){
-  //       setState(() {
-  //         isBtnLoading = false;
-  //       });
-  //       emtyMethod();
-  //       CustomSnackBar.showTopSnackBar(context, "${data["message"]}");
-  //       // ===== Success dialog =====
-  //       showDialog(
-  //       context: context,
-  //       builder: (ctx) => AlertDialog(
-  //         title: const Text("Success!",style: TextStyle(color: Color.fromARGB(255, 1, 126, 5),fontWeight: FontWeight.bold),),
-  //         content: const Text( "Do you want to print invoice?"),
-  //         actions: [
-  //           GestureDetector(
-  //             onTap: () => Navigator.of(ctx).pop(), 
-  //             child: Container(
-  //               height: 30, 
-  //               width: 60,
-  //               decoration: BoxDecoration(
-  //                 color: const Color.fromARGB(255, 211, 15, 1),
-  //                 borderRadius: BorderRadius.circular(5),
-  //               ),
-  //               child: Center(child: Text("No",style: AllTextStyle.saveButtonTextStyle))),
-  //           ),
-  //           GestureDetector(
-  //             onTap: () {
-  //               Navigator.of(ctx).pop(); 
-  //               Navigator.of(context).push(MaterialPageRoute(
-  //                 builder: (_) => SupplierPaymentInvoicePage(paymentId: "${data["paymentId"]}"),
-  //               ));
-  //             }, 
-  //             child: Container(
-  //               height: 30, 
-  //               width: 60,
-  //                 decoration: BoxDecoration(
-  //                 color: const Color.fromARGB(255, 44, 40, 248),
-  //                 borderRadius: BorderRadius.circular(5),
-  //               ),
-  //               child: Center(child: Text("Yes",style: AllTextStyle.saveButtonTextStyle))),
-  //           ),
-  //         ],
-  //       ),
-  //       );
-  //       return 'true';
-  //     }else{
-  //       setState(() {
-  //         isBtnLoading = false;
-  //       });
-  //       Utils.errorSnackBar(context, "${data["message"]}");
-  //       return '';
-  //     }
-  //   } catch (e) {
-  //     setState(() {
-  //       isBtnLoading = false;
-  //     });
-  //     Utils.errorSnackBar(context, e.toString());
-  //     return '';
-  //   }
-  // }
+bool patientPayBtnClk = false;
+Future<String> patientPayEntry(BuildContext context) async {
+  String link = AppUrl.addPatientPayEndPoint;
+  print("patientPayCode=>> $patientPayCode");
+  print("_selectedPatientId=>> $_selectedPatientId");
+  print("getPaymentType=>> $getPaymentType");
+  print("_selectedBankAccount=>> $_selectedBankAccount");
+  print("paymentType=>> $paymentType");
+  print("dueAmmount=>> $dueAmmount");
+  print("backEndFirstDate=>> $backEndFirstDate");
+  print("_descriptionController.text.trim()=>> ${_descriptionController.text.trim()}");
+  print("_amountController.text.trim()=>> ${_amountController.text.trim()}");
+  try {
+    final token = getToken();
+    var response = await Dio().post(link,
+      data: {
+          "transaction_number": "$patientPayCode",
+          "patient_id": _selectedPatientId.toString(),
+          "payment_type": getPaymentType.toString(),
+          "account_id": _selectedBankAccount.toString(),
+          "transaction_type": paymentType.toString(),
+          "previous_due": dueAmmount.toString(),
+          "payment_date": backEndFirstDate.toString(),
+          "remark": _descriptionController.text.trim(),
+          "amount": _amountController.text.trim(),
+        },
+      options: Options(
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
+        },
+      ),
+    );
+
+    var item = response.data;
+    print("API Response: $item");
+
+    if (item["success"] == true) {
+      setState(() {
+        patientPayBtnClk = false;
+      });
+      emptyMethod();
+      CustomSnackBar.showTopSnackBar(context, "${item["message"]}");
+      return "true";
+    } else {
+      setState(() {
+        patientPayBtnClk = false;
+      });
+      Utils.showTopSnackBar(context,"${item["message"]}");
+      return "false";
+    }
+  } catch (e) {
+    setState(() {
+      patientPayBtnClk = false;
+    });
+    print("Exception caught: $e");
+    Utils.showTopSnackBar(context, "Something went wrong: $e");
+    return "false";
+  }
+ }
 }

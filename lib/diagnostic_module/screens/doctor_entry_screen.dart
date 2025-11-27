@@ -1,12 +1,21 @@
 library;
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_typeahead/flutter_typeahead.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:intl/intl.dart';
+import 'package:medical_trade/config/app_url.dart';
+import 'package:medical_trade/diagnostic_module/models/department_module.dart';
 import 'package:medical_trade/diagnostic_module/models/slot_model.dart';
+import 'package:medical_trade/diagnostic_module/providers/department_provider.dart';
 import 'package:medical_trade/diagnostic_module/utils/all_textstyle.dart';
+import 'package:medical_trade/diagnostic_module/utils/animation_snackbar.dart';
 import 'package:medical_trade/diagnostic_module/utils/common_textfield.dart';
 import 'package:medical_trade/diagnostic_module/utils/utils.dart';
 import 'package:medical_trade/utilities/color_manager.dart';
+import 'package:medical_trade/view/auth/login_register_auth.dart';
+import 'package:provider/provider.dart';
 
 class DoctorEntryScreen extends StatefulWidget {
   const DoctorEntryScreen({super.key,});
@@ -51,10 +60,7 @@ class _DoctorEntryScreenState extends State<DoctorEntryScreen> {
 
   String? customerType = "";
   String? employeeSlNo;
-  String? regionId;
-  String? territoriesId;
-  String? outletsSlNo;
-  String? marketSlNo;
+  String? _departmentId;
   String? employeeId = "";
   String? userEmployeeId = "";
   String userName = "";
@@ -196,15 +202,58 @@ void _calculateCommissionFromAmount() {
 }
 
 
+  static String getToken() {
+    final box = GetStorage();
+    return box.read('loginToken') ?? "";
+  }
+
+String? doctorId = "";
+getDoctorCode() async {
+  try {
+    String link = AppUrl.getDoctorCodeEndPoint;
+    final token = getToken();
+
+    var response = await Dio().get(
+      link,
+      options: Options(
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
+        },
+        validateStatus: (status) {
+          return status! < 500;
+        },
+      ),
+    );
+
+    print("Response =====> ${response.data}");
+    if (response.statusCode == 401) {
+      Utils.showTopSnackBar(context, "Session expired. Please log in again.");
+      Navigator.pushReplacement(context,MaterialPageRoute(builder: (context) => const LoginView(isLogin: true,)));
+      return;
+    }
+    setState(() {
+      doctorId = response.data["data"].toString();
+    });
+    CustomSnackBar.showTopSnackBar(context, "${response.data["message"]}");
+    print("doctorId ID =========> $doctorId");
+
+  } catch (e) {
+    print("doctorId ERROR =======> $e");
+  }
+}
+
 
    @override
   void initState() {
+    getDoctorCode();
     _dayController.addListener(_onTextChanged);
     // TODO: implement initState
     super.initState();
     //_initializeData();
     firstPickedDate = Utils.formatFrontEndDate(DateTime.now());
     backEndFirstDate = Utils.formatBackEndDate(DateTime.now());
+    Provider.of<DepartmentProvider>(context, listen: false).getDepartment("Doctor");
   }
 
   void _onTextChanged() {
@@ -270,6 +319,7 @@ void _calculateCommissionFromAmount() {
 
   @override
   Widget build(BuildContext context) {
+    final allDepartmentData = Provider.of<DepartmentProvider>(context).allDepartmentList;
     mainScrollController.addListener(mainScrollListener);
     return Scaffold(
       appBar:AppBar(
@@ -312,17 +362,93 @@ void _calculateCommissionFromAmount() {
                 ),
                 child: Column(
                   children: [
-                    CommonTextFieldRow(
-                      label: "Doctor ID",
-                      controller: _doctorIDController,
-                      hintText: "P00001",
+                    Row(
+                      children: [
+                        Expanded(flex: 6,child: Text("Doctor ID",style: AllTextStyle.textFieldHeadStyle)),
+                        const Expanded(flex: 1,child: Text(":")),
+                        Expanded(
+                          flex: 16,
+                          child: Container(
+                            height: 25.h,
+                            decoration: ContDecoration.contDecoration,
+                            child: Padding(
+                              padding: EdgeInsets.only(left: 5.w, right: 5.w,top: 3.h),
+                              child: Text(doctorId.toString(),
+                                style: AllTextStyle.dropDownlistStyle
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                     SizedBox(height: 4.0.h),
-                    CommonTextFieldRow(
-                      label: "Department",
-                      controller: _departmentController,
-                      hintText: "Select Department",
-                    ),
+                    Row(
+                    children: [
+                      Expanded(flex: 6, child: Text("Department",style: AllTextStyle.textFieldHeadStyle)),
+                      const Expanded(flex: 1, child: Text(":")),
+                      Expanded(
+                        flex: 16,
+                        child: Container(
+                          height: 25.h,
+                          width: MediaQuery.of(context).size.width / 2,
+                          decoration: ContDecoration.contDecoration,
+                            child: TypeAheadField<DepartmentModel>(
+                            controller: _departmentController,
+                            builder: (context, controller, focusNode) {
+                            return TextField(
+                              controller: controller,
+                              focusNode: focusNode,
+                              style: TextStyle(fontSize: 13, color: Colors.grey.shade800, overflow: TextOverflow.ellipsis),
+                              decoration: InputDecoration(contentPadding: EdgeInsets.only(left: 5.0, top: 4.0),
+                                isDense: true,
+                                hintText: 'Select Department',
+                                hintStyle: TextStyle(fontSize: 13),
+                                suffixIcon: _departmentId == '' || _departmentId == 'null' || _departmentId == null || controller.text == '' ? null
+                                    : GestureDetector(
+                                  onTap: () {
+                                    setState(() {
+                                      _departmentController.clear();
+                                      controller.clear();
+                                      _departmentId = null;
+                                    });
+                                  },
+                                  child: Padding(padding: EdgeInsets.all(5), child: Icon(Icons.close, size: 16)),
+                                ),
+                                suffixIconConstraints: BoxConstraints(maxHeight: 30),
+                                filled: false,
+                                fillColor: Colors.white,
+                                border: InputBorder.none,
+                              ),
+                            );
+                          },
+                          suggestionsCallback: (pattern) async {
+                            return Future.delayed(const Duration(seconds: 1), () {
+                          return allDepartmentData
+                            .where((element) => element.name.toLowerCase().contains(pattern.toLowerCase()))
+                          .toList().cast<DepartmentModel>(); 
+                            });
+                            },
+                        
+                          itemBuilder: (context, DepartmentModel suggestion) {
+                            return Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 6.w,vertical: 4.h),
+                              child: Text("${suggestion.name}",
+                                style: TextStyle(fontSize: 12), maxLines: 1, overflow: TextOverflow.ellipsis,
+                              ),
+                            );
+                          },
+                          onSelected: (DepartmentModel suggestion) {
+                                _departmentController.text = "${suggestion.name}";
+                                  setState(() {
+                                    _departmentId = suggestion.id.toString();
+                                  // previousDueController.text = suggestion.dueAmount.toString();
+                                  });
+                          },
+                        ),
+                        ),
+                      ),
+                    ],
+                  ),
                     SizedBox(height: 4.0.h),
                     CommonTextFieldRow(
                       label: "Name",
@@ -333,7 +459,7 @@ void _calculateCommissionFromAmount() {
                     CommonTextFieldRow(
                       label: "Name(Bangla)",
                       controller: _nameBanglaController,
-                      hintText: "Enter Doctor Name",
+                      hintText: "Enter Bangla Name",
                     ),
                     SizedBox(height: 4.0.h),
                     CommonTextFieldRow(
@@ -720,10 +846,8 @@ void _calculateCommissionFromAmount() {
     _commissionAmountController.text = "";
     _commissionPercentController.text = "";
     _remarkController.text = "";
-    regionId = "";
-    territoriesId = "";
     employeeId = "";
-    marketSlNo = "";
+    _departmentId = "";
     //_image = null;
   });
 }

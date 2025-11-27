@@ -2,13 +2,21 @@ library;
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:intl/intl.dart';
 import 'package:medical_trade/diagnostic_module/models/add_cart_model.dart';
+import 'package:medical_trade/diagnostic_module/models/agents_model.dart';
+import 'package:medical_trade/diagnostic_module/models/doctors_model.dart';
+import 'package:medical_trade/diagnostic_module/models/test_entry_model.dart';
+import 'package:medical_trade/diagnostic_module/providers/agents_provider.dart';
+import 'package:medical_trade/diagnostic_module/providers/doctors_provider.dart';
+import 'package:medical_trade/diagnostic_module/providers/test_entry_provider.dart';
 import 'package:medical_trade/diagnostic_module/utils/all_textstyle.dart';
 import 'package:medical_trade/diagnostic_module/utils/app_colors.dart';
 import 'package:medical_trade/diagnostic_module/utils/common_textfield.dart';
 import 'package:medical_trade/diagnostic_module/utils/utils.dart';
 import 'package:medical_trade/utilities/color_manager.dart';
+import 'package:provider/provider.dart';
 class TestReceiptScreen extends StatefulWidget {
   const TestReceiptScreen({super.key,});
   @override
@@ -64,7 +72,10 @@ class _TestReceiptScreenState extends State<TestReceiptScreen> {
   String? invoiceType = "";
   String? employeeSlNo;
   String? employeeId = "";
-  String? userEmployeeId = "";
+  String? _testId = "";
+  String? _doctorId = "";
+  String? _agentId = "";
+  
   String userName = "";
   String userType = "";
   String? firstPickedDate;
@@ -164,6 +175,9 @@ class _TestReceiptScreenState extends State<TestReceiptScreen> {
     // TODO: implement initState
     super.initState();
     //_initializeData();
+    Provider.of<TestEntryProvider>(context, listen: false).getTestEntry();
+    Provider.of<DoctorsProvider>(context, listen: false).getDoctors();
+    Provider.of<AgentsProvider>(context,listen: false).getAgents();
   }
 
   ScrollController mainScrollController = ScrollController();
@@ -350,6 +364,9 @@ void _onDiscountAmountChanged(String value) {
 
   @override
   Widget build(BuildContext context) {
+    final allTestData = Provider.of<TestEntryProvider>(context).allTestEntryList;
+    final allDoctorsData = Provider.of<DoctorsProvider>(context).allDoctorsList;
+    final allAgentsData = Provider.of<AgentsProvider>(context).allAgentsList;
     mainScrollController.addListener(mainScrollListener);
     return Scaffold(
       appBar:AppBar(
@@ -409,7 +426,6 @@ void _onDiscountAmountChanged(String value) {
                        padding: EdgeInsets.only(left: 5.0.w,right: 5.0.w,top: 5.0.h),
                       child: Column(
                         children: [
-                          
                           CommonTextFieldRow(
                             label: "Patient",
                             controller: _patientController,
@@ -641,12 +657,103 @@ void _onDiscountAmountChanged(String value) {
                 ),
                 child: Column(
                   children: [
-                    CommonTextFieldRow(
-                      label: "Test Name",
-                      controller: _testNameController,
-                      hintText: "Enter Test Name",
+                    Row(
+                      children: [
+                        Expanded(flex: 6, child: Text("Test Name",style: AllTextStyle.textFieldHeadStyle)),
+                        const Expanded(flex: 1, child: Text(":")),
+                        Expanded(
+                          flex: 16,
+                          child: Container(
+                            height: 25.h,
+                            width: MediaQuery.of(context).size.width / 2,
+                            decoration: ContDecoration.contDecoration,
+                            child: TypeAheadField<TestEntryModel>(
+                            controller: _testNameController,
+                            builder: (context, controller, focusNode) {
+                              return TextField(
+                                controller: controller,
+                                focusNode: focusNode,
+                                style: AllTextStyle.textValueStyle,
+                                decoration: InputDecoration(
+                                  contentPadding: EdgeInsets.only(left: 5.w, top: 2.5.h),
+                                  isDense: true,
+                                  hintText: 'Select Test Name',
+                                  hintStyle: TextStyle(fontSize: 13.sp),
+                                  suffixIcon: _testId == '' || _testId == 'null' || _testId == null || controller.text == ''
+                                      ? null
+                                      : GestureDetector(
+                                          onTap: () {
+                                            setState(() {
+                                              _testNameController.clear();
+                                              controller.clear();
+                                              _testId = null;
+                                            });
+                                            // Clear করার পর নতুনভাবে customer লোড
+                                            Provider.of<TestEntryProvider>(context, listen: false).getTestEntry(); 
+                                          },
+                                          child: Padding(
+                                            padding: EdgeInsets.all(5.r),
+                                            child: Icon(Icons.close, size: 16.r),
+                                          ),
+                                        ),
+                                  suffixIconConstraints: BoxConstraints(maxHeight: 30.h),
+                                  filled: false,
+                                  fillColor: Colors.white,
+                                  border: InputBorder.none,
+                                ),
+                                onTap: () {
+                                  // কার্সর রাখলেই নতুনভাবে লোড হবে
+                                  Provider.of<TestEntryProvider>(context, listen: false).getTestEntry(); 
+                                  // আগের সিলেকশন থাকলে clear হবে
+                                  if (_testId != null &&
+                                      _testId != '' &&
+                                      _testId != 'null') {
+                                    setState(() {
+                                      _testNameController.clear();
+                                      controller.clear();
+                                      _testId = null;
+                                    });
+                                  }
+                                },
+                              );
+                            },
+                            suggestionsCallback: (pattern) async {
+                              return Future.delayed(const Duration(seconds: 1), () {
+                                return allTestData
+                                    .where((element) => element.name.toLowerCase().contains(pattern.toLowerCase()))
+                                    .toList().cast<TestEntryModel>();
+                              });
+                            },
+                            itemBuilder: (context, TestEntryModel suggestion) {
+                              return Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 4.h),
+                                child: Text(
+                                  "${suggestion.name} - ${suggestion.testCode}",
+                                  style: TextStyle(fontSize: 12.sp),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              );
+                            },
+                            onSelected: (TestEntryModel suggestion) {
+                              _testNameController.text =  "${suggestion.name} - ${suggestion.testCode}";
+                              setState(() {
+                                _roomNoController.text = suggestion.roomNumber ?? '';
+                                _priceController.text = (suggestion.price ?? 0).toString();
+                                _subAmountController.text = (suggestion.price ?? 0).toString();
+                                _testId = suggestion.id.toString();
+                              });
+                              print('Selected Test ID: $_testId');
+                              print('Selected Test Name: ${_testNameController.text}');
+                              print('Selected Room No: ${_roomNoController.text}');
+                              print('Selected Price: ${_priceController.text}');
+                              print('Selected Sub Amount: ${_subAmountController.text}');
+                            },
+                          ),
+                          ),
+                        ),
+                      ],
                     ),
-
                     SizedBox(height: 4.0.h),
                     CommonTextFieldRow(
                       label: "Room No",
@@ -914,17 +1021,143 @@ void _onDiscountAmountChanged(String value) {
                           hintText: "1",
                         ),
                         SizedBox(height: 4.0.h),
-                        CommonTextFieldRow(
-                          label: "Doctor",
-                          controller: _doctorController,
-                          hintText: "Select Doctor",
-                        ),
+                        Row(
+                        children: [
+                          Expanded(flex: 6, child: Text("Doctor",style: AllTextStyle.textFieldHeadStyle)),
+                          const Expanded(flex: 1, child: Text(":")),
+                          Expanded(
+                            flex: 16,
+                            child: Container(
+                              height: 25.h,
+                              width: MediaQuery.of(context).size.width / 2,
+                              decoration: ContDecoration.contDecoration,
+                                child: TypeAheadField<DoctorsModel>(
+                                controller: _doctorController,
+                                builder: (context, controller, focusNode) {
+                                return TextField(
+                                  controller: controller,
+                                  focusNode: focusNode,
+                                  style: TextStyle(fontSize: 13, color: Colors.grey.shade800, overflow: TextOverflow.ellipsis),
+                                  decoration: InputDecoration(contentPadding: EdgeInsets.only(left: 5.0, top: 4.0),
+                                    isDense: true,
+                                    hintText: 'Select Doctor',
+                                    hintStyle: TextStyle(fontSize: 13),
+                                    suffixIcon: _doctorId == '' || _doctorId == 'null' || _doctorId == null || controller.text == '' ? null
+                                        : GestureDetector(
+                                      onTap: () {
+                                        setState(() {
+                                          _doctorController.clear();
+                                          controller.clear();
+                                          _doctorId = null;
+                                          //previousDueController.clear();
+                                        });
+                                      },
+                                      child: Padding(padding: EdgeInsets.all(5), child: Icon(Icons.close, size: 16)),
+                                    ),
+                                    suffixIconConstraints: BoxConstraints(maxHeight: 30),
+                                    filled: false,
+                                    fillColor: Colors.white,
+                                    border: InputBorder.none,
+                                  ),
+                                );
+                              },
+                              suggestionsCallback: (pattern) async {
+                                return Future.delayed(const Duration(seconds: 1), () {
+                              return allDoctorsData
+                                .where((element) => element.name.toLowerCase().contains(pattern.toLowerCase()))
+                              .toList().cast<DoctorsModel>(); 
+                                });
+                                },
+                            
+                              itemBuilder: (context, DoctorsModel suggestion) {
+                                return Padding(
+                                  padding: EdgeInsets.symmetric(horizontal: 6.w,vertical: 4.h),
+                                  child: Text("${suggestion.doctorCode} ${suggestion.name != "" ? " - ${suggestion.name}" : ""}",
+                                    style: TextStyle(fontSize: 12), maxLines: 1, overflow: TextOverflow.ellipsis,
+                                  ),
+                                );
+                              },
+                              onSelected: (DoctorsModel suggestion) {
+                                _doctorController.text = "${suggestion.doctorCode} ${suggestion.name != "" ? " - ${suggestion.name}" : ""}";
+                                  setState(() {
+                                    _doctorId = suggestion.id.toString();
+                                    // previousDueController.text = suggestion.dueAmount.toString();
+                                  });
+                                },
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                         SizedBox(height: 4.0.h),
-                        CommonTextFieldRow(
-                          label: "Ref.By",
-                          controller: _referenceByController,
-                          hintText: "Select Reference",
-                        ),
+                        Row(
+                        children: [
+                          Expanded(flex: 6, child: Text("Ref.By",style: AllTextStyle.textFieldHeadStyle)),
+                          const Expanded(flex: 1, child: Text(":")),
+                          Expanded(
+                            flex: 16,
+                            child: Container(
+                              height: 25.h,
+                              width: MediaQuery.of(context).size.width / 2,
+                              decoration: ContDecoration.contDecoration,
+                                child: TypeAheadField<AgentsModel>(
+                                controller: _referenceByController,
+                                builder: (context, controller, focusNode) {
+                                return TextField(
+                                  controller: controller,
+                                  focusNode: focusNode,
+                                  style: TextStyle(fontSize: 13, color: Colors.grey.shade800, overflow: TextOverflow.ellipsis),
+                                  decoration: InputDecoration(contentPadding: EdgeInsets.only(left: 5.0, top: 4.0),
+                                    isDense: true,
+                                    hintText: 'Select Agent',
+                                    hintStyle: TextStyle(fontSize: 13),
+                                    suffixIcon: _agentId == '' || _agentId == 'null' || _agentId == null || controller.text == '' ? null
+                                        : GestureDetector(
+                                      onTap: () {
+                                        setState(() {
+                                          _referenceByController.clear();
+                                          controller.clear();
+                                          _agentId = null;
+                                          //previousDueController.clear();
+                                        });
+                                      },
+                                      child: Padding(padding: EdgeInsets.all(5), child: Icon(Icons.close, size: 16)),
+                                    ),
+                                    suffixIconConstraints: BoxConstraints(maxHeight: 30),
+                                    filled: false,
+                                    fillColor: Colors.white,
+                                    border: InputBorder.none,
+                                  ),
+                                );
+                              },
+                              suggestionsCallback: (pattern) async {
+                                return Future.delayed(const Duration(seconds: 1), () {
+                              return allAgentsData
+                                .where((element) => element.name.toLowerCase().contains(pattern.toLowerCase()))
+                              .toList().cast<AgentsModel>(); 
+                                });
+                                },
+                            
+                              itemBuilder: (context, AgentsModel suggestion) {
+                                return Padding(
+                                  padding: EdgeInsets.symmetric(horizontal: 6.w,vertical: 4.h),
+                                  child: Text("${suggestion.agentCode} ${suggestion.name != "" ? " - ${suggestion.name}" : ""}",
+                                    style: TextStyle(fontSize: 12), maxLines: 1, overflow: TextOverflow.ellipsis,
+                                  ),
+                                );
+                              },
+                              onSelected: (AgentsModel suggestion) {
+                                    _referenceByController.text = "${suggestion.agentCode} ${suggestion.name != "" ? " - ${suggestion.name}" : ""}";
+                                      setState(() {
+                                        _agentId = suggestion.id.toString();
+                                        // previousDueController.text = suggestion.dueAmount.toString();
+                                      });
+                              },
+                            ),
+                            ),
+                          ),
+                        ],
+                      ),
                         SizedBox(height: 4.0.h),
                         Row(children: [
                           Expanded(flex:6, child: Text("Date", style:AllTextStyle.textFieldHeadStyle)),

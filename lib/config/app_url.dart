@@ -57,7 +57,13 @@ class AppUrl {
   static var getPatientCodeEndPoint = '$baseUrl/get-patient-code';
   static var addPatientEndPoint = '$baseUrl/add-patient';
 
+  static var getPatientPayEndPoint = '$baseUrl/get-patient-payments';
+  static var getPatientPayCodeEndPoint = '$baseUrl/get-patient-payment-code';
+  static var getMadicinePatientDueEndPoint = '$baseUrl/get_madicine_patient_due';
+  static var addPatientPayEndPoint = '$baseUrl/add-patient-payment';
+
   static var getDoctorEndPoint = '$baseUrl/get-doctor';
+  static var getDepartmentEndPoint = '$baseUrl/get-departments';
   static var getDoctorCodeEndPoint = '$baseUrl/get-doctor-code';
   static var addDoctorEndPoint = '$baseUrl/add-doctor';
   
