@@ -304,7 +304,6 @@ final LayerLink _pTypeLayerLink = LayerLink();
   //   print("Action=====  $actionList");
   //   print("role=====  $role");
   // }
-
 static String getToken() {
   final box = GetStorage();
   return box.read('loginToken') ?? "";

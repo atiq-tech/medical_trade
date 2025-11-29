@@ -243,7 +243,6 @@ getDoctorCode() async {
   }
 }
 
-
    @override
   void initState() {
     getDoctorCode();

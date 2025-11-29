@@ -230,14 +230,12 @@ getPatientCode() async {
                       controller: _patientNameController,
                       hintText: "Enter Patient Name",
                     ),
-
                     SizedBox(height: 4.0.h),
                     CommonTextFieldRow(
                       label: "Mobile",
                       controller: _mobileController,
                       hintText: "Enter Mobile Number",
                     ),
-
                     SizedBox(height: 4.0.h),
                      Row(
                         children: [

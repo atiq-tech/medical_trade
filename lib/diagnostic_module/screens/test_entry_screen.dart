@@ -556,7 +556,6 @@ class _TestEntryScreenState extends State<TestEntryScreen> {
     specimensId = "";
   });
 }
-
 bool testEntryBtnClk = false;
 Future<String> testEntry(BuildContext context) async {
   String link = AppUrl.addTestEntryEndPoint;

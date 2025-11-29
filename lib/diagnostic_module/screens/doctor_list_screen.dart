@@ -20,8 +20,6 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
     super.initState();
       Provider.of<DoctorsProvider>(context, listen: false).getDoctors();
   }
-
-
   @override
   Widget build(BuildContext context) {
     final allDoctorsData = Provider.of<DoctorsProvider>(context).allDoctorsList;

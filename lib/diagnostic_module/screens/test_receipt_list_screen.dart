@@ -21,7 +21,6 @@ class _TestReceiptListScreenState extends State<TestReceiptListScreen> {
   Color getColorsbyAll(Set<WidgetState> states) {
     return Colors.green.shade100;
   }
-
   String? firstPickedDate;
   var backEndFirstDate;
   var backEndSecondtDate;

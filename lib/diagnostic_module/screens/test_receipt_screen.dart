@@ -761,7 +761,6 @@ void _onDiscountAmountChanged(String value) {
                       hintText: "Enter Room No",
                       keyboardType: TextInputType.number,
                     ),
-
                     SizedBox(height: 4.0.h),
                     CommonTextFieldRow(
                       label: "Price",
