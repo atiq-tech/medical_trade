@@ -86,7 +86,6 @@ class _AppointmentListScreenState extends State<AppointmentListScreen> {
     final RenderBox renderBox = _key.currentContext?.findRenderObject() as RenderBox;
     _dropdownSize = renderBox.size;
   }
-
   void _toggleDropdown() {
     if (_isDropdownOpen) {
       _removeDropdown();
@@ -94,7 +93,6 @@ class _AppointmentListScreenState extends State<AppointmentListScreen> {
       _showDropdown();
     }
   }
-
   void _showDropdown() {
     _overlayEntry = _createOverlayEntry();
     Overlay.of(context).insert(_overlayEntry!);

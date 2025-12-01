@@ -20,7 +20,6 @@ class CustomSnackBar {
     });
   }
 }
-
 class _TopSnackBarWidget extends StatefulWidget {
   final String message;
   final Color backgroundColor;

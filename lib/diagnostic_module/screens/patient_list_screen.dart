@@ -48,10 +48,8 @@ class _PatientListScreenState extends State<PatientListScreen> {
                 headingRowHeight: 22.h,
                 //dataRowMaxHeight:double.infinity,
                 dataRowHeight: 22.h,
-                headingRowColor: MaterialStateColor.resolveWith(
-                    (states) => const Color.fromARGB(255, 70, 54, 141)),
-                border: TableBorder.all(
-                    color: const Color.fromARGB(255, 110, 143, 145), width: 1),
+                headingRowColor: MaterialStateColor.resolveWith((states) => const Color.fromARGB(255, 70, 54, 141)),
+                border: TableBorder.all(color: const Color.fromARGB(255, 110, 143, 145), width: 1),
                 columns: const [
                   DataColumn(label: Center(child: Text('ID ↕', style: TextStyle(color: Colors.white)))),
                   DataColumn(label: Center(child: Text('Name ↕', style: TextStyle(color: Colors.white)))),
