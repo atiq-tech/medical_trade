@@ -22,12 +22,9 @@ class CommissionPaymentEntryScreen extends StatefulWidget {
 }
 
 class _CommissionPaymentEntryScreenState extends State<CommissionPaymentEntryScreen> {
-  Color getColor(Set<WidgetState> states) {
-    return Colors.blue.shade200;
-  }
-  Color getColors(Set<WidgetState> states) {
-    return Colors.white;
-  }
+  Color getColor(Set<WidgetState> states) {return Colors.blue.shade200;}
+  Color getColors(Set<WidgetState> states) {return Colors.white;}
+  
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _amountController = TextEditingController();
   final TextEditingController bankAccountController = TextEditingController();

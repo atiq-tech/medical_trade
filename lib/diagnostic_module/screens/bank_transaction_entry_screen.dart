@@ -11,13 +11,8 @@ class BankTransactionEntryScreen extends StatefulWidget {
 }
 
 class _BankTransactionEntryScreenState extends State<BankTransactionEntryScreen> {
-  Color getColor(Set<WidgetState> states) {
-    return Colors.blue.shade100;
-  }
-
-  Color getColors(Set<WidgetState> states) {
-    return Colors.white;
-  }
+  Color getColor(Set<WidgetState> states) {return Colors.blue.shade100;}
+  Color getColors(Set<WidgetState> states) {return Colors.white;}
 
   final TextEditingController _amountController = TextEditingController();
   final TextEditingController _noteController = TextEditingController();
@@ -208,7 +203,6 @@ class _BankTransactionEntryScreenState extends State<BankTransactionEntryScreen>
       });
     }
   }
-
   // final int _itemsPerPage = 15;
   // int _currentPage = 1;
   // List<dynamic> _getPaginatedData(List<dynamic> allBankTransaction) {

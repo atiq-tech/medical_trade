@@ -15,12 +15,8 @@ class CashTransactionEntryScreen extends StatefulWidget {
 }
 
 class _CashTransactionEntryScreenState extends State<CashTransactionEntryScreen> {
-  Color getColor(Set<WidgetState> states) {
-    return Colors.blue.shade100;
-  }
-  Color getColors(Set<WidgetState> states) {
-    return Colors.white;
-  }
+  Color getColor(Set<WidgetState> states) {return Colors.blue.shade100;}
+  Color getColors(Set<WidgetState> states) {return Colors.white;}
 
   final _DescriptionController = TextEditingController();
   final _AmountController = TextEditingController();

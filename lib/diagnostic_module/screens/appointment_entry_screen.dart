@@ -15,13 +15,9 @@ class AppointmentEntryScreen extends StatefulWidget {
 }
 
 class _AppointmentEntryScreenState extends State<AppointmentEntryScreen> {
-  Color getColor(Set<WidgetState> states) {
-    return Colors.blue.shade200;
-  }
-
-  Color getColors(Set<WidgetState> states) {
-    return Colors.white;
-  }
+  Color getColor(Set<WidgetState> states) {return Colors.blue.shade200;}
+  Color getColors(Set<WidgetState> states) {return Colors.white;}
+  
   final _patientController = TextEditingController();
   final _nameController = TextEditingController();
   final _mobileController = TextEditingController();

@@ -11,15 +11,9 @@ class AppointmentListScreen extends StatefulWidget {
 }
 
 class _AppointmentListScreenState extends State<AppointmentListScreen> {
-  Color getColor(Set<WidgetState> states) {
-    return Colors.blue.shade100;
-  }
-  Color getColors(Set<WidgetState> states) {
-    return Colors.white;
-  }
-  Color getColorsbyAll(Set<WidgetState> states) {
-    return Colors.green.shade100;
-  }
+  Color getColor(Set<WidgetState> states) {return Colors.blue.shade100;}
+  Color getColors(Set<WidgetState> states) { return Colors.white;}
+  Color getColorsbyAll(Set<WidgetState> states) {return Colors.green.shade100;}
 
   String? firstPickedDate;
   var backEndFirstDate;
