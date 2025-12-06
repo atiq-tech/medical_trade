@@ -5,7 +5,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:medical_trade/config/app_url.dart';
 import 'package:medical_trade/diagnostic_module/providers/patients_provider.dart';
-import 'package:medical_trade/diagnostic_module/screens/patient_list_screen.dart';
 import 'package:medical_trade/diagnostic_module/utils/all_textstyle.dart';
 import 'package:medical_trade/diagnostic_module/utils/animation_snackbar.dart';
 import 'package:medical_trade/diagnostic_module/utils/common_textfield.dart';
@@ -546,7 +545,7 @@ Future<String> patientEntry(BuildContext context) async {
       });
       emptyMethod();
       CustomSnackBar.showTopSnackBar(context, "${item["message"]}");
-      Navigator.push(context,MaterialPageRoute(builder:(context) => const PatientListScreen()));
+      Navigator.pushReplacement(context,MaterialPageRoute(builder:(context) => const PatientEntryScreen()));
       return "true";
     } else {
       setState(() {

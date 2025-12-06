@@ -9,6 +9,7 @@ import 'package:medical_trade/config/app_url.dart';
 import 'package:medical_trade/diagnostic_module/models/department_module.dart';
 import 'package:medical_trade/diagnostic_module/models/slot_model.dart';
 import 'package:medical_trade/diagnostic_module/providers/department_provider.dart';
+import 'package:medical_trade/diagnostic_module/providers/doctors_provider.dart';
 import 'package:medical_trade/diagnostic_module/utils/all_textstyle.dart';
 import 'package:medical_trade/diagnostic_module/utils/animation_snackbar.dart';
 import 'package:medical_trade/diagnostic_module/utils/common_textfield.dart';
@@ -126,8 +127,6 @@ void addSlot() {
   if (startTime != null && endTime != null) {
     setState(() {
       slotList.add(SlotModel(start: startTime!, end: endTime!));
-      startTime = null;
-      endTime = null;
     });
   }
 }
@@ -249,6 +248,10 @@ getDoctorCode() async {
     // TODO: implement initState
     super.initState();
     //_initializeData();
+    /// Set current time initially for start & end
+    TimeOfDay now = TimeOfDay.now();
+    startTime = now;
+    endTime = now;
     firstPickedDate = Utils.formatFrontEndDate(DateTime.now());
     backEndFirstDate = Utils.formatBackEndDate(DateTime.now());
     Provider.of<DepartmentProvider>(context, listen: false).getDepartment("Doctor");
@@ -475,10 +478,10 @@ getDoctorCode() async {
                      /// ---- Slot Input Row (আপনার কোড) ----
                       Row(
                         children: [
-                          Expanded(child: Text("Slot(S/E)", style:AllTextStyle.textFieldHeadStyle)),
-                          Expanded(flex: 0, child: Text(": ")),
+                          Expanded(flex: 3, child: Text("Slot(S/E)", style:AllTextStyle.textFieldHeadStyle)),
+                          Expanded(flex: 0, child: Text("   :   ")),
                           Expanded(
-                            flex: 2,
+                            flex: 4,
                             child: GestureDetector(
                               onTap: () => pickTime(true),
                               child: Container(
@@ -487,10 +490,10 @@ getDoctorCode() async {
                                 child: TextFormField(
                                   enabled: false,
                                   decoration: InputDecoration(
-                                    contentPadding: EdgeInsets.only(left: 5.w, bottom: 13.h),
-                                    hintStyle: TextStyle(fontSize: 11.sp, color: Colors.black54),
-                                    hintText: startTime == null ? "00:00AM": formatTime(startTime),
-                                    suffixIcon: Padding(padding: EdgeInsets.only(left: 20.w),
+                                    contentPadding: EdgeInsets.only(left: 2.w, bottom: 15.h),
+                                    hintStyle: TextStyle(fontSize: 9.sp, color: Colors.black54,fontWeight: FontWeight.bold),
+                                    hintText: startTime == null ? "": formatTime(startTime),
+                                    suffixIcon: Padding(padding: EdgeInsets.only(right: 0.w),
                                    child: Icon(Icons.alarm_on, color: Colors.black87,size: 16.r)),
                                   ),
                                 ),
@@ -499,7 +502,7 @@ getDoctorCode() async {
                           ),
                           SizedBox(width:2.w),
                           Expanded(
-                            flex: 2,
+                            flex: 4,
                             child: GestureDetector(
                               onTap: () => pickTime(false),
                               child: Container(
@@ -508,10 +511,10 @@ getDoctorCode() async {
                                 child: TextFormField(
                                   enabled: false,
                                   decoration: InputDecoration(
-                                    contentPadding: EdgeInsets.only(left: 5.w, bottom: 13.h),
-                                    hintStyle: TextStyle(fontSize: 11.sp, color: Colors.black54),
-                                    hintText: endTime == null ? "00:00AM" : formatTime(endTime),
-                                    suffixIcon: Padding(padding: EdgeInsets.only(left: 20.w),
+                                    contentPadding: EdgeInsets.only(left: 2.w, bottom: 15.h),
+                                    hintStyle: TextStyle(fontSize: 9.sp, color: Colors.black54,fontWeight: FontWeight.bold),
+                                    hintText: endTime == null ? "" : formatTime(endTime),
+                                    suffixIcon: Padding(padding: EdgeInsets.only(right: 0.w),
                                    child: Icon(Icons.alarm_on, color: Colors.black87,size: 16.r)),
                                   ),
                                 ),
@@ -530,54 +533,47 @@ getDoctorCode() async {
                             child: Icon(Icons.add, color: Colors.white, size: 16.r))),
                         ],
                       ),
-                      Container(
-                      padding: EdgeInsets.symmetric(horizontal: 4.w),
-                      margin: EdgeInsets.symmetric(horizontal: 4.w,vertical: 4.h),
-                      color: const Color.fromARGB(255, 71, 114, 255),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text("Slot No", style: TextStyle(fontSize: 12.sp, fontWeight: FontWeight.bold)),
-                          Text("Start Time", style: TextStyle(fontSize: 12.sp,fontWeight: FontWeight.bold)),
-                          Text("End Time", style: TextStyle(fontSize: 12.sp,fontWeight: FontWeight.bold)),
-                          Text("Action", style: TextStyle(fontSize: 12.sp,fontWeight: FontWeight.bold)),
-                        ],
-                      ),
-                    ),
-                    // ------- List Row --------
                     Container(
-                      color: const Color.fromARGB(255, 156, 253, 216),
-                      child: ListView.builder(
-                        shrinkWrap: true,
-                        physics: NeverScrollableScrollPhysics(),
-                        itemCount: slotList.length,
-                        itemBuilder: (context, index) {
-                          final slot = slotList[index];
-                          return Container(
-                            height: 20.h,
-                            padding: EdgeInsets.symmetric(horizontal: 5.h),
-                            decoration: BoxDecoration(
-                              border: Border(bottom: BorderSide(color: Colors.grey.shade300)),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                              Text("Slot ${index + 1}",style: TextStyle(fontSize: 12.sp, fontWeight: FontWeight.bold)),
-                              Text(formatTime(slot.start),style: TextStyle(fontSize: 12.sp, fontWeight: FontWeight.bold)),
-                              Text(formatTime(slot.end),style: TextStyle(fontSize: 12.sp, fontWeight: FontWeight.bold)),
-                              GestureDetector(
-                               onTap: () {
-                                  setState(() {
-                                   slotList.removeAt(index);
-                                });
-                              },
-                              child: Container(
-                              padding: EdgeInsets.only(right: 10.w),
-                              child: Icon(Icons.delete, color: Colors.blue.shade800, size: 16.r))),
-                              ],
-                            ),
-                          );
-                        },
+                      width: double.infinity,
+                      padding: EdgeInsets.symmetric(vertical: 5.h),
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: DataTable(
+                          headingRowHeight: 18.h,
+                          dataRowHeight: 18.h,
+                          headingRowColor: MaterialStateColor.resolveWith((states) => Colors.blue.shade900),
+                          border: TableBorder.all(color: const Color.fromARGB(255, 110, 143, 145), width: 1),
+                          columns: [
+                            DataColumn(label: Center(child: Text('Slot No',style: TextStyle(color: Colors.white,fontSize: 10.sp)))),
+                            DataColumn(label: Center(child: Text('Start Time',style: TextStyle(color: Colors.white,fontSize: 10.sp)))),
+                            DataColumn(label: Center(child: Text('End Time',style: TextStyle(color: Colors.white,fontSize: 10.sp)))),
+                            DataColumn(label: Center(child: Text('Action',style: TextStyle(color: Colors.white,fontSize: 10.sp)))),
+                          ],
+                          rows: List.generate(
+                            slotList.length,
+                            (index) {
+                              final slot = slotList[index];
+                              return DataRow(
+                                color: MaterialStateProperty.resolveWith((states) =>index % 2 == 0? const Color.fromARGB(255, 197, 248, 255): Colors.white),
+                                cells: [
+                                  DataCell(Center(child: Text("Slot ${index + 1}",style: TextStyle(fontSize: 10.sp)))),
+                                  DataCell(Center(child: Text(formatTime(slot.start), style: TextStyle(fontSize: 10.sp)))),
+                                  DataCell(Center(child: Text(formatTime(slot.end),style: TextStyle(fontSize: 10.sp)))),
+                                  DataCell(Center(
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        setState(() {
+                                          slotList.removeAt(index);
+                                        });
+                                      },
+                                      child: Icon(Icons.delete,color: Colors.blue.shade800, size: 15.r),
+                                    ),
+                                  )),
+                                ],
+                              );
+                            },
+                          ),
+                        ),
                       ),
                     ),
                     CommonTextFieldRow(
@@ -671,51 +667,34 @@ getDoctorCode() async {
                   alignment: Alignment.bottomRight,
                   child: InkWell(
                     onTap: () async {
-                      // Utils.closeKeyBoard(context);
-                      // print("Tapped Save");
+                      Utils.closeKeyBoard(context);
+                      print("Tapped Save");
 
-                      // if (_customerNameController.text == '') {
-                      //   Utils.showTopSnackBar(context, "Customer name is required");
-                      //   return;
-                      // }
-                      // if (_regionController.text == '') {
-                      //   Utils.showTopSnackBar(context, "Please Select Region");
-                      //   return;
-                      // }
-                      // if (_territoryController.text == '') {
-                      //   Utils.showTopSnackBar(context, "Please Select Territory");
-                      //   return;
-                      // }
-                      // if (_ownerMobileController.text == '') {
-                      //   Utils.showTopSnackBar(context, "Owner Mobile field is required");
-                      //   return;
-                      // }
-                      // if (_bankNameController.text == '') {
-                      //   Utils.showTopSnackBar(context, "Bank Name field is required");
-                      //   return;
-                      // }
-                      // if (_checkNoController.text == '') {
-                      //   Utils.showTopSnackBar(context, "Check No. field is required");
-                      //   return;
-                      // }
-                      // if (_bankBranchNameController.text == '') {
-                      //   Utils.showTopSnackBar(context, "Bank Branch field is required");
-                      //   return;
-                      // }
-                      // if (_accountNoController.text == '') {
-                      //   Utils.showTopSnackBar(context, "Account No. field is required");
-                      //   return;
-                      // }
+                      if (_doctorNameController.text == '') {
+                        Utils.showTopSnackBar(context, "Doctor name is required");
+                        return;
+                      }
+                      if (_departmentController.text == '') {
+                        Utils.showTopSnackBar(context, "Please Select Department");
+                        return;
+                      }
+                      if (_educationLevelController.text == '') {
+                        Utils.showTopSnackBar(context, "Education Level is required");
+                        return;
+                      }
+                      if (_feesController.text == '') {
+                        Utils.showTopSnackBar(context, "Fees field is required");
+                        return;
+                      }
+                      setState(() {
+                        customerEntryBtnClk = true;
+                      });
 
-                      // setState(() {
-                      //   customerEntryBtnClk = true;
-                      // });
-
-                      // var result = await customerEntry(context);
-                      // if (result == "true") {
-                      //   Provider.of<CustomerListProvider>(context, listen: false).getCustomerList("", "", "");
-                      // }
-                      // setState(() {});
+                      var result = await addDoctor();
+                      if (result == "true") {
+                        Provider.of<DoctorsProvider>(context, listen: false).getDoctors();
+                      }
+                      setState(() {});
                     },
                     child: Container(
                       height: 28.0.h,
@@ -850,68 +829,59 @@ getDoctorCode() async {
   });
 }
 bool customerEntryBtnClk = false;
-// Future<String> customerEntry(BuildContext context) async {
-//   String link = "${baseUrl}add_customer";
-//   SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-//   try {
-//     var response = await Dio().post(link,
-//       data:{
-//         "Customer_SlNo": 0,
-//         "Customer_Code": "",
-//         "Customer_Name": _customerNameController.text.trim(),
-//         "Customer_Type": customerType.toString().trim(),
-//         "Customer_Phone": '',
-//         "Customer_Mobile": _ownerMobileController.text.trim(),
-//         "cheque_number": _chequeDetailsController.text.trim(),
-//         "Customer_Email": _emailController.text.trim(),
-//         "Customer_OfficePhone": _pMMobileController.text.trim(),
-//         "Customer_Address": _deliveryAddressController.text.trim(),
-//         "Customer_Address_Others": _officeAddressController.text.trim(),
-//         "owner_name": _ownerNameController.text.trim(),
-//         "bank_name": _bankNameController.text.trim(),
-//         "check_no": _checkNoController.text.trim(),
-//         "brunch_name": _bankBranchNameController.text.trim(),
-//         "account_no": _accountNoController.text.trim(),
-//         "unit_area_id": regionId.toString().trim(),
-//         "territory_id": territoriesId.toString().trim(),
-//         "Customer_Credit_Limit": _creditLimitController.text.trim(),
-//         "previous_due": _previousDueController.text.trim(),
-//       },
-//       options: Options(
-//         headers: {
-//           "Content-Type": "application/json",
-//           'Cookie': 'ci_session=${sharedPreferences.getString("sessionId")}',
-//           "Authorization": "Bearer ${sharedPreferences.getString("token")}",
-//         },
-//       ),
-//     );
+addDoctor() async {
+   String link = AppUrl.addDoctorEndPoint;
 
-//     var item = response.data;
-//     print("API Response: $item");
+  try {
+    final token = getToken();
+    var slotData = slotList.map((slot) {
+      return {
+        "slotName": "Slot ${slotList.indexOf(slot) + 1}",
+        "startTime": formatTime(slot.start).replaceAll(" ", ""),
+        "endTime": formatTime(slot.end).replaceAll(" ", ""),
+      };
+    }).toList();
+    var doctorData = {
+      "doctor_code": doctorId.toString(),
+      "department_id": _departmentId.toString(),
+      "name": _doctorNameController.text.trim(),
+      "name_bangla": _nameBanglaController.text.trim(),
+      "mobile": _mobileController.text.trim(),
+      "education_level": _educationLevelController.text.trim(),
+      "education_level_bangla": _eduLevelBanglaController.text.trim(),
+      "address": _addressController.text.trim(),
+      "remark": _remarkController.text.trim(),
+      "fees": _feesController.text.trim(),
+      "slots": slotData,
+    };
+    print("======== 📤 ADD DOCTOR API CALL ========");
+    print("slotData Data:\n$slotData");
+    print("Doctor Data:\n$doctorData");
+    Response response = await Dio().post(link,
+      data: doctorData,
+      options: Options( headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
+        },),
+    );
 
-//     if (item["success"] == true) {
-//       setState(() {
-//         customerEntryBtnClk = false;
-//       });
-//       emptyMethod();
-//       CustomSnackBar.showTopSnackBar(context, "${item["message"]}");
-//       Navigator.push(context,MaterialPageRoute(builder:(context) => const CustomerEntryScreen()));
-//       return "true";
-//     } else {
-//       setState(() {
-//         customerEntryBtnClk = false;
-//       });
-//       Utils.showTopSnackBar(context,"${item["message"]}");
-//       return "false";
-//     }
-//   } catch (e) {
-//     setState(() {
-//       customerEntryBtnClk = false;
-//     });
-//     print("Exception caught: $e");
-//     Utils.showTopSnackBar(context, "Something went wrong: $e");
-//     return "false";
-//   }
-// }
- 
+    var res = response.data;
+    print("======== ✅ API RESPONSE ========");
+    print(res);
+
+    if (res["success"] == true) {
+      CustomSnackBar.showTopSnackBar(context, "${res['message']}");
+      emptyMethod();
+      slotList.clear();
+
+    } else {
+      Utils.showTopSnackBar(
+          context, res["errorMsg"] ?? "Doctor entry failed!");
+    }
+  } catch (e) {
+    print("❌ Error Add Doctor: $e");
+    Utils.showTopSnackBar(context, e.toString());
+  }
+}
+
 }
