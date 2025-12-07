@@ -8,6 +8,7 @@ import 'package:medical_trade/diagnostic_module/models/agents_model.dart';
 import 'package:medical_trade/diagnostic_module/models/bank_account_model.dart';
 import 'package:medical_trade/diagnostic_module/providers/agents_provider.dart';
 import 'package:medical_trade/diagnostic_module/providers/bank_account_provider.dart';
+import 'package:medical_trade/diagnostic_module/providers/commission_payment_provider.dart';
 import 'package:medical_trade/diagnostic_module/utils/all_textstyle.dart';
 import 'package:medical_trade/diagnostic_module/utils/animation_snackbar.dart';
 import 'package:medical_trade/diagnostic_module/utils/utils.dart';
@@ -22,10 +23,10 @@ class CommissionPaymentEntryScreen extends StatefulWidget {
 }
 
 class _CommissionPaymentEntryScreenState extends State<CommissionPaymentEntryScreen> {
-  Color getColor(Set<WidgetState> states) {return Colors.blue.shade200;}
+  Color getColor(Set<WidgetState> states) {return Colors.brown.shade100;}
   Color getColors(Set<WidgetState> states) {return Colors.white;}
   
-  final TextEditingController _descriptionController = TextEditingController();
+  final TextEditingController _remarkController = TextEditingController();
   final TextEditingController _amountController = TextEditingController();
   final TextEditingController bankAccountController = TextEditingController();
   final TextEditingController agentController = TextEditingController();
@@ -36,7 +37,6 @@ class _CommissionPaymentEntryScreenState extends State<CommissionPaymentEntryScr
   //
   String? firstPickedDate;
   String? backEndFirstDate;
-  bool isBtnLoading = false;
 
   var toDay = DateTime.now();
   void _firstSelectedDate() async {
@@ -49,8 +49,8 @@ class _CommissionPaymentEntryScreenState extends State<CommissionPaymentEntryScr
       setState(() {
         firstPickedDate = Utils.formatFrontEndDate(selectedDate);
         backEndFirstDate = Utils.formatBackEndDate(selectedDate);
-        // SupplierPaymentProvider().on();
-        // Provider.of<SupplierPaymentProvider>(context,listen: false).getSupplierPayment("","$backEndFirstDate","$backEndFirstDate");
+        CommissionPaymentProvider().on();
+        Provider.of<CommissionPaymentProvider>(context,listen: false).getCommissionPayment(backEndFirstDate,backEndFirstDate);
 
       });
     }
@@ -263,10 +263,10 @@ final LayerLink _pTypeLayerLink = LayerLink();
      setState(() {
       _paymentType = selectValue;
       if (selectValue == "Cash") {
-        getPaymentType = "cash";
+        getPaymentType = "Cash";
       }
       if (selectValue == "Bank") {
-        getPaymentType = "bank";
+        getPaymentType = "Bank";
       }
       _paymentType == "Bank" ? isBankListClicked = true : isBankListClicked = false;
      });
@@ -309,7 +309,7 @@ static String getToken() {
 String? commissionPayCode = "";
 getCommissionPayCode() async {
   try {
-    String link = AppUrl.getPatientCodeEndPoint;
+    String link = AppUrl.getCommissionPayCodeEndPoint;
     final token = getToken();
 
     var response = await Dio().get(
@@ -344,6 +344,42 @@ getCommissionPayCode() async {
   }
 }
 
+String? dueBalance = "0";
+getDueBalance(String? agentID) async {
+  try {
+    String link = AppUrl.getAgentCommissionDue;
+    final token = getToken();
+
+    var response = await Dio().post(link,
+      data: {
+        "agentId": agentID.toString()
+      },
+      options: Options(
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
+        },
+        validateStatus: (status) => status! < 500,
+      ),
+    );
+    print("Response =====> ${response.data}");
+    // Safety check
+    if (response.data["getDues"] != null && response.data["getDues"].isNotEmpty) {
+      setState(() {
+        dueBalance = response.data["getDues"][0]["due"].toString();
+      });
+      print("dueBalance =========> $dueBalance");
+    } else {
+      print("No due found!");
+      dueBalance = "0";
+    }
+    CustomSnackBar.showTopSnackBar(context, "Due Amount is ${dueBalance}");
+  } catch (e) {
+    print("dueBalance ERROR =======> $e");
+  }
+}
+
+
   @override
   void initState() {
     getCommissionPayCode();
@@ -352,12 +388,11 @@ getCommissionPayCode() async {
     // _initializeData();
     firstPickedDate = Utils.formatFrontEndDate(DateTime.now());
     backEndFirstDate = Utils.formatBackEndDate(DateTime.now());
-    //getTransactionType = 'CP';
-    getPaymentType = "cash";
-    // SupplierPaymentProvider.isSupplierPaymentLoading = true;
-    // Provider.of<SupplierPaymentProvider>(context,listen: false).supplierPaymentList = [];
+    getPaymentType = "Cash";
+    CommissionPaymentProvider.isCommissionPaymentLoading = true;
+    Provider.of<CommissionPaymentProvider>(context,listen: false).commissionPaymentList = [];
     Provider.of<AgentsProvider>(context,listen: false).getAgents();
-    // Provider.of<SupplierPaymentProvider>(context,listen: false).getSupplierPayment("",Utils.formatBackEndDate(DateTime.now()),"${Utils.formatBackEndDate(DateTime.now())}");
+    Provider.of<CommissionPaymentProvider>(context,listen: false).getCommissionPayment(Utils.formatBackEndDate(DateTime.now()),Utils.formatBackEndDate(DateTime.now()));
     Provider.of<BankAccountProvider>(context,listen: false).getBankAccount();
     super.initState();
   }
@@ -373,6 +408,8 @@ getCommissionPayCode() async {
     // ///bank account
     final allAgentsData = Provider.of<AgentsProvider>(context).allAgentsList;
     final allBankAccountData = Provider.of<BankAccountProvider>(context).allBankAccountList;
+    print("allBankAccountData==============${allBankAccountData.length}");
+    final allCommissionPayData = Provider.of<CommissionPaymentProvider>(context).commissionPaymentList;
     return
     //  RefreshIndicator(
     //   onRefresh: () async {
@@ -480,7 +517,7 @@ getCommissionPayCode() async {
                                           }),
                                           child: TextFormField(
                                             enabled: false,
-                                            decoration: InputDecoration(contentPadding: EdgeInsets.only(left: 5.w),
+                                            decoration: InputDecoration(contentPadding: EdgeInsets.only(left: 2.w),
                                                 suffixIcon: Padding(padding: EdgeInsets.only(left: 20.w),
                                                   child: Icon(Icons.calendar_month, color: Colors.black87, size: 16.r)),
                                                 border: const OutlineInputBorder(borderSide: BorderSide.none),
@@ -691,6 +728,8 @@ getCommissionPayCode() async {
                                                   _agentId = suggestion.id.toString();
                                                  // previousDueController.text = suggestion.dueAmount.toString();
                                                 });
+                                                print("Agent   Id======$_agentId");
+                                                getDueBalance(_agentId);
                                         },
                                       ),
                                       ),
@@ -708,21 +747,10 @@ getCommissionPayCode() async {
                                         height: 25.h,
                                         width: MediaQuery.of(context).size.width / 2,
                                          decoration: ContDecoration.contDecoration,
-                                        child: TextField(
-                                          style: AllTextStyle.dropDownlistStyle,
-                                          controller: previousDueController,
-                                          keyboardType: TextInputType.number,
-                                          decoration: InputDecoration(
-                                            //filled: true,
-                                            enabled: false,
-                                            hintText: "0",
-                                            fillColor: Colors.white,
-                                            contentPadding: EdgeInsets.symmetric(vertical: 7.h, horizontal: 5.w),
-                                            border: InputBorder.none,
-                                            focusedBorder: TextFieldInputBorder.focusEnabledBorder,
-                                            enabledBorder: TextFieldInputBorder.focusEnabledBorder
-                                          ),
-                                        ),
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(5.0),
+                                          child: Text("$dueBalance",style: AllTextStyle.dateFormatStyle),
+                                        )
                                       ),
                                     ),
                                   ],
@@ -741,7 +769,7 @@ getCommissionPayCode() async {
                                           style: AllTextStyle.dropDownlistStyle,
                                           controller: _amountController,
                                           keyboardType: TextInputType.number,
-                                          decoration: InputDecoration(contentPadding: EdgeInsets.symmetric(vertical: 5.h, horizontal: 5.w),
+                                          decoration: InputDecoration(contentPadding: EdgeInsets.symmetric(vertical: 5.h, horizontal: 2.w),
                                             filled: true,
                                             hintText: "0",
                                             fillColor: Colors.white,
@@ -757,7 +785,7 @@ getCommissionPayCode() async {
                                 SizedBox(height: 3.h),
                                 Row(
                                   children: [
-                                    Expanded(flex: 6,child:Text("Description",style:AllTextStyle.textFieldHeadStyle)),
+                                    Expanded(flex: 6,child:Text("Note",style:AllTextStyle.textFieldHeadStyle)),
                                     const Expanded(flex: 1, child: Text(":")),
                                     Expanded(
                                       flex: 11,
@@ -765,10 +793,10 @@ getCommissionPayCode() async {
                                         width: MediaQuery.of(context).size.width / 2,
                                         child: TextField(
                                           style: AllTextStyle.dropDownlistStyle,
-                                          controller: _descriptionController,
+                                          controller: _remarkController,
                                           maxLines: 2,
                                           decoration: InputDecoration(contentPadding: EdgeInsets.symmetric(vertical: 5.h, horizontal: 5.w),
-                                            hintText: "Note",
+                                            hintText: "Remarks",
                                             filled: true,
                                             fillColor: Colors.white,
                                             border: InputBorder.none,
@@ -807,43 +835,26 @@ getCommissionPayCode() async {
                                     // ),
                                     // SizedBox(width: 10.w),
                                     InkWell(
-                                      onTap: () {
-                                        // if(supplierController.text == ''){
-                                        //   Utils.errorSnackBar(context, "Supplier is required");
-                                        // }
-                                        // else if (_paymentType == "Bank" && bankAccountController.text == '') {
-                                        //   Utils.errorSnackBar( context, "Bank account is required");
-                                        // }
-                                        // else if( _amountController.text == ''){
-                                        //   Utils.errorSnackBar(context, "Amount is required");
-                                        // }
-                                        // else{
-                                        //   setState(() {
-                                        //     isBtnLoading = true;
-                                        //   });
-                                        //   getApiAllAddSupplierPayment(context,
-                                        //     _amountController.text,
-                                        //    _selectedBankAccount,
-                                        //     backEndFirstDate,
-                                        //     getPaymentType,
-                                        //     _descriptionController.text,
-                                        //     _selectedSupplier,
-                                        //     getTransactionType,
-                                        //   ).then((value){
-                                        //     if(value=='true'){
-                                        //       setState(() {
-                                        //         isBtnLoading = false;
-                                        //       });
-                                        //       _descriptionController.text = "";
-                                        //       supplierController.text = '';
-                                        //       _amountController.text = "";
-                                        //       Provider.of<SupplierPaymentProvider>(context,listen: false).getSupplierPayment("",Utils.formatBackEndDate(DateTime.now()),Utils.formatBackEndDate(DateTime.now()));
-                                        //       Provider.of<SupplierDueProvider>(context,listen: false).getSupplierDue(context, "","");
-                                        //       setState(() {
-                                        //       });
-                                        //     }
-                                        //   });
-                                        // }
+                                      onTap: () async {
+                                        Utils.closeKeyBoard(context);
+                                          print("Tapped Save");
+
+                                          if (agentController.text == '') {
+                                            Utils.showTopSnackBar(context, "Please Select Agent");
+                                            return;
+                                          }
+                                          if (_paymentType == "Bank" && bankAccountController.text == '') {
+                                            Utils.showTopSnackBar(context, "Please Select Bank Account");
+                                            return;
+                                          }
+                                          setState(() {
+                                            commissionPayBtnClk = true;
+                                          });
+                                          var result = await commissionPay(context);
+                                          if (result == "true") {
+                                            Provider.of<CommissionPaymentProvider>(context, listen: false).getCommissionPayment(backEndFirstDate,backEndFirstDate);
+                                          }
+                                          setState(() {});
                                       },
                                       child: Container(
                                         height: 28.h,
@@ -861,7 +872,7 @@ getCommissionPayCode() async {
                                           ],
                                         ),
                                         child: Center(
-                                            child: isBtnLoading ? SizedBox(height: 20.h,width:20.w,child: CircularProgressIndicator(color: Colors.white,)) : Text(
+                                            child: commissionPayBtnClk ? SizedBox(height: 20.h,width:20.w,child: CircularProgressIndicator(color: Colors.white,)) : Text(
                                                 "Save",style:AllTextStyle.saveButtonTextStyle)),
                                       ),
                                     ),
@@ -874,6 +885,58 @@ getCommissionPayCode() async {
                     ),
                   ),
                 ),
+              CommissionPaymentProvider.isCommissionPaymentLoading ? CircularProgressIndicator()
+              : Container(
+              height: MediaQuery.of(context).size.height / 1.43,
+              width: double.infinity,
+              padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+              child: SizedBox(
+                width: double.infinity,
+                height: double.infinity,
+                child: SingleChildScrollView(
+                  // controller: _listViewScrollController,
+                  // physics: _physics,
+                  scrollDirection: Axis.vertical,
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: DataTable(
+                      headingRowHeight: 20.0,
+                      dataRowHeight: 20.0,
+                      headingRowColor: WidgetStateColor.resolveWith((states) => Color.fromARGB(255, 75, 76, 77)),
+                      showCheckboxColumn: true,
+                      border: TableBorder.all(color: Colors.grey.shade400, width: 1),
+                      columns: [
+                        DataColumn(label: Expanded(child: Center(child: Text('S/L No.',style: AllTextStyle.tableHeadTextStyle)))),
+                        DataColumn(label: Expanded(child: Center(child: Text('Transaction date',style: AllTextStyle.tableHeadTextStyle)))),
+                        DataColumn(label: Expanded(child: Center(child: Text('Referance',style: AllTextStyle.tableHeadTextStyle)))),
+                        DataColumn(label: Expanded(child: Center(child: Text('Payment Type',style: AllTextStyle.tableHeadTextStyle)))),
+                        DataColumn(label: Expanded(child: Center(child: Text('Account Name',style: AllTextStyle.tableHeadTextStyle)))),
+                        DataColumn(label: Expanded(child: Center(child: Text('Transaction Type',style: AllTextStyle.tableHeadTextStyle)))),
+                        DataColumn(label: Expanded(child: Center(child: Text('Amount',style: AllTextStyle.tableHeadTextStyle)))),
+                        DataColumn(label: Expanded(child: Center(child: Text('Note',style: AllTextStyle.tableHeadTextStyle)))),			
+                      ],
+                      rows: List.generate(
+                       allCommissionPayData.length,
+                            (int index) => DataRow(
+                          color: index % 2 == 0 ? WidgetStateProperty.resolveWith(getColor) : WidgetStateProperty.resolveWith(getColors),
+                          cells: <DataCell>[
+                            DataCell(Center(child: Text('${index+1}'))),
+                            DataCell(Center(child: Text('${allCommissionPayData[index].paymentDate??""}'))),
+                            DataCell(Center(child: Text('${allCommissionPayData[index].agent!.name??""}'))),
+                            DataCell(Center(child: Text('${allCommissionPayData[index].paymentType??""}'))),
+                            DataCell(Center(child: allCommissionPayData[index].bank=="null"||allCommissionPayData[index].bank==null? Text("N/A"):Text('${allCommissionPayData[index].bank!.accountName??""} - ${allCommissionPayData[index].bank!.accountNumber??""} - ${allCommissionPayData[index].bank!.bankName??""}'))),
+                            DataCell(Center(child: Text('${allCommissionPayData[index].transactionType??""}'))),
+                            DataCell(Center(child: Text('${allCommissionPayData[index].amount??""}'))),
+                            DataCell(Center(child: Text('${allCommissionPayData[index].remark??""}'))),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(height: 15.0.h),
                 // Container(
                 //   height: MediaQuery.of(context).size.height/1.5,
                 //   padding: const EdgeInsets.symmetric(horizontal: 5.0,vertical: 5.0),
@@ -994,6 +1057,7 @@ getCommissionPayCode() async {
                 //   ),
                 // ),
                 // SizedBox(height: 15.h),
+              
               ],
             ),
           ),
@@ -1021,102 +1085,65 @@ getCommissionPayCode() async {
     );
   }
 
-  emtyMethod() {
+  emptyMethod() {
     setState(() {
-      _descriptionController.text = "";
+      _remarkController.text = "";
       agentController.text = "";
       previousDueController.text = "";
       _amountController.text = "";
       bankAccountController.text = "";
     });
   }
-  // Future<String>getApiAllAddSupplierPayment(context,
-  //     String? amount,
-  //      bankAccountId,
-  //     String? date,
-  //     String? method,
-  //     String? note,
-  //      supplierId,
-  //     String? type,
-  //     ) async {
-        
-  //   SharedPreferences? sharedPreferences;
-  //   sharedPreferences = await SharedPreferences.getInstance();
-  //   String Link = "${sharedPreferences.getString("BaseUrl")}/create-supplierpayment";
-  //   try {
-  //     Response response = await Dio().post(Link,
-  //         data: {
-  //           "amount": amount,
-  //           "bank_account_id": bankAccountId ?? "",
-  //           "date": date,
-  //           "method": method,
-  //           "note": note,
-  //           "supplier_id": supplierId,
-  //           "type": type,
-  //         },
-  //         options: Options(headers: {
-  //           "Content-Type": "application/json",
-  //           "Authorization": "Bearer ${sharedPreferences.getString("token")}",
-  //           "Cookie": "laravel_session=${sharedPreferences.getString('sessionId')}",
-  //         }));
-  //     var data = response.data;
-  //     if(data['status'] == true){
-  //       setState(() {
-  //         isBtnLoading = false;
-  //       });
-  //       emtyMethod();
-  //       CustomSnackBar.showTopSnackBar(context, "${data["message"]}");
-  //       // ===== Success dialog =====
-  //       showDialog(
-  //       context: context,
-  //       builder: (ctx) => AlertDialog(
-  //         title: const Text("Success!",style: TextStyle(color: Color.fromARGB(255, 1, 126, 5),fontWeight: FontWeight.bold),),
-  //         content: const Text( "Do you want to print invoice?"),
-  //         actions: [
-  //           GestureDetector(
-  //             onTap: () => Navigator.of(ctx).pop(), 
-  //             child: Container(
-  //               height: 30, 
-  //               width: 60,
-  //               decoration: BoxDecoration(
-  //                 color: const Color.fromARGB(255, 211, 15, 1),
-  //                 borderRadius: BorderRadius.circular(5),
-  //               ),
-  //               child: Center(child: Text("No",style: AllTextStyle.saveButtonTextStyle))),
-  //           ),
-  //           GestureDetector(
-  //             onTap: () {
-  //               Navigator.of(ctx).pop(); 
-  //               Navigator.of(context).push(MaterialPageRoute(
-  //                 builder: (_) => SupplierPaymentInvoicePage(paymentId: "${data["paymentId"]}"),
-  //               ));
-  //             }, 
-  //             child: Container(
-  //               height: 30, 
-  //               width: 60,
-  //                 decoration: BoxDecoration(
-  //                 color: const Color.fromARGB(255, 44, 40, 248),
-  //                 borderRadius: BorderRadius.circular(5),
-  //               ),
-  //               child: Center(child: Text("Yes",style: AllTextStyle.saveButtonTextStyle))),
-  //           ),
-  //         ],
-  //       ),
-  //       );
-  //       return 'true';
-  //     }else{
-  //       setState(() {
-  //         isBtnLoading = false;
-  //       });
-  //       Utils.errorSnackBar(context, "${data["message"]}");
-  //       return '';
-  //     }
-  //   } catch (e) {
-  //     setState(() {
-  //       isBtnLoading = false;
-  //     });
-  //     Utils.errorSnackBar(context, e.toString());
-  //     return '';
-  //   }
-  // }
+bool commissionPayBtnClk = false;
+Future<String> commissionPay(BuildContext context) async {
+  String link = AppUrl.addCommissionPayEndPoint;
+  try {
+    final token = getToken();
+    var response = await Dio().post(link,
+      data: {
+          "transaction_number": commissionPayCode.toString(),
+          "reference_id": _agentId.toString(),
+          "reference_type": "Agent",
+          "payment_date": backEndFirstDate.toString(),
+          "transaction_type":"Payment",
+          "payment_type": getPaymentType,
+          "account_id": getPaymentType == "Cash" ? "" :_selectedBankAccount.toString(),
+          "amount": _amountController.text.trim(),
+          "due": dueBalance.toString(),
+          "remark": _remarkController.text.trim(),
+      },
+      options: Options(
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
+        },
+      ),
+    );
+    var item = response.data;
+    print("API Response: $item");
+
+    if (item["success"] == true) {
+      setState(() {
+        commissionPayBtnClk = false;
+      });
+      emptyMethod();
+      CustomSnackBar.showTopSnackBar(context, "${item["message"]}");
+      getCommissionPayCode();
+      return "true";
+    } else {
+      setState(() {
+        commissionPayBtnClk = false;
+      });
+      Utils.showTopSnackBar(context,"${item["message"]}");
+      return "false";
+    }
+  } catch (e) {
+    setState(() {
+      commissionPayBtnClk = false;
+    });
+    print("Exception caught: $e");
+    Utils.showTopSnackBar(context, "Something went wrong: $e");
+    return "false";
+  }
+ }
 }

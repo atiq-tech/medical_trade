@@ -3,8 +3,10 @@ import 'package:get_storage/get_storage.dart';
 import 'package:medical_trade/config/app_url.dart';
 import 'package:medical_trade/diagnostic_module/models/agents_model.dart';
 import 'package:medical_trade/diagnostic_module/models/bank_account_model.dart';
+import 'package:medical_trade/diagnostic_module/models/commission_payment_model.dart';
 import 'package:medical_trade/diagnostic_module/models/department_module.dart';
 import 'package:medical_trade/diagnostic_module/models/doctors_model.dart';
+import 'package:medical_trade/diagnostic_module/models/patient_payment_model.dart';
 import 'package:medical_trade/diagnostic_module/models/patients_model.dart';
 import 'package:medical_trade/diagnostic_module/models/specimens_model.dart';
 import 'package:medical_trade/diagnostic_module/models/test_entry_model.dart';
@@ -169,4 +171,52 @@ class DiagnosticeApiservice {
     }
     return null;
   }
+
+  //==================get-CommissionPayment List =======================
+  static fetchCommissionPayment(String? dateFrom,String? dateTo) async {
+    String link = AppUrl.getCommissionPayEndPoint;
+    final token = getToken();
+    try {
+      Response response = await Dio().post(link,
+         data: {
+            "start_date":"$dateFrom",
+            "end_date":"$dateTo",
+          },
+          options: Options(headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer $token",
+          }));
+      var item = response.data;
+      print("get-commission-payment Data======$item");
+      return List.from(item).map((e) => CommissionPaymentModel.fromMap(e)).toList();
+    } catch (e) {
+      print(e);
+    }
+    return null;
+  }
+
+  //==================get-Patient Payment List =======================
+  static fetchPatientPayment(String? dateFrom,String? dateTo) async {
+    String link = AppUrl.getPatientPayEndPoint;
+    final token = getToken();
+    try {
+      Response response = await Dio().post(link,
+         data: {
+            "start_date":"$dateFrom",
+            "end_date":"$dateTo",
+          },
+          options: Options(headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer $token",
+          }));
+      var item = response.data;
+      print("get-Patient Payment Data======$item");
+      return List.from(item).map((e) => PatientPaymentModel.fromMap(e)).toList();
+    } catch (e) {
+      print(e);
+    }
+    return null;
+  }
+
+  
 }

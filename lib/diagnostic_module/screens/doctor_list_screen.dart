@@ -75,7 +75,7 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
                     DataCell(Center(child: Text(allDoctorsData[index].doctorCode.toString()))),
                     DataCell(Center(child: Text(allDoctorsData[index].name.toString(), style: TextStyle(fontSize: 11.sp)))),
                     DataCell(Center(child: Text(allDoctorsData[index].nameBangla.toString(), style: TextStyle(fontSize: 11.sp)))),
-                    DataCell(Center(child: Text(allDoctorsData[index].departmentId.toString(), style: TextStyle(fontSize: 11.sp)))),
+                    DataCell(Center(child: Text(allDoctorsData[index].department.name.toString(), style: TextStyle(fontSize: 11.sp)))),
                     DataCell(Center(child: Text(allDoctorsData[index].mobile.toString(), style: TextStyle(fontSize: 11.sp)))),
                     DataCell(Center(child: Text(allDoctorsData[index].address.toString(), style: TextStyle(fontSize: 11.sp)))),
                     DataCell(Center(child: Text(allDoctorsData[index].fees.toString(), style: TextStyle(fontSize: 11.sp)))),

@@ -507,7 +507,7 @@ class _TestEntryScreenState extends State<TestEntryScreen> {
                             DataCell(Center(child: Text('${allTestData[index].name??""}'))),
                             DataCell(Center(child: Text('${allTestData[index].roomNumber??""}'))),
                             DataCell(Center(child: Text('${allTestData[index].price??""}'))),
-                            DataCell(Center(child: Text('${allTestData[index].specimenId??""}'))),
+                            DataCell(Center(child: Text('${allTestData[index].specimen.specimenName??""}'))),
                             DataCell(Center(child: Text('${allTestData[index].day??""}Days'))),
                             DataCell(Center(child: Text('${allTestData[index].remark??""}'))),
                           ],

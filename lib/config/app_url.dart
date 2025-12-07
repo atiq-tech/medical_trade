@@ -73,6 +73,7 @@ class AppUrl {
   static var addTestEntryEndPoint = '$baseUrl/add-test-entry';
 
   static var getCommissionPayEndPoint = '$baseUrl/get-commission-payment';
+  static var getAgentCommissionDue = '$baseUrl/agent-commission-due';
   static var getCommissionPayCodeEndPoint = '$baseUrl/get-commission-payment-code';
   static var getBankAccountEndPoint = '$baseUrl/get-bank-accounts';
   static var getAgentsEndPoint = '$baseUrl/get-agents';

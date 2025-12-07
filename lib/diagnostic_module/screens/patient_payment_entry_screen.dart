@@ -346,7 +346,7 @@ getPatientPayCode() async {
   }
 }
 
-String? dueAmmount = "";
+String? dueAmmount = "0";
 getMadicinePatientDue(String? patientId) async {
   try {
     String link = AppUrl.getMadicinePatientDueEndPoint;
@@ -368,17 +368,16 @@ getMadicinePatientDue(String? patientId) async {
     );
 
     print("Response =====> ${response.data}");
-    if (response.statusCode == 401) {
-      Utils.showTopSnackBar(context, "Session expired. Please log in again.");
-      Navigator.pushReplacement(context,
-        MaterialPageRoute(builder: (context) => const LoginView(isLogin: true)),
-      );
-      return;
+     if (response.data["getDues"] != null && response.data["getDues"].isNotEmpty) {
+      setState(() {
+        dueAmmount = response.data["getDues"][0]["due"].toString();
+      });
+      print("dueAmmount =========> $dueAmmount");
+    } else {
+      print("No due found!");
+      dueAmmount = "0";
     }
-    setState(() {
-      dueAmmount = response.data["due"].toString();
-    });
-    CustomSnackBar.showTopSnackBar(context, "${response.data["message"]}");
+    CustomSnackBar.showTopSnackBar(context, "Due Amount is ${dueAmmount}");
     print("dueAmmount  =========> $dueAmmount");
 
   } catch (e) {
@@ -394,7 +393,7 @@ getMadicinePatientDue(String? patientId) async {
     // _initializeData();
     firstPickedDate = Utils.formatFrontEndDate(DateTime.now());
     backEndFirstDate = Utils.formatBackEndDate(DateTime.now());
-    //getTransactionType = 'CP';
+    paymentType = 'Payment';
     getPaymentType = "Cash";
     // SupplierPaymentProvider.isSupplierPaymentLoading = true;
     // Provider.of<SupplierPaymentProvider>(context,listen: false).supplierPaymentList = [];
@@ -516,9 +515,9 @@ getMadicinePatientDue(String? patientId) async {
                                           }),
                                           child: TextFormField(
                                             enabled: false,
-                                            decoration: InputDecoration(contentPadding: EdgeInsets.only(left: 5.w),
+                                            decoration: InputDecoration(contentPadding: EdgeInsets.only(left: 3.w),
                                                 suffixIcon: Padding(padding: EdgeInsets.only(left: 20.w),
-                                                  child: Icon(Icons.calendar_month, color: Colors.black87, size: 16.r)),
+                                                child: Icon(Icons.calendar_month, color: Colors.black87, size: 16.r)),
                                                 border: const OutlineInputBorder(borderSide: BorderSide.none),
                                                 hintText: firstPickedDate, hintStyle:AllTextStyle.dropDownlistStyle
                                             ),
@@ -781,25 +780,14 @@ getMadicinePatientDue(String? patientId) async {
                                     Expanded(
                                       flex: 11,
                                       child: Container(
-                                        height: 25.h,
-                                        width: MediaQuery.of(context).size.width / 2,
-                                         decoration: ContDecoration.contDecoration,
-                                        child: TextField(
-                                          style: AllTextStyle.dropDownlistStyle,
-                                          controller: previousDueController,
-                                          keyboardType: TextInputType.number,
-                                          decoration: InputDecoration(
-                                            //filled: true,
-                                            enabled: false,
-                                            hintText: "0",
-                                            fillColor: Colors.white,
-                                            contentPadding: EdgeInsets.symmetric(vertical: 7.h, horizontal: 5.w),
-                                            border: InputBorder.none,
-                                            focusedBorder: TextFieldInputBorder.focusEnabledBorder,
-                                            enabledBorder: TextFieldInputBorder.focusEnabledBorder
-                                          ),
-                                        ),
-                                      ),
+                                      height: 25.h,
+                                      width: MediaQuery.of(context).size.width / 2,
+                                       decoration: ContDecoration.contDecoration,
+                                       child: Padding(
+                                        padding: const EdgeInsets.all(5.0),
+                                        child: Text("$dueAmmount",style: AllTextStyle.dropDownlistStyle),
+                                      )
+                                     ),
                                     ),
                                   ],
                                 ),
@@ -817,7 +805,7 @@ getMadicinePatientDue(String? patientId) async {
                                           style: AllTextStyle.dropDownlistStyle,
                                           controller: _amountController,
                                           keyboardType: TextInputType.number,
-                                          decoration: InputDecoration(contentPadding: EdgeInsets.symmetric(vertical: 5.h, horizontal: 5.w),
+                                          decoration: InputDecoration(contentPadding: EdgeInsets.symmetric(vertical: 5.h, horizontal: 2.w),
                                             filled: true,
                                             hintText: "0",
                                             fillColor: Colors.white,
@@ -891,10 +879,10 @@ getMadicinePatientDue(String? patientId) async {
                                           Utils.showTopSnackBar(context, "Please Select Patient");
                                           return;
                                         }
-                                        // if (_specimenController.text == '') {
-                                        //   Utils.showTopSnackBar(context, "Please Select Specimen");
-                                        //   return;
-                                        // }
+                                        if (_paymentType == "Bank" && bankAccountController.text == '') {
+                                            Utils.showTopSnackBar(context, "Please Select Bank Account");
+                                            return;
+                                        }
                                         // if (_amountController.text == '') {
                                         //   Utils.showTopSnackBar(context, "Amount is required");
                                         //   return;
@@ -924,7 +912,7 @@ getMadicinePatientDue(String? patientId) async {
                                           ],
                                         ),
                                         child: Center(
-                                            child: isBtnLoading ? SizedBox(height: 20.h,width:20.w,child: CircularProgressIndicator(color: Colors.white,)) : Text(
+                                            child: patientPayBtnClk ? SizedBox(height: 20.h,width:20.w,child: CircularProgressIndicator(color: Colors.white,)) : Text(
                                                 "Paid",style:AllTextStyle.saveButtonTextStyle)),
                                       ),
                                     ),
@@ -1112,7 +1100,7 @@ Future<String> patientPayEntry(BuildContext context) async {
           "transaction_number": "$patientPayCode",
           "patient_id": _selectedPatientId.toString(),
           "payment_type": getPaymentType.toString(),
-          "account_id": _selectedBankAccount.toString(),
+          "account_id": getPaymentType == "Cash" ? "" :_selectedBankAccount.toString(),
           "transaction_type": paymentType.toString(),
           "previous_due": dueAmmount.toString(),
           "payment_date": backEndFirstDate.toString(),

@@ -67,33 +67,6 @@ class _DoctorEntryScreenState extends State<DoctorEntryScreen> {
   String userName = "";
   String userType = "";
 
-// TimeOfDay? startTime;
-// TimeOfDay? endTime;
-
-// String formatTime(TimeOfDay? time) {
-//   if (time == null) return "--:--";
-//   final now = DateTime.now();
-//   final dt = DateTime(now.year, now.month, now.day, time.hour, time.minute);
-//   return DateFormat("hh:mm a").format(dt);
-// }
-
-// Future<void> pickTime(bool isStart) async {
-//   TimeOfDay? picked = await showTimePicker(
-//     context: context,
-//     initialTime: TimeOfDay.now(),
-//   );
-
-//   if (picked != null) {
-//     setState(() {
-//       if (isStart) {
-//         startTime = picked;
-//       } else {
-//         endTime = picked;
-//       }
-//     });
-//   }
-// }
-
 TimeOfDay? startTime;
 TimeOfDay? endTime;
 
@@ -103,9 +76,13 @@ String formatTime(TimeOfDay? time) {
   if (time == null) return "--:--";
   final now = DateTime.now();
   final dt = DateTime(now.year, now.month, now.day, time.hour, time.minute);
-  return DateFormat("hh:mm a").format(dt);
+  return DateFormat("hh:mm a").format(dt);  // UI FORMAT
 }
-
+String formatTimeForApi(TimeOfDay time) {
+  final now = DateTime.now();
+  final dt = DateTime(now.year, now.month, now.day, time.hour, time.minute);
+  return DateFormat("HH:mm").format(dt);  // API FORMAT
+}
 Future<void> pickTime(bool isStart) async {
   TimeOfDay? picked = await showTimePicker(
     context: context,
@@ -127,11 +104,11 @@ void addSlot() {
   if (startTime != null && endTime != null) {
     setState(() {
       slotList.add(SlotModel(start: startTime!, end: endTime!));
+      // startTime = null;
+      // endTime = null;
     });
   }
 }
-
-
 
   String? firstPickedDate;
   var backEndFirstDate;
@@ -687,7 +664,7 @@ getDoctorCode() async {
                         return;
                       }
                       setState(() {
-                        customerEntryBtnClk = true;
+                        doctorEntryBtnClk = true;
                       });
 
                       var result = await addDoctor();
@@ -712,7 +689,7 @@ getDoctorCode() async {
                         ],
                       ),
                       child: Center(
-                        child: customerEntryBtnClk
+                        child: doctorEntryBtnClk
                             ? SizedBox(
                                 height: 20.0.h,
                                 width: 20.0.w,
@@ -828,19 +805,23 @@ getDoctorCode() async {
     //_image = null;
   });
 }
-bool customerEntryBtnClk = false;
+bool doctorEntryBtnClk = false;
 addDoctor() async {
-   String link = AppUrl.addDoctorEndPoint;
+  String link = AppUrl.addDoctorEndPoint;
 
   try {
     final token = getToken();
+
+    // 🔹 Convert Slot List for API
     var slotData = slotList.map((slot) {
       return {
         "slotName": "Slot ${slotList.indexOf(slot) + 1}",
-        "startTime": formatTime(slot.start).replaceAll(" ", ""),
-        "endTime": formatTime(slot.end).replaceAll(" ", ""),
+        "startTime": formatTimeForApi(slot.start), // HH:mm
+        "endTime": formatTimeForApi(slot.end),     // HH:mm
       };
     }).toList();
+
+    // 🔹 Doctor Data Body for API
     var doctorData = {
       "doctor_code": doctorId.toString(),
       "department_id": _departmentId.toString(),
@@ -854,27 +835,43 @@ addDoctor() async {
       "fees": _feesController.text.trim(),
       "slots": slotData,
     };
+
+    // 🔹 Debug print
     print("======== 📤 ADD DOCTOR API CALL ========");
-    print("slotData Data:\n$slotData");
+    print("Slot Data:\n$slotData");
     print("Doctor Data:\n$doctorData");
-    Response response = await Dio().post(link,
+
+    // 🔹 API Post
+    Response response = await Dio().post(
+      link,
       data: doctorData,
-      options: Options( headers: {
+      options: Options(
+        headers: {
           "Content-Type": "application/json",
           "Authorization": "Bearer $token",
-        },),
+        },
+      ),
     );
 
     var res = response.data;
     print("======== ✅ API RESPONSE ========");
     print(res);
 
+    // 🔹 Response handle
     if (res["success"] == true) {
+       setState(() {
+        doctorEntryBtnClk = false;
+      });
       CustomSnackBar.showTopSnackBar(context, "${res['message']}");
-      emptyMethod();
+
+      emptyMethod(); // Clear fields
       slotList.clear();
+      setState(() {});
 
     } else {
+      setState(() {
+        doctorEntryBtnClk = false;
+      });
       Utils.showTopSnackBar(
           context, res["errorMsg"] ?? "Doctor entry failed!");
     }
@@ -883,5 +880,6 @@ addDoctor() async {
     Utils.showTopSnackBar(context, e.toString());
   }
 }
+
 
 }
