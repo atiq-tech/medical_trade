@@ -1,8 +1,11 @@
 import 'package:dio/dio.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:medical_trade/config/app_url.dart';
+import 'package:medical_trade/diagnostic_module/models/accounts_model.dart';
 import 'package:medical_trade/diagnostic_module/models/agents_model.dart';
 import 'package:medical_trade/diagnostic_module/models/bank_account_model.dart';
+import 'package:medical_trade/diagnostic_module/models/bank_transaction_model.dart';
+import 'package:medical_trade/diagnostic_module/models/cash_transaction_model.dart';
 import 'package:medical_trade/diagnostic_module/models/commission_payment_model.dart';
 import 'package:medical_trade/diagnostic_module/models/department_module.dart';
 import 'package:medical_trade/diagnostic_module/models/doctors_model.dart';
@@ -150,6 +153,28 @@ class DiagnosticeApiservice {
     return null;
   }
   
+    //==================get-Accounts List =======================
+  static fetchAllAccounts() async {
+    String link = AppUrl.getAccountsEndPoint;
+    final token = getToken();
+    try {
+      Response response = await Dio().get(link,
+         data: {
+              //"categoryId": "$categoryId"
+          },
+          options: Options(headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer $token",
+          }));
+      var item = response.data;
+      print("All get-Accounts Data======$item");
+      return List.from(item).map((e) => AccountsModel.fromMap(e)).toList();
+    } catch (e) {
+      print(e);
+    }
+    return null;
+  }
+  
    //==================get-Agents List =======================
   static fetchDepartment(String? useFor) async {
     String link = AppUrl.getDepartmentEndPoint;
@@ -218,5 +243,49 @@ class DiagnosticeApiservice {
     return null;
   }
 
+ //==================get-cash-transactions List =======================
+  static fetchCashTransaction(String? dateFrom,String? dateTo) async {
+    String link = AppUrl.getCashTransactionEndPoint;
+    final token = getToken();
+    try {
+      Response response = await Dio().get(link,
+         data: {
+            "start_date":"$dateFrom",
+            "end_date":"$dateTo",
+          },
+          options: Options(headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer $token",
+          }));
+      var item = response.data;
+      print("get-cash-transactions Data======$item");
+      return List.from(item).map((e) => CashTransactionModel.fromMap(e)).toList();
+    } catch (e) {
+      print(e);
+    }
+    return null;
+  }
   
+  //==================get-bank-transactions List =======================
+  static fetchBankTransaction(String? dateFrom,String? dateTo) async {
+    String link = AppUrl.getBankTransactionEndPoint;
+    final token = getToken();
+    try {
+      Response response = await Dio().get(link,
+         data: {
+            "start_date":"$dateFrom",
+            "end_date":"$dateTo",
+          },
+          options: Options(headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer $token",
+          }));
+      var item = response.data;
+      print("get-BankT-transactions Data======$item");
+      return List.from(item).map((e) => BankTransactionModel.fromMap(e)).toList();
+    } catch (e) {
+      print(e);
+    }
+    return null;
+  }
 }

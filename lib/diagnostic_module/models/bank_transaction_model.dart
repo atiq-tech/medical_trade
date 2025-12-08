@@ -1,17 +1,12 @@
 import 'dart:convert';
 
-class PatientPaymentModel {
+class BankTransactionModel {
     final dynamic id;
     final dynamic transactionNumber;
-    final dynamic patientId;
-    final dynamic admissionId;
-    final dynamic paymentDate;
+    final dynamic bankAccountId;
+    final dynamic transactionDate;
     final dynamic transactionType;
-    final dynamic paymentType;
-    final dynamic accountId;
-    final dynamic discount;
     final dynamic amount;
-    final dynamic previousDue;
     final dynamic remark;
     final dynamic createdBy;
     final dynamic updatedBy;
@@ -22,20 +17,14 @@ class PatientPaymentModel {
     final dynamic status;
     final dynamic branchId;
     final Bank? bank;
-    final Patient? patient;
 
-    PatientPaymentModel({
+    BankTransactionModel({
         required this.id,
         required this.transactionNumber,
-        required this.patientId,
-        required this.admissionId,
-        required this.paymentDate,
+        required this.bankAccountId,
+        required this.transactionDate,
         required this.transactionType,
-        required this.paymentType,
-        required this.accountId,
-        required this.discount,
         required this.amount,
-        required this.previousDue,
         required this.remark,
         required this.createdBy,
         required this.updatedBy,
@@ -46,25 +35,19 @@ class PatientPaymentModel {
         required this.status,
         required this.branchId,
         required this.bank,
-        required this.patient,
     });
 
-    factory PatientPaymentModel.fromJson(String str) => PatientPaymentModel.fromMap(json.decode(str));
+    factory BankTransactionModel.fromJson(String str) => BankTransactionModel.fromMap(json.decode(str));
 
     String toJson() => json.encode(toMap());
 
-    factory PatientPaymentModel.fromMap(Map<String, dynamic> json) => PatientPaymentModel(
+    factory BankTransactionModel.fromMap(Map<String, dynamic> json) => BankTransactionModel(
         id: json["id"],
         transactionNumber: json["transaction_number"],
-        patientId: json["patient_id"],
-        admissionId: json["admission_id"],
-        paymentDate: json["payment_date"],
+        bankAccountId: json["bank_account_id"],
+        transactionDate: json["transaction_date"],
         transactionType: json["transaction_type"],
-        paymentType: json["payment_type"],
-        accountId: json["account_id"],
-        discount: json["discount"],
         amount: json["amount"],
-        previousDue: json["previous_due"],
         remark: json["remark"],
         createdBy: json["created_by"],
         updatedBy: json["updated_by"],
@@ -75,21 +58,15 @@ class PatientPaymentModel {
         status: json["status"],
         branchId: json["branch_id"],
         bank: json["bank"] == null || json["bank"] == "null" ? null : Bank.fromMap(json["bank"]),
-        patient: json["patient"] == null || json["patient"] == "null" ? null : Patient.fromMap(json["patient"]),
     );
 
     Map<String, dynamic> toMap() => {
         "id": id,
         "transaction_number": transactionNumber,
-        "patient_id": patientId,
-        "admission_id": admissionId,
-        "payment_date": paymentDate,
+        "bank_account_id": bankAccountId,
+        "transaction_date": transactionDate,
         "transaction_type": transactionType,
-        "payment_type": paymentType,
-        "account_id": accountId,
-        "discount": discount,
         "amount": amount,
-        "previous_due": previousDue,
         "remark": remark,
         "created_by": createdBy,
         "updated_by": updatedBy,
@@ -100,7 +77,6 @@ class PatientPaymentModel {
         "status": status,
         "branch_id": branchId,
         "bank": bank!.toJson(),
-        "patient": patient!.toJson(),
     };
 }
 
@@ -133,33 +109,5 @@ class Bank {
         "account_name": accountName,
         "account_number": accountNumber,
         "bank_name": bankName,
-    };
-}
-
-class Patient {
-    final dynamic id;
-    final dynamic patientCode;
-    final dynamic name;
-
-    Patient({
-        required this.id,
-        required this.patientCode,
-        required this.name,
-    });
-
-    factory Patient.fromJson(String str) => Patient.fromMap(json.decode(str));
-
-    String toJson() => json.encode(toMap());
-
-    factory Patient.fromMap(Map<String, dynamic> json) => Patient(
-        id: json["id"],
-        patientCode: json["patient_code"],
-        name: json["name"],
-    );
-
-    Map<String, dynamic> toMap() => {
-        "id": id,
-        "patient_code": patientCode,
-        "name": name,
     };
 }

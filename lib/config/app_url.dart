@@ -79,6 +79,16 @@ class AppUrl {
   static var getAgentsEndPoint = '$baseUrl/get-agents';
   static var addCommissionPayEndPoint = '$baseUrl/add-commission-payment';
 
+  static var getCashTrCodeEndPoint = '$baseUrl/get-cash-transaction-code';
+  static var getCashTransactionEndPoint = '$baseUrl/get-cash-transactions';
+  static var getAccountsEndPoint = '$baseUrl/get-accounts';
+  static var addCashTrEndPoint = '$baseUrl/add-cash-transaction';
+  
+  static var getBankTrCodeEndPoint = '$baseUrl/get-bank-transaction-code';
+  static var getBankTransactionEndPoint = '$baseUrl/get-bank-transactions';
+  // static var getAccountsEndPoint = '$baseUrl/get-accounts';
+  static var addBankTrEndPoint = '$baseUrl/add-bank-transaction';
+
   //end
 }
 

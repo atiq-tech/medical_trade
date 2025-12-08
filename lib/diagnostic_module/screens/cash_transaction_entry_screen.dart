@@ -1,11 +1,19 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
+import 'package:get_storage/get_storage.dart';
+import 'package:medical_trade/config/app_url.dart';
+import 'package:medical_trade/diagnostic_module/models/accounts_model.dart';
 import 'package:medical_trade/diagnostic_module/models/bank_account_model.dart';
+import 'package:medical_trade/diagnostic_module/providers/accounts_provider.dart';
 import 'package:medical_trade/diagnostic_module/providers/bank_account_provider.dart';
+import 'package:medical_trade/diagnostic_module/providers/cash_transaction_provider.dart';
 import 'package:medical_trade/diagnostic_module/utils/all_textstyle.dart';
+import 'package:medical_trade/diagnostic_module/utils/animation_snackbar.dart';
 import 'package:medical_trade/diagnostic_module/utils/utils.dart';
 import 'package:medical_trade/utilities/color_manager.dart';
+import 'package:medical_trade/view/auth/login_register_auth.dart';
 import 'package:provider/provider.dart';
 
 class CashTransactionEntryScreen extends StatefulWidget {
@@ -23,6 +31,7 @@ class _CashTransactionEntryScreenState extends State<CashTransactionEntryScreen>
   final tnxIdNoController = TextEditingController();
   var quantityController = TextEditingController();
   final bankAccountController = TextEditingController();
+  final accountsController = TextEditingController();
   
   ///new condition
   FocusNode quantityFocusNode = FocusNode();
@@ -31,7 +40,7 @@ class _CashTransactionEntryScreenState extends State<CashTransactionEntryScreen>
   String? paymentType;
   String? _selectedType = 'Payment';
   final List<String> _selectedTypeList = [
-    'Receive',
+    'Received',
     'Payment',
   ];
 
@@ -123,13 +132,14 @@ class _CashTransactionEntryScreenState extends State<CashTransactionEntryScreen>
   void _onSelectedType(String selectedValue) {
        setState(() {
          _selectedType = selectedValue;
-       if (selectedValue == "Receive") {
-          paymentType = "In Cash";
+       if (selectedValue == "Received") {
+          paymentType = "Received";
         }
        if (selectedValue == "Payment") {
-          paymentType = "Out Cash";
+          paymentType = "Payment";
         }
     });
+    print("paymentType========$paymentType");
   }
 
 
@@ -230,10 +240,10 @@ final LayerLink _pTypeLayerLink = LayerLink();
      setState(() {
       _paymentType = selectValue;
       if (selectValue == "Cash") {
-        getPaymentType = "cash";
+        getPaymentType = "Cash";
       }
       if (selectValue == "Bank") {
-        getPaymentType = "bank";
+        getPaymentType = "Bank";
       }
       _paymentType == "Bank" ? isBankListClicked = true : isBankListClicked = false;
      });
@@ -241,6 +251,7 @@ final LayerLink _pTypeLayerLink = LayerLink();
 
 
   String? _selectedBankAccount;
+  String? accountsID;
   String? firstPickedDate;
   var backEndFirstDate;
   var toDay = DateTime.now();
@@ -255,8 +266,8 @@ final LayerLink _pTypeLayerLink = LayerLink();
       setState(() {
         firstPickedDate = Utils.formatFrontEndDate(selectedDate);
         backEndFirstDate = Utils.formatBackEndDate(selectedDate);
-        // CashTransactionProvider.isCashTransactionLoading = true;
-        // Provider.of<CashTransactionProvider>(context, listen: false).getCashTransactionApi("","$backEndFirstDate","$backEndFirstDate","");
+        CashTransactionProvider.isCashTransactionLoading = true;
+        Provider.of<CashTransactionProvider>(context, listen: false).getCashTransaction("$backEndFirstDate","$backEndFirstDate");
       
       });
     }
@@ -293,6 +304,48 @@ final LayerLink _pTypeLayerLink = LayerLink();
   //   print("role=====  $role");
   // }
 
+  static String getToken() {
+  final box = GetStorage();
+  return box.read('loginToken') ?? "";
+}
+
+String? cashTrCode = "";
+getCashTrCode() async {
+  try {
+    String link = AppUrl.getCashTrCodeEndPoint;
+    final token = getToken();
+
+    var response = await Dio().get(link,
+      options: Options(
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
+        },
+        validateStatus: (status) {
+          return status! < 500;
+        },
+      ),
+    );
+
+    print("Response =====> ${response.data}");
+    if (response.statusCode == 401) {
+      Utils.showTopSnackBar(context, "Session expired. Please log in again.");
+      Navigator.pushReplacement(context,
+        MaterialPageRoute(builder: (context) => const LoginView(isLogin: true)),
+      );
+      return;
+    }
+    setState(() {
+      cashTrCode = response.data["data"].toString();
+    });
+    CustomSnackBar.showTopSnackBar(context, "${response.data["message"]}");
+    print("cashTrCode =========> $cashTrCode");
+
+  } catch (e) {
+    print("cashTrCode ERROR =======> $e");
+  }
+}
+
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback(_getDropdownSize);
@@ -300,14 +353,16 @@ final LayerLink _pTypeLayerLink = LayerLink();
     //_initializeData();
     firstPickedDate = Utils.formatFrontEndDate(DateTime.now());
     backEndFirstDate = Utils.formatBackEndDate(DateTime.now());
-    _selectedType == "Payment";
-    paymentType = "Out Cash";
+    paymentType = "Payment";
+    getPaymentType = "Cash";
+    getCashTrCode();
     // getCashTransactionId();
     // // ACCOUNTS
-    // CashTransactionProvider.isCashTransactionLoading = true;
-    // Provider.of<CashTransactionProvider>(context, listen: false).cashTransactionList = [];
+    CashTransactionProvider.isCashTransactionLoading = true;
+    Provider.of<CashTransactionProvider>(context, listen: false).cashTransactionList = [];
+    Provider.of<AccountsProvider>(context, listen: false).getAccounts();
     Provider.of<BankAccountProvider>(context, listen: false).getBankAccount();
-    // Provider.of<CashTransactionProvider>(context, listen: false).getCashTransactionApi("",Utils.formatBackEndDate(DateTime.now()),Utils.formatBackEndDate(DateTime.now()),"");
+    Provider.of<CashTransactionProvider>(context, listen: false).getCashTransaction(Utils.formatBackEndDate(DateTime.now()),Utils.formatBackEndDate(DateTime.now()));
     super.initState();
   }
 
@@ -356,6 +411,9 @@ final LayerLink _pTypeLayerLink = LayerLink();
     // int displayPageCount = totalPages > 20 ? 20 : totalPages;
     // /// account
     final allBankAccountList = Provider.of<BankAccountProvider>(context).allBankAccountList;
+    final allAccountData = Provider.of<AccountsProvider>(context).accountsList;
+    final allCashTransactionData = Provider.of<CashTransactionProvider>(context).cashTransactionList;
+    
     return 
     //RefreshIndicator(
       // onRefresh: () async {
@@ -420,32 +478,85 @@ final LayerLink _pTypeLayerLink = LayerLink();
                         children: [
                           Row(
                             children: [
-                              Expanded(flex: 6,child: Text("Tr. No",style:AllTextStyle.textFieldHeadStyle)),
+                              Expanded(flex: 6,child: Text("Tr.Id",style:AllTextStyle.textFieldHeadStyle)),
                               const Expanded(flex: 1, child: Text(':')),
                               Expanded(
                                 flex: 15,
                                 child: Container(
                                   height: 25.h,
                                   decoration: ContDecoration.contDecoration,
-                                  child: TextField(
-                                    style: AllTextStyle.dropDownlistStyle,
-                                    controller: tnxIdNoController,
-                                    decoration: InputDecoration(contentPadding: EdgeInsets.only(bottom: 17.5.h,left: 5.w),
-                                      enabled: false,
-                                      filled: true,
-                                      border: InputBorder.none,
-                                      focusedBorder: TextFieldInputBorder.focusEnabledBorder,
-                                      enabledBorder: TextFieldInputBorder.focusEnabledBorder
-                                    ),
-                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(4.0),
+                                    child: Text("$cashTrCode",style: AllTextStyle.dateFormatStyle),
+                                  )
                                 ),
                               ),
                             ],
                           ),
-                          SizedBox(height: 4.h),
                           Row(
                             children: [
-                              Expanded(flex: 6,child: Text("Tr. Type",style:AllTextStyle.textFieldHeadStyle)),
+                              Expanded(flex:6,child:Text("Tr.Date",style:AllTextStyle.textFieldHeadStyle)),
+                              const Expanded(flex: 1, child: Text(":")),
+                              Expanded(
+                                flex: 15,
+                                child: Container(
+                                  margin: EdgeInsets.only(top: 3.h, bottom: 3.h),
+                                  height: 25.h,
+                                  decoration: ContDecoration.contDecoration,
+                                  child: GestureDetector(
+                                    onTap: (() {
+                                      FocusScope.of(context).requestFocus(quantityFocusNode);
+                                      firstSelectedDate();
+                                    }),
+                                    child: TextFormField(
+                                      enabled: false,
+                                      decoration: InputDecoration(
+                                        contentPadding: EdgeInsets.only(left: 3.w),
+                                        suffixIcon: Padding(padding: EdgeInsets.only(left: 20.w),
+                                          child: Icon(Icons.calendar_month,color: Colors.black87,size: 16.r),
+                                        ),
+                                        border: const OutlineInputBorder(borderSide: BorderSide.none),
+                                        hintText: firstPickedDate,
+                                        hintStyle: AllTextStyle.dateFormatStyle
+                                      ),
+                                      validator: (value) {
+                                        if (value == null || value.isEmpty) {
+                                          return null;
+                                        }
+                                        return null;
+                                      },
+                                    ),
+                                  // ):GestureDetector(
+                                  //   onTap: (() {
+                                  //     // FocusScope.of(context).requestFocus(quantityFocusNode);
+                                  //     // firstSelectedDate();
+                                  //   }),
+                                  //   child: TextFormField(
+                                  //     enabled: false,
+                                  //     decoration: InputDecoration(
+                                  //       contentPadding: const EdgeInsets.only(left: 5),
+                                  //       // suffixIcon: const Padding(padding: EdgeInsets.only(left: 20.0),
+                                  //       //   child: Icon(Icons.calendar_month,color: Colors.black87,size: 16),
+                                  //       // ),
+                                  //       border: const OutlineInputBorder(borderSide: BorderSide.none),
+                                  //       hintText: firstPickedDate,
+                                  //       hintStyle: AllTextStyle.dateFormatStyle
+                                  //     ),
+                                  //     validator: (value) {
+                                  //       if (value == null || value.isEmpty) {
+                                  //         return null;
+                                  //       }            return null;
+                                  //     },
+                                  //   ),
+                                  ),
+                                ),
+                              )
+                            ,
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              Expanded(flex: 6,child: Text("Tr.Type",style:AllTextStyle.textFieldHeadStyle)),
                               const Expanded(flex: 1, child: Text(":")),
                               Expanded(
                             flex: 15,
@@ -485,7 +596,7 @@ final LayerLink _pTypeLayerLink = LayerLink();
                         SizedBox(height: 3.h),
                         Row(
                         children: [
-                          Expanded(flex: 6, child: Text("Pay. Type",style: AllTextStyle.textFieldHeadStyle)),
+                          Expanded(flex: 6, child: Text("Pay.Type",style: AllTextStyle.textFieldHeadStyle)),
                           const Expanded(flex: 1, child: Text(":")),
                           Expanded(
                           flex: 15,
@@ -544,7 +655,7 @@ final LayerLink _pTypeLayerLink = LayerLink();
                                     style: TextStyle(fontSize: 13, color: Colors.grey.shade800, overflow: TextOverflow.ellipsis),
                                     decoration: InputDecoration(contentPadding: EdgeInsets.only(left: 5.0, top: 4.0),
                                       isDense: true,
-                                      hintText: 'Select Account',
+                                      hintText: 'Select Bank Account',
                                       hintStyle: TextStyle(fontSize: 13),
                                       suffixIcon: _selectedBankAccount == '' || _selectedBankAccount == 'null' || _selectedBankAccount == null || controller.text == '' ? null
                                           : GestureDetector(
@@ -600,153 +711,57 @@ final LayerLink _pTypeLayerLink = LayerLink();
                                   height: 25.h,
                                   width: MediaQuery.of(context).size.width / 2,
                                   decoration: ContDecoration.contDecoration,
-                                //    child: TypeAheadField<AccountModel>(
-                                //    controller: _accountController,
-                                //    builder: (context, controller, focusNode) {
-                                //      return TextField(
-                                //        controller: controller,
-                                //        focusNode: focusNode,
-                                //        style: TextStyle(fontSize: 13, color: Colors.grey.shade800, overflow: TextOverflow.ellipsis),
-                                //        decoration: InputDecoration(contentPadding: EdgeInsets.only(left: 5.0, top: 4.0),
-                                //          isDense: true,
-                                //          hintText: 'Select Account',
-                                //          hintStyle: TextStyle(fontSize: 13),
-                                //          suffixIcon: _selectedAccount == '' || _selectedAccount == 'null' || _selectedAccount == null || controller.text == '' ? null
-                                //              : GestureDetector(
-                                //            onTap: () {
-                                //              setState(() {
-                                //                _accountController.clear();
-                                //                controller.clear();
-                                //                _selectedAccount = null;
-                                //              });
-                                //            },
-                                //            child: Padding(padding: EdgeInsets.all(5), child: Icon(Icons.close, size: 16)),
-                                //          ),
-                                //          suffixIconConstraints: BoxConstraints(maxHeight: 30),
-                                //          filled: false,
-                                //          fillColor: Colors.white,
-                                //          border: InputBorder.none,
-                                //        ),
-                                //          onTap: () {
-                                //         if (_selectedAccount != null && _selectedAccount != '' && _selectedAccount != 'null') {
-                                //          setState(() {
-                                //             _accountController.clear();
-                                //             controller.clear();
-                                //             _selectedAccount = null;
-                                //            });
-                                //          }
-                                //         },
-                                //      );
-                                //    },
-                                //    suggestionsCallback: (pattern) async {
-                                //     return Future.delayed(const Duration(seconds: 1), () {
-                                //    return allAccountList
-                                //     .where((element) => element.name.toLowerCase().contains(pattern.toLowerCase()))
-                                //    .toList().cast<AccountModel>(); 
-                                //     });
-                                //     },
-                                 
-                                //    itemBuilder: (context, AccountModel suggestion) {
-                                //      return Padding(
-                                //        padding: EdgeInsets.symmetric(horizontal: 6,vertical: 4),
-                                //        child: Text("${suggestion.code} - ${suggestion.name}",
-                                //          style: TextStyle(fontSize: 12), maxLines: 1, overflow: TextOverflow.ellipsis,
-                                //        ),
-                                //      );
-                                //    },
-                                //    onSelected: (AccountModel suggestion) {
-                                //        setState(() {
-                                //         _accountController.text = "${suggestion.code} - ${suggestion.name}";
-                                //         _selectedAccount = suggestion.id.toString();
-                                //       });  
-                                //    },
-                                //  ),
-                                
-                                ),
-                              ),
-                            ],
-                          ),
-                          Row(
-                            children: [
-                              Expanded(flex:6,child:Text("Tr.Date",style:AllTextStyle.textFieldHeadStyle)),
-                              const Expanded(flex: 1, child: Text(":")),
-                              Expanded(
-                                flex: 15,
-                                child: Container(
-                                  margin: EdgeInsets.only(top: 4.h, bottom: 4.h),
-                                  height: 25.h,
-                                  decoration: ContDecoration.contDecoration,
-                                  child: GestureDetector(
-                                    onTap: (() {
-                                      FocusScope.of(context).requestFocus(quantityFocusNode);
-                                      firstSelectedDate();
-                                    }),
-                                    child: TextFormField(
-                                      enabled: false,
-                                      decoration: InputDecoration(
-                                        contentPadding: EdgeInsets.only(left: 5.w),
-                                        suffixIcon: Padding(padding: EdgeInsets.only(left: 20.w),
-                                          child: Icon(Icons.calendar_month,color: Colors.black87,size: 16.r),
-                                        ),
-                                        border: const OutlineInputBorder(borderSide: BorderSide.none),
-                                        hintText: firstPickedDate,
-                                        hintStyle: AllTextStyle.dateFormatStyle
+                                   child: TypeAheadField<AccountsModel>(
+                                    controller: accountsController,
+                                    builder: (context, controller, focusNode) {
+                                    return TextField(
+                                    controller: controller,
+                                    focusNode: focusNode,
+                                    style: TextStyle(fontSize: 13, color: Colors.grey.shade800, overflow: TextOverflow.ellipsis),
+                                    decoration: InputDecoration(contentPadding: EdgeInsets.only(left: 5.0, top: 4.0),
+                                      isDense: true,
+                                      hintText: 'Select Account',
+                                      hintStyle: TextStyle(fontSize: 13),
+                                      suffixIcon: accountsID == '' || accountsID == 'null' || accountsID == null || controller.text == '' ? null
+                                          : GestureDetector(
+                                        onTap: () {
+                                          setState(() {
+                                            accountsController.clear();
+                                            controller.clear();
+                                            accountsID = null;
+                                          });
+                                        },
+                                        child: Padding(padding: EdgeInsets.all(5), child: Icon(Icons.close, size: 16)),
                                       ),
-                                      validator: (value) {
-                                        if (value == null || value.isEmpty) {
-                                          return null;
-                                        }
-                                        return null;
-                                      },
+                                      suffixIconConstraints: BoxConstraints(maxHeight: 30),
+                                      filled: false,
+                                      fillColor: Colors.white,
+                                      border: InputBorder.none,
                                     ),
-                                  // ):GestureDetector(
-                                  //   onTap: (() {
-                                  //     // FocusScope.of(context).requestFocus(quantityFocusNode);
-                                  //     // firstSelectedDate();
-                                  //   }),
-                                  //   child: TextFormField(
-                                  //     enabled: false,
-                                  //     decoration: InputDecoration(
-                                  //       contentPadding: const EdgeInsets.only(left: 5),
-                                  //       // suffixIcon: const Padding(padding: EdgeInsets.only(left: 20.0),
-                                  //       //   child: Icon(Icons.calendar_month,color: Colors.black87,size: 16),
-                                  //       // ),
-                                  //       border: const OutlineInputBorder(borderSide: BorderSide.none),
-                                  //       hintText: firstPickedDate,
-                                  //       hintStyle: AllTextStyle.dateFormatStyle
-                                  //     ),
-                                  //     validator: (value) {
-                                  //       if (value == null || value.isEmpty) {
-                                  //         return null;
-                                  //       }            return null;
-                                  //     },
-                                  //   ),
-                                  ),
-                                ),
-                              )
-                            ,
-                            ],
-                          ),
-                          Row(
-                            children: [
-                              Expanded(flex: 6,child:Text("Note",style:AllTextStyle.textFieldHeadStyle)),
-                              const Expanded(flex: 1, child: Text(":")),
-                              Expanded(
-                                flex: 15,
-                                child: TextField(
-                                  style: AllTextStyle.dropDownlistStyle,
-                                  controller: _DescriptionController,
-                                  maxLines: 2,
-                                  decoration: InputDecoration(
-                                    contentPadding: EdgeInsets.symmetric(vertical: 5.h, horizontal: 5.w),
-                                    hintText: "Remarks",
-                                    hintStyle: AllTextStyle.dropDownlistStyle,
-                                    filled: true,
-                                    fillColor: Colors.white,
-                                    border: InputBorder.none,
-                                    focusedBorder: TextFieldInputBorder.focusEnabledBorder,
-                                    enabledBorder: TextFieldInputBorder.focusEnabledBorder
-                                  ),
+                                    );
+                                    },
+                                    suggestionsCallback: (pattern) async {
+                                    return Future.delayed(const Duration(seconds: 1), () {
+                                      return allAccountData
+                                      .where((element) => element.accountName.toLowerCase().contains(pattern.toLowerCase()))
+                                      .toList().cast<AccountsModel>(); 
+                                      });
+                                      },                    
+                                    itemBuilder: (context, AccountsModel suggestion) {
+                                      return Padding(
+                                    padding: EdgeInsets.symmetric(horizontal: 6,vertical: 4),
+                                    child: Text("${suggestion.accountCode} - ${suggestion.accountName}",
+                                      style: TextStyle(fontSize: 12), maxLines: 1, overflow: TextOverflow.ellipsis,
+                                    ),
+                                    );
+                                    },
+                                    onSelected: (AccountsModel suggestion) {
+                                    setState(() {
+                                      accountsController.text = "${suggestion.accountCode} - ${suggestion.accountName}";
+                                      accountsID = suggestion.id.toString();
+                                    });  
+                                    },
+                                    ),
                                 ),
                               ),
                             ],
@@ -778,49 +793,58 @@ final LayerLink _pTypeLayerLink = LayerLink();
                               ),
                             ],
                           ),
+                          SizedBox(height: 4.h),
+                          Row(
+                            children: [
+                              Expanded(flex: 6,child:Text("Note",style:AllTextStyle.textFieldHeadStyle)),
+                              const Expanded(flex: 1, child: Text(":")),
+                              Expanded(
+                                flex: 15,
+                                child: TextField(
+                                  style: AllTextStyle.dropDownlistStyle,
+                                  controller: _DescriptionController,
+                                  maxLines: 2,
+                                  decoration: InputDecoration(
+                                    contentPadding: EdgeInsets.symmetric(vertical: 5.h, horizontal: 5.w),
+                                    hintText: "Remarks",
+                                    hintStyle: AllTextStyle.dropDownlistStyle,
+                                    filled: true,
+                                    fillColor: Colors.white,
+                                    border: InputBorder.none,
+                                    focusedBorder: TextFieldInputBorder.focusEnabledBorder,
+                                    enabledBorder: TextFieldInputBorder.focusEnabledBorder
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 4.h),
                           ///=====customer loading hide 
                           ///HiddenItemsLoading(controller: quantityController,focusNode: quantityFocusNode),
-                          SizedBox(height: 5.h),
                         //  ((role == 'Superadmin' || role == 'admin') || actionList.contains('e') == true) ?
                           Align(
                             alignment: Alignment.bottomRight,
                             child: InkWell(
-                              onTap: () {
-                                // Utils.closeKeyBoard(context);
-                                // if(_accountController.text ==''){
-                                //   Utils.errorSnackBar(context, "Account field is required");
-                                // }
-                                // else if(_AmountController.text == ''){
-                                //   Utils.errorSnackBar(context, "Amount field is required");
-                                // }
-                                // else{
-                                //   setState(() {
-                                //     isLoading = true;
-                                //   });
-                                //   fetchAddCashTransactions(
-                                //       context,
-                                //       int.parse("$_selectedAccount"),
-                                //       tnxIdNoController.text,
-                                //       "$backEndFirstDate",
-                                //       _DescriptionController.text,
-                                //       paymentType == "In Cash" ? _AmountController.text:'0',
-                                //       paymentType == "In Cash" ? '0':_AmountController.text,
-                                //       paymentType
-                                                  
-                                //   ).then((value){
-                                //     if(value=="true"){
-                                //       _AmountController.text = '';
-                                //       _DescriptionController.text = '';
-                                //       _selectedAccount = "";
-                                //       _accountController.text = "";
-                                //       paymentType = "";
-                                //       Provider.of<CashTransactionProvider>(context, listen: false).getCashTransactionApi(" ","${Utils.formatBackEndDate(DateTime.now())}","${Utils.formatBackEndDate(DateTime.now())}","");
-                                //       getCashTransactionId();
-                                //       setState(() {
-                                //       });
-                                //     }
-                                //   });
-                                // }
+                              onTap: () async {
+                                Utils.closeKeyBoard(context);
+                                  print("Tapped Save");
+
+                                  if (accountsController.text == '') {
+                                    Utils.showTopSnackBar(context, "Please Select Account");
+                                    return;
+                                  }
+                                  if (_paymentType == "Bank" && bankAccountController.text == '') {
+                                    Utils.showTopSnackBar(context, "Please Select Bank Account");
+                                    return;
+                                  }
+                                  setState(() {
+                                    cashTrBtnClk = true;
+                                  });
+                                  var result = await addCashTransaction(context);
+                                  if (result == "true") {
+                                   Provider.of<CashTransactionProvider>(context, listen: false).getCashTransaction(backEndFirstDate,backEndFirstDate);
+                                  }
+                                  setState(() {});
                               },
                               child: Container(
                                 height: 25.h,
@@ -833,7 +857,7 @@ final LayerLink _pTypeLayerLink = LayerLink();
                                     BoxShadow(color: Colors.grey.withOpacity(0.6),spreadRadius: 2,blurRadius: 5.r,offset: const Offset(0, 3)),
                                   ],
                                 ),
-                                child: Center(child: isLoading ? SizedBox(height: 20.h,width:20.h,child: CircularProgressIndicator(color: Colors.white,)) : Text(
+                                child: Center(child: cashTrBtnClk ? SizedBox(height: 20.h,width:20.h,child: CircularProgressIndicator(color: Colors.white,)) : Text(
                                     "Save", style:AllTextStyle.saveButtonTextStyle)),
                               ),
                             ),
@@ -845,6 +869,58 @@ final LayerLink _pTypeLayerLink = LayerLink();
                   ],
                 ),
               ),
+              CashTransactionProvider.isCashTransactionLoading ? CircularProgressIndicator()
+                  : Container(
+                  height: MediaQuery.of(context).size.height / 1.43,
+                  width: double.infinity,
+                  padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+                  child: SizedBox(
+                    width: double.infinity,
+                    height: double.infinity,
+                    child: SingleChildScrollView(
+                      // controller: _listViewScrollController,
+                      // physics: _physics,
+                      scrollDirection: Axis.vertical,
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: DataTable(
+                          headingRowHeight: 20.0,
+                          dataRowHeight: 20.0,
+                          headingRowColor: WidgetStateColor.resolveWith((states) => const Color.fromARGB(255, 70, 54, 141)),
+                          showCheckboxColumn: true,
+                          border: TableBorder.all(color: Colors.grey.shade400, width: 1),
+                          columns: [
+                            DataColumn(label: Expanded(child: Center(child: Text('S/L No.',style: AllTextStyle.tableHeadTextStyle)))),
+                            DataColumn(label: Expanded(child: Center(child: Text('Transaction date',style: AllTextStyle.tableHeadTextStyle)))),
+                            DataColumn(label: Expanded(child: Center(child: Text('Transaction number',style: AllTextStyle.tableHeadTextStyle)))),
+                            DataColumn(label: Expanded(child: Center(child: Text('Account Name',style: AllTextStyle.tableHeadTextStyle)))),
+                            DataColumn(label: Expanded(child: Center(child: Text('Account Type',style: AllTextStyle.tableHeadTextStyle)))),
+                            DataColumn(label: Expanded(child: Center(child: Text('Payment By',style: AllTextStyle.tableHeadTextStyle)))),
+                            DataColumn(label: Expanded(child: Center(child: Text('Amount',style: AllTextStyle.tableHeadTextStyle)))),
+                            DataColumn(label: Expanded(child: Center(child: Text('Note',style: AllTextStyle.tableHeadTextStyle)))),			
+                          ],
+                          rows: List.generate(
+                          allCashTransactionData.length,
+                                (int index) => DataRow(
+                              color: index % 2 == 0 ? WidgetStateProperty.resolveWith(getColor) : WidgetStateProperty.resolveWith(getColors),
+                              cells: <DataCell>[
+                                DataCell(Center(child: Text('${index+1}'))),
+                                DataCell(Center(child: Text('${allCashTransactionData[index].transactionDate??""}'))),
+                                DataCell(Center(child: Text('${allCashTransactionData[index].transactionNumber??""}'))),
+                                DataCell(Center(child: allCashTransactionData[index].account == "null" || allCashTransactionData[index].account == null?Text("N/A"):Text('${allCashTransactionData[index].account!.accountCode??""} - ${allCashTransactionData[index].account!.accountName??""}'))),
+                                DataCell(Center(child: Text('${allCashTransactionData[index].transactionType??""}'))),
+                                DataCell(Center(child: allCashTransactionData[index].bank == "null" || allCashTransactionData[index].bank == null? Text("N/A"):Text('${allCashTransactionData[index].bank!.accountName??""} - ${allCashTransactionData[index].bank!.accountNumber??""} - ${allCashTransactionData[index].bank!.bankName??""}'))),
+                                DataCell(Center(child: Text('${allCashTransactionData[index].amount??""}'))),
+                                DataCell(Center(child: Text('${allCashTransactionData[index].remark??""}'))),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 15.0.h),
               // const SizedBox(height: 8.0),
               // Container(
               //   height: MediaQuery.of(context).size.height/1.5,
@@ -972,82 +1048,71 @@ final LayerLink _pTypeLayerLink = LayerLink();
       ),
     );
   }
+ emptyMethod() {
+    setState(() {
+      _DescriptionController.text = "";
+      _AmountController.text = "";
+      accountsController.text = "";
+      bankAccountController.text = "";
+    });
+  }
 
-  // // ignore: non_constant_identifier_names
-  // String? TransactionId;
-  // getCashTransactionId() async {
-  //   SharedPreferences? sharedPreferences;
-  //   sharedPreferences = await SharedPreferences.getInstance();
-  //   String link = "${sharedPreferences.getString("BaseUrl")}/get-cashtransactioncode";
-  //   try {
-  //     var response = await Dio().get(
-  //       link,
-  //       options: Options(headers: {
-  //         "Content-Type": "application/json",
-  //         "Authorization": "Bearer ${sharedPreferences.getString("token")}",
-  //         "Cookie": "laravel_session=${sharedPreferences.getString('sessionId')}",
-  //       }),
-  //     );
-  //     TransactionId = response.data;
-  //     setState(() {
-  //       tnxIdNoController.text = response.data;
-  //     });
-  //   } catch (e) {
-  //     print(e);
-  //   }
-  // }
+bool cashTrBtnClk = false;
+Future<String> addCashTransaction(BuildContext context) async {
+  String link = AppUrl.addCashTrEndPoint;
+  print("transaction_number=>> $cashTrCode");
+  print("accountsID=>> $accountsID");
+  print("payment_type=>> $getPaymentType");
+  print("_selectedBankAccount=>> $_selectedBankAccount");
+  print("transaction_type=>> $paymentType");
+  print("backEndFirstDate=>> $backEndFirstDate");
+  print("_descriptionController.text.trim()=>> ${_DescriptionController.text.trim()}");
+  print("_amountController.text.trim()=>> ${_AmountController.text.trim()}");
+  try {
+    final token = getToken();
+    var response = await Dio().post(link,
+      data: {
+          "transaction_number": cashTrCode.toString(),
+          "transaction_date": backEndFirstDate.toString(),
+          "transaction_type": paymentType,
+          "payment_type": getPaymentType,
+          "bank_account_id":getPaymentType == "Cash" ? "" :_selectedBankAccount.toString(),
+          "account_id": accountsID.toString(),
+          "amount": _AmountController.text.trim(),
+          "remark": _DescriptionController.text.trim(),
+      },
+      options: Options(
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
+        },
+      ),
+    );
+    var item = response.data;
+    print("API Response: $item");
 
-  // Future<String>fetchAddCashTransactions(BuildContext context,
-  //     int? account_id,
-  //     String? code,
-  //     String? date,
-  //     String? description,
-  //     String? in_amount,
-  //     String? out_amount,
-  //     String? type,
-  //     ) async {
-  //       SharedPreferences? sharedPreferences;
-  //   sharedPreferences = await SharedPreferences.getInstance();
-  //   String Link = "${sharedPreferences.getString("BaseUrl")}/create-cashtransaction";
-    
-  //   try {
-  //     Response response = await Dio().post(Link,
-  //         data: {
-  //           "account_id": account_id,
-  //           "code": "$code",
-  //           "date": "$date",
-  //           "description": "$description",
-  //           "in_amount": "$in_amount",
-  //           "out_amount": "$out_amount",
-  //           "type": "$type",
-  //         },
-  //         options: Options(headers: {
-  //           "Content-Type": "application/json",
-  //           "Authorization": "Bearer ${sharedPreferences.getString("token")}",
-  //           "Cookie": "laravel_session=${sharedPreferences.getString('sessionId')}",
-  //         }));
-  //     var data = response.data;
-  //     if(data['status']==true){
-  //       setState(() {
-  //         isLoading = false;
-  //       });
-  //       CustomSnackBar.showTopSnackBar(context, "${data["message"]}");
-  //       return "true";
-  //     }
-  //     else{
-  //       setState(() {
-  //         isLoading = false;
-  //       });
-  //       Utils.showTopSnackBar(context, "${data["message"]}");
-  //       return "";
-  //     }
-  //   } catch (e) {
-  //     setState(() {
-  //       isLoading = false;
-  //     });
-  //     Utils.showTopSnackBar(context, e.toString());
-  //     return "";
-  //   }
-  // }
-
+    if (item["success"] == true) {
+      setState(() {
+        cashTrBtnClk = false;
+      });
+      emptyMethod();
+      CustomSnackBar.showTopSnackBar(context, "${item["message"]}");
+      getCashTrCode();
+      return "true";
+    } else {
+      setState(() {
+        cashTrBtnClk = false;
+      });
+      Utils.showTopSnackBar(context,"${item["message"]}");
+      return "false";
+    }
+  } catch (e) {
+    setState(() {
+      cashTrBtnClk = false;
+    });
+    print("Exception caught: $e");
+    Utils.showTopSnackBar(context, "Something went wrong: $e");
+    return "false";
+  }
+ }
 }

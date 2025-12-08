@@ -5,11 +5,15 @@ import 'package:medical_trade/controller/contact_api.dart';
 import 'package:medical_trade/controller/customer_product_buy_api.dart';
 import 'package:medical_trade/controller/slider_controller.dart';
 import 'package:medical_trade/controller/wall_post_api.dart';
+import 'package:medical_trade/diagnostic_module/providers/accounts_provider.dart';
 import 'package:medical_trade/diagnostic_module/providers/agents_provider.dart';
 import 'package:medical_trade/diagnostic_module/providers/bank_account_provider.dart';
+import 'package:medical_trade/diagnostic_module/providers/bank_transaction_provider.dart';
+import 'package:medical_trade/diagnostic_module/providers/cash_transaction_provider.dart';
 import 'package:medical_trade/diagnostic_module/providers/commission_payment_provider.dart';
 import 'package:medical_trade/diagnostic_module/providers/department_provider.dart';
 import 'package:medical_trade/diagnostic_module/providers/doctors_provider.dart';
+import 'package:medical_trade/diagnostic_module/providers/patient_payment_provider.dart';
 import 'package:medical_trade/diagnostic_module/providers/patients_provider.dart';
 import 'package:medical_trade/diagnostic_module/providers/specimens_provider.dart';
 import 'package:medical_trade/diagnostic_module/providers/test_entry_provider.dart';
@@ -89,12 +93,13 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider(create: (_) => GetClientPostProvider()),
         ChangeNotifierProvider(create: (_) => GetEngineerSupportProductProvider()),
         ChangeNotifierProvider(create: (_) => GetSalesOldMachineProvider()),
+
         ///======new part
-        
         ChangeNotifierProvider<AgentsProvider>(create: (_) => AgentsProvider()),
         ChangeNotifierProvider<DoctorsProvider>(create: (_) => DoctorsProvider()),
         ChangeNotifierProvider<CategoryProvider>(create: (_) => CategoryProvider()),
         ChangeNotifierProvider<PatientsProvider>(create: (_) => PatientsProvider()),
+        ChangeNotifierProvider<AccountsProvider>(create: (_) => AccountsProvider()),
         ChangeNotifierProvider<TestEntryProvider>(create: (_) => TestEntryProvider()),
         ChangeNotifierProvider<SpecimensProvider>(create: (_) => SpecimensProvider()),
         ChangeNotifierProvider<DepartmentProvider>(create: (_) => DepartmentProvider()),
@@ -102,6 +107,9 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider<WallPostNewProvider>(create: (_) => WallPostNewProvider()),
         ChangeNotifierProvider<AllProductsProvider>(create: (_) => AllProductsProvider()),
         ChangeNotifierProvider<NewClientPostProvider>(create: (_) => NewClientPostProvider()),
+        ChangeNotifierProvider<PatientPaymentProvider>(create: (_) => PatientPaymentProvider()),
+        ChangeNotifierProvider<CashTransactionProvider>(create: (_) => CashTransactionProvider()),
+        ChangeNotifierProvider<BankTransactionProvider>(create: (_) => BankTransactionProvider()),
         ChangeNotifierProvider<CommissionPaymentProvider>(create: (_) => CommissionPaymentProvider()),
         
         

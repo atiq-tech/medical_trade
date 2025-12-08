@@ -885,58 +885,58 @@ getDueBalance(String? agentID) async {
                     ),
                   ),
                 ),
-              CommissionPaymentProvider.isCommissionPaymentLoading ? CircularProgressIndicator()
-              : Container(
-              height: MediaQuery.of(context).size.height / 1.43,
-              width: double.infinity,
-              padding: const EdgeInsets.only(left: 8.0, right: 8.0),
-              child: SizedBox(
-                width: double.infinity,
-                height: double.infinity,
-                child: SingleChildScrollView(
-                  // controller: _listViewScrollController,
-                  // physics: _physics,
-                  scrollDirection: Axis.vertical,
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: DataTable(
-                      headingRowHeight: 20.0,
-                      dataRowHeight: 20.0,
-                      headingRowColor: WidgetStateColor.resolveWith((states) => Color.fromARGB(255, 75, 76, 77)),
-                      showCheckboxColumn: true,
-                      border: TableBorder.all(color: Colors.grey.shade400, width: 1),
-                      columns: [
-                        DataColumn(label: Expanded(child: Center(child: Text('S/L No.',style: AllTextStyle.tableHeadTextStyle)))),
-                        DataColumn(label: Expanded(child: Center(child: Text('Transaction date',style: AllTextStyle.tableHeadTextStyle)))),
-                        DataColumn(label: Expanded(child: Center(child: Text('Referance',style: AllTextStyle.tableHeadTextStyle)))),
-                        DataColumn(label: Expanded(child: Center(child: Text('Payment Type',style: AllTextStyle.tableHeadTextStyle)))),
-                        DataColumn(label: Expanded(child: Center(child: Text('Account Name',style: AllTextStyle.tableHeadTextStyle)))),
-                        DataColumn(label: Expanded(child: Center(child: Text('Transaction Type',style: AllTextStyle.tableHeadTextStyle)))),
-                        DataColumn(label: Expanded(child: Center(child: Text('Amount',style: AllTextStyle.tableHeadTextStyle)))),
-                        DataColumn(label: Expanded(child: Center(child: Text('Note',style: AllTextStyle.tableHeadTextStyle)))),			
-                      ],
-                      rows: List.generate(
-                       allCommissionPayData.length,
-                            (int index) => DataRow(
-                          color: index % 2 == 0 ? WidgetStateProperty.resolveWith(getColor) : WidgetStateProperty.resolveWith(getColors),
-                          cells: <DataCell>[
-                            DataCell(Center(child: Text('${index+1}'))),
-                            DataCell(Center(child: Text('${allCommissionPayData[index].paymentDate??""}'))),
-                            DataCell(Center(child: Text('${allCommissionPayData[index].agent!.name??""}'))),
-                            DataCell(Center(child: Text('${allCommissionPayData[index].paymentType??""}'))),
-                            DataCell(Center(child: allCommissionPayData[index].bank=="null"||allCommissionPayData[index].bank==null? Text("N/A"):Text('${allCommissionPayData[index].bank!.accountName??""} - ${allCommissionPayData[index].bank!.accountNumber??""} - ${allCommissionPayData[index].bank!.bankName??""}'))),
-                            DataCell(Center(child: Text('${allCommissionPayData[index].transactionType??""}'))),
-                            DataCell(Center(child: Text('${allCommissionPayData[index].amount??""}'))),
-                            DataCell(Center(child: Text('${allCommissionPayData[index].remark??""}'))),
+                  CommissionPaymentProvider.isCommissionPaymentLoading ? CircularProgressIndicator()
+                  : Container(
+                  height: MediaQuery.of(context).size.height / 1.43,
+                  width: double.infinity,
+                  padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+                  child: SizedBox(
+                    width: double.infinity,
+                    height: double.infinity,
+                    child: SingleChildScrollView(
+                      // controller: _listViewScrollController,
+                      // physics: _physics,
+                      scrollDirection: Axis.vertical,
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: DataTable(
+                          headingRowHeight: 20.0,
+                          dataRowHeight: 20.0,
+                          headingRowColor: WidgetStateColor.resolveWith((states) => Color.fromARGB(255, 75, 76, 77)),
+                          showCheckboxColumn: true,
+                          border: TableBorder.all(color: Colors.grey.shade400, width: 1),
+                          columns: [
+                            DataColumn(label: Expanded(child: Center(child: Text('S/L No.',style: AllTextStyle.tableHeadTextStyle)))),
+                            DataColumn(label: Expanded(child: Center(child: Text('Transaction date',style: AllTextStyle.tableHeadTextStyle)))),
+                            DataColumn(label: Expanded(child: Center(child: Text('Referance',style: AllTextStyle.tableHeadTextStyle)))),
+                            DataColumn(label: Expanded(child: Center(child: Text('Payment Type',style: AllTextStyle.tableHeadTextStyle)))),
+                            DataColumn(label: Expanded(child: Center(child: Text('Account Name',style: AllTextStyle.tableHeadTextStyle)))),
+                            DataColumn(label: Expanded(child: Center(child: Text('Transaction Type',style: AllTextStyle.tableHeadTextStyle)))),
+                            DataColumn(label: Expanded(child: Center(child: Text('Amount',style: AllTextStyle.tableHeadTextStyle)))),
+                            DataColumn(label: Expanded(child: Center(child: Text('Note',style: AllTextStyle.tableHeadTextStyle)))),			
                           ],
+                          rows: List.generate(
+                          allCommissionPayData.length,
+                                (int index) => DataRow(
+                              color: index % 2 == 0 ? WidgetStateProperty.resolveWith(getColor) : WidgetStateProperty.resolveWith(getColors),
+                              cells: <DataCell>[
+                                DataCell(Center(child: Text('${index+1}'))),
+                                DataCell(Center(child: Text('${allCommissionPayData[index].paymentDate??""}'))),
+                                DataCell(Center(child: Text('${allCommissionPayData[index].agent!.name??""}'))),
+                                DataCell(Center(child: Text('${allCommissionPayData[index].paymentType??""}'))),
+                                DataCell(Center(child: allCommissionPayData[index].bank=="null"||allCommissionPayData[index].bank==null? Text("N/A"):Text('${allCommissionPayData[index].bank!.accountName??""} - ${allCommissionPayData[index].bank!.accountNumber??""} - ${allCommissionPayData[index].bank!.bankName??""}'))),
+                                DataCell(Center(child: Text('${allCommissionPayData[index].transactionType??""}'))),
+                                DataCell(Center(child: Text('${allCommissionPayData[index].amount??""}'))),
+                                DataCell(Center(child: Text('${allCommissionPayData[index].remark??""}'))),
+                              ],
+                            ),
+                          ),
                         ),
                       ),
                     ),
                   ),
                 ),
-              ),
-            ),
-            SizedBox(height: 15.0.h),
+                SizedBox(height: 15.0.h),
                 // Container(
                 //   height: MediaQuery.of(context).size.height/1.5,
                 //   padding: const EdgeInsets.symmetric(horizontal: 5.0,vertical: 5.0),

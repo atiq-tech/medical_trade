@@ -1,8 +1,18 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_typeahead/flutter_typeahead.dart';
+import 'package:get_storage/get_storage.dart';
+import 'package:medical_trade/config/app_url.dart';
+import 'package:medical_trade/diagnostic_module/models/bank_account_model.dart';
+import 'package:medical_trade/diagnostic_module/providers/bank_account_provider.dart';
+import 'package:medical_trade/diagnostic_module/providers/bank_transaction_provider.dart';
 import 'package:medical_trade/diagnostic_module/utils/all_textstyle.dart';
+import 'package:medical_trade/diagnostic_module/utils/animation_snackbar.dart';
 import 'package:medical_trade/diagnostic_module/utils/utils.dart';
 import 'package:medical_trade/utilities/color_manager.dart';
+import 'package:medical_trade/view/auth/login_register_auth.dart';
+import 'package:provider/provider.dart';
 class BankTransactionEntryScreen extends StatefulWidget {
   const BankTransactionEntryScreen({super.key});
 
@@ -11,7 +21,7 @@ class BankTransactionEntryScreen extends StatefulWidget {
 }
 
 class _BankTransactionEntryScreenState extends State<BankTransactionEntryScreen> {
-  Color getColor(Set<WidgetState> states) {return Colors.blue.shade100;}
+  Color getColor(Set<WidgetState> states) {return Colors.green.shade100;}
   Color getColors(Set<WidgetState> states) {return Colors.white;}
 
   final TextEditingController _amountController = TextEditingController();
@@ -21,7 +31,7 @@ class _BankTransactionEntryScreenState extends State<BankTransactionEntryScreen>
   ///new condition
   FocusNode quantityFocusNode = FocusNode();
 
-  //String? _selectedAccount;
+  String? _selectedAccount;
   String? currentBalance = "0";
   String? firstPickedDate;
   var backEndFirstDate;
@@ -38,16 +48,14 @@ class _BankTransactionEntryScreenState extends State<BankTransactionEntryScreen>
       setState(() {
         firstPickedDate = Utils.formatFrontEndDate(selectedDate);
         backEndFirstDate = Utils.formatBackEndDate(selectedDate);
-        // BankTransactionProvider().on();
-        // Provider.of<BankTransactionProvider>(
-        //   context,
-        //   listen: false,
-        // ).getBankTransactionApi(
-        //   "",
-        //   "${backEndFirstDate}",
-        //   "${backEndFirstDate}",
-        //   "",
-        // );
+        BankTransactionProvider().on();
+        Provider.of<BankTransactionProvider>(
+          context,
+          listen: false,
+        ).getBankTransaction(
+          "$backEndFirstDate",
+          "$backEndFirstDate",
+        );
       });
     } else {
       setState(() {
@@ -154,10 +162,10 @@ class _BankTransactionEntryScreenState extends State<BankTransactionEntryScreen>
        setState(() {
          _transactionType = selectedValue;
          if (selectedValue == "Deposit") {
-            paymentType = "deposit";
+            paymentType = "Deposit";
           }
          if (selectedValue == "Withdraw") {
-             paymentType = "withdraw";
+             paymentType = "Withdraw";
            }
     });
   }
@@ -230,39 +238,79 @@ class _BankTransactionEntryScreenState extends State<BankTransactionEntryScreen>
   //   print("role=====  $role");
   // }
 
+static String getToken() {
+  final box = GetStorage();
+  return box.read('loginToken') ?? "";
+}
+
+ String? bankTrCode = "";
+ getBankTrCode() async {
+  try {
+    String link = AppUrl.getBankTrCodeEndPoint;
+    final token = getToken();
+
+    var response = await Dio().get(link,
+      options: Options(
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
+        },
+        validateStatus: (status) {
+          return status! < 500;
+        },
+      ),
+    );
+
+    print("Response =====> ${response.data}");
+    if (response.statusCode == 401) {
+      Utils.showTopSnackBar(context, "Session expired. Please log in again.");
+      Navigator.pushReplacement(context,
+        MaterialPageRoute(builder: (context) => const LoginView(isLogin: true)),
+      );
+      return;
+    }
+    setState(() {
+      bankTrCode = response.data["data"].toString();
+    });
+    CustomSnackBar.showTopSnackBar(context, "${response.data["message"]}");
+    print("bankTrCode =========> $bankTrCode");
+
+  } catch (e) {
+    print("bankTrCode ERROR =======> $e");
+  }
+}
+
   @override
   void initState() {
+    getBankTrCode();
     WidgetsBinding.instance.addPostFrameCallback(_getDropdownSize);
     //_initializeData();
-    paymentType = "deposit";
+    paymentType = "Deposit";
     firstPickedDate = Utils.formatFrontEndDate(DateTime.now());
     backEndFirstDate = Utils.formatBackEndDate(DateTime.now());
-    // BankTransactionProvider.isBankTransactionLoading = true;
-    // Provider.of<BankTransactionProvider>(context, listen: false)
-    //     .bankTransactionList = [];
-    // Provider.of<BankTransactionProvider>(
-    //   context,
-    //   listen: false,
-    // ).getBankTransactionApi(
-    //   "",
-    //   "${Utils.formatBackEndDate(DateTime.now())}",
-    //   "${Utils.formatBackEndDate(DateTime.now())}",
-    //   "",
-    // );
-    // Provider.of<BankAccountProvider>(context, listen: false).getBankAccount();
+    BankTransactionProvider.isBankTransactionLoading = true;
+    Provider.of<BankTransactionProvider>(context, listen: false).bankTransactionList = [];
+    Provider.of<BankTransactionProvider>(
+      context,
+      listen: false,
+    ).getBankTransaction(
+      Utils.formatBackEndDate(DateTime.now()),
+      Utils.formatBackEndDate(DateTime.now()),
+    );
+    Provider.of<BankAccountProvider>(context, listen: false).getBankAccount();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     mainScrollController.addListener(mainScrollListener);
-    // final allBankTransaction = Provider.of<BankTransactionProvider>(context).bankTransactionList;
+    final allBankTransactionData = Provider.of<BankTransactionProvider>(context).bankTransactionList;
     // int totalPages = allBankTransaction.length <= _itemsPerPage
     //         ? 1 : (allBankTransaction.length / _itemsPerPage).ceil();
     // int displayPageCount = totalPages > 20 ? 20 : totalPages;
 
-    // ///bank account
-    // final allBankAccountList = Provider.of<BankAccountProvider>(context).bankAccountList;
+    ///bank account
+    final allBankAccountData = Provider.of<BankAccountProvider>(context).allBankAccountList;
     return 
     // RefreshIndicator(
     //   onRefresh: () async {
@@ -334,6 +382,23 @@ class _BankTransactionEntryScreenState extends State<BankTransactionEntryScreen>
                       children: [
                         Row(
                           children: [
+                            Expanded(flex: 6,child: Text("Tr.Id",style:AllTextStyle.textFieldHeadStyle)),
+                            const Expanded(flex: 1, child: Text(':')),
+                            Expanded(
+                              flex: 11,
+                              child: Container(
+                                height: 25.h,
+                                decoration: ContDecoration.contDecoration,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(4.0),
+                                  child: Text("$bankTrCode",style: AllTextStyle.dateFormatStyle),
+                                )
+                              ),
+                            ),
+                          ],
+                        ),
+                        Row(
+                          children: [
                             Expanded(
                               flex: 6,
                               child: Text(
@@ -345,7 +410,7 @@ class _BankTransactionEntryScreenState extends State<BankTransactionEntryScreen>
                             Expanded(
                               flex: 11,
                               child: Container(
-                                margin: EdgeInsets.only(bottom: 4.h),
+                                margin: EdgeInsets.only(top: 4.h,bottom: 4.h),
                                 height: 25.h,
                                 decoration: ContDecoration.contDecoration,
                                 child: 
@@ -433,109 +498,65 @@ class _BankTransactionEntryScreenState extends State<BankTransactionEntryScreen>
                               child: Container(
                                 height: 25.h,
                                 width: MediaQuery.of(context).size.width / 2,
+                                margin: EdgeInsets.only(bottom: 3.h),
                                 decoration: ContDecoration.contDecoration,
-                                // child: TypeAheadField<BankAccountModel>(
-                                //   controller: accountController,
-                                //   builder: (context, controller, focusNode) {
-                                //     return TextField(
-                                //       controller: controller,
-                                //       focusNode: focusNode,
-                                //       style: TextStyle(
-                                //         fontSize: 13,
-                                //         color: Colors.grey.shade800,
-                                //         overflow: TextOverflow.ellipsis,
-                                //       ),
-                                //       decoration: InputDecoration(
-                                //         contentPadding: EdgeInsets.only(
-                                //           left: 5.0,
-                                //           top: 4.0,
-                                //         ),
-                                //         isDense: true,
-                                //         hintText: 'Select Account',
-                                //         hintStyle: TextStyle(fontSize: 13),
-                                //         suffixIcon:
-                                //             _selectedAccount == '' ||
-                                //                     _selectedAccount ==
-                                //                         'null' ||
-                                //                     _selectedAccount == null ||
-                                //                     controller.text == ''
-                                //                 ? null
-                                //                 : GestureDetector(
-                                //                   onTap: () {
-                                //                     setState(() {
-                                //                       accountController.clear();
-                                //                       controller.clear();
-                                //                       _selectedAccount = null;
-                                //                     });
-                                //                   },
-                                //                   child: Padding(
-                                //                     padding: EdgeInsets.all(5),
-                                //                     child: Icon(
-                                //                       Icons.close,
-                                //                       size: 16,
-                                //                     ),
-                                //                   ),
-                                //                 ),
-                                //         suffixIconConstraints: BoxConstraints(
-                                //           maxHeight: 30,
-                                //         ),
-                                //         filled: false,
-                                //         fillColor: Colors.white,
-                                //         border: InputBorder.none,
-                                //       ),
-                                //     );
-                                //   },
-                                //   suggestionsCallback: (pattern) async {
-                                //     return Future.delayed(
-                                //       const Duration(seconds: 1),
-                                //       () {
-                                //         return allBankAccountList
-                                //             .where(
-                                //               (element) => element.name
-                                //                   .toLowerCase()
-                                //                   .contains(
-                                //                     pattern.toLowerCase(),
-                                //                   ),
-                                //             )
-                                //             .toList()
-                                //             .cast<BankAccountModel>();
-                                //       },
-                                //     );
-                                //   },
-
-                                //   itemBuilder: (
-                                //     context,
-                                //     BankAccountModel suggestion,
-                                //   ) {
-                                //     return Padding(
-                                //       padding: EdgeInsets.symmetric(
-                                //         horizontal: 6,
-                                //         vertical: 4,
-                                //       ),
-                                //       child: Text(
-                                //         "${suggestion.name}-${suggestion.number} (${suggestion.bankName})",
-                                //         style: TextStyle(fontSize: 12),
-                                //         maxLines: 1,
-                                //         overflow: TextOverflow.ellipsis,
-                                //       ),
-                                //     );
-                                //   },
-                                //   onSelected: (BankAccountModel suggestion) {
-                                //     setState(() {
-                                //       accountController.text =
-                                //           "${suggestion.name}-${suggestion.number} (${suggestion.bankName})";
-                                //       _selectedAccount =
-                                //           suggestion.id.toString();
-                                //       currentBalance = suggestion.balance;
-                                //     });
-                                //   },
-                                // ),
-                             
+                                child: TypeAheadField<BankAccountModel>(
+                                controller: accountController,
+                                builder: (context, controller, focusNode) {
+                                return TextField(
+                                controller: controller,
+                                focusNode: focusNode,
+                                style: TextStyle(fontSize: 13, color: Colors.grey.shade800, overflow: TextOverflow.ellipsis),
+                                decoration: InputDecoration(contentPadding: EdgeInsets.only(left: 5.0, top: 4.0),
+                                  isDense: true,
+                                  hintText: 'Select Account',
+                                  hintStyle: TextStyle(fontSize: 13),
+                                  suffixIcon: _selectedAccount == '' || _selectedAccount == 'null' || _selectedAccount == null || controller.text == '' ? null
+                                      : GestureDetector(
+                                    onTap: () {
+                                      setState(() {
+                                        accountController.clear();
+                                        controller.clear();
+                                        _selectedAccount = null;
+                                      });
+                                    },
+                                    child: Padding(padding: EdgeInsets.all(5), child: Icon(Icons.close, size: 16)),
+                                  ),
+                                  suffixIconConstraints: BoxConstraints(maxHeight: 30),
+                                  filled: false,
+                                  fillColor: Colors.white,
+                                  border: InputBorder.none,
+                                ),
+                                );
+                                },
+                                suggestionsCallback: (pattern) async {
+                                return Future.delayed(const Duration(seconds: 1), () {
+                                  return allBankAccountData
+                                  .where((element) => element.accountName.toLowerCase().contains(pattern.toLowerCase()))
+                                  .toList().cast<BankAccountModel>(); 
+                                  });
+                                  },                    
+                                itemBuilder: (context, BankAccountModel suggestion) {
+                                  return Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 6,vertical: 4),
+                                child: Text("${suggestion.accountName} - ${suggestion.accountNumber} (${suggestion.bankName})",
+                                  style: TextStyle(fontSize: 12), maxLines: 1, overflow: TextOverflow.ellipsis,
+                                ),
+                                );
+                                },
+                                onSelected: (BankAccountModel suggestion) {
+                                setState(() {
+                                  accountController.text = "${suggestion.accountName} - ${suggestion.accountNumber} (${suggestion.bankName})";
+                                  _selectedAccount = suggestion.id.toString();
+                                });  
+                                },
+                                ),
+                            
                               ),
                             ),
                           ],
                         ),
-                        SizedBox(height: 4.h),
+                        SizedBox(height: 1.h),
                         Row(
                           children: [
                             Expanded(
@@ -659,48 +680,23 @@ class _BankTransactionEntryScreenState extends State<BankTransactionEntryScreen>
                             // ),
                             // ((role == 'Superadmin' || role == 'admin') || actionList.contains('e') == true) ?
                              InkWell(
-                              onTap: () {
-                                // Utils.closeKeyBoard(context);
-                                // if (accountController.text == '') {
-                                //   Utils.errorSnackBar(
-                                //     context,
-                                //     "Account field is required",
-                                //   );
-                                // } else if (_amountController.text == "") {
-                                //   Utils.errorSnackBar(
-                                //     context,
-                                //     "Amount field is required",
-                                //   );
-                                // } else {
-                                //   setState(() {
-                                //     isLoading = true;
-                                //   });
-                                //   fetchAddBankTransactions(
-                                //     context,
-                                //     _amountController.text,
-                                //     int.parse("$_selectedAccount"),
-                                //     "$backEndFirstDate",
-                                //     _noteController.text,
-                                //     "$paymentType",
-                                //   ).then((value) {
-                                //     if (value != "") {
-                                //       setState(() {
-                                //         isLoading = false;
-                                //       });
-                                //       Provider.of<BankTransactionProvider>(
-                                //         context,
-                                //         listen: false,
-                                //       ).getBankTransactionApi(
-                                //         "",
-                                //         "${Utils.formatBackEndDate(DateTime.now())}",
-                                //         "${Utils.formatBackEndDate(DateTime.now())}",
-                                //         "",
-                                //       );
-                                //       emtyMethod();
-                                //       setState(() {});
-                                //     }
-                                //   });
-                                // }
+                              onTap: () async {
+                                Utils.closeKeyBoard(context);
+                                  print("Tapped Save");
+
+                                  if (accountController.text == '') {
+                                    Utils.showTopSnackBar(context, "Please Select Account");
+                                    return;
+                                  }
+                                  
+                                  setState(() {
+                                    bankTrBtnClk = true;
+                                  });
+                                  var result = await addBankTransaction(context);
+                                  if (result == "true") {
+                                   Provider.of<BankTransactionProvider>(context, listen: false).getBankTransaction(backEndFirstDate,backEndFirstDate);
+                                  }
+                                  setState(() {});
                               },
                               child: Container(
                                 height: 25.0.h,
@@ -720,7 +716,7 @@ class _BankTransactionEntryScreenState extends State<BankTransactionEntryScreen>
                                 ),
                                 child: Center(
                                   child:
-                                      isLoading
+                                      bankTrBtnClk
                                           ? SizedBox(
                                             height: 20.h,
                                             width: 20.w,
@@ -744,6 +740,56 @@ class _BankTransactionEntryScreenState extends State<BankTransactionEntryScreen>
                     ),
                   ),
                 ),
+                BankTransactionProvider.isBankTransactionLoading ? CircularProgressIndicator()
+                  : Container(
+                  height: MediaQuery.of(context).size.height / 1.43,
+                  width: double.infinity,
+                  padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+                  child: SizedBox(
+                    width: double.infinity,
+                    height: double.infinity,
+                    child: SingleChildScrollView(
+                      // controller: _listViewScrollController,
+                      // physics: _physics,
+                      scrollDirection: Axis.vertical,
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: DataTable(
+                          headingRowHeight: 20.0,
+                          dataRowHeight: 20.0,
+                          headingRowColor: WidgetStateColor.resolveWith((states) => const Color.fromARGB(255, 52, 146, 68)),
+                          showCheckboxColumn: true,
+                          border: TableBorder.all(color: Colors.grey.shade400, width: 1),
+                          columns: [
+                            DataColumn(label: Expanded(child: Center(child: Text('S/L No.',style: AllTextStyle.tableHeadTextStyle)))),
+                            DataColumn(label: Expanded(child: Center(child: Text('Transaction date',style: AllTextStyle.tableHeadTextStyle)))),
+                            DataColumn(label: Expanded(child: Center(child: Text('Transaction number',style: AllTextStyle.tableHeadTextStyle)))),
+                            DataColumn(label: Expanded(child: Center(child: Text('Bank Name',style: AllTextStyle.tableHeadTextStyle)))),
+                            DataColumn(label: Expanded(child: Center(child: Text('Account Type',style: AllTextStyle.tableHeadTextStyle)))),
+                            DataColumn(label: Expanded(child: Center(child: Text('Amount',style: AllTextStyle.tableHeadTextStyle)))),
+                            DataColumn(label: Expanded(child: Center(child: Text('Note',style: AllTextStyle.tableHeadTextStyle)))),		
+                          ],
+                          rows: List.generate(
+                          allBankTransactionData.length,
+                                (int index) => DataRow(
+                              color: index % 2 == 0 ? WidgetStateProperty.resolveWith(getColor) : WidgetStateProperty.resolveWith(getColors),
+                              cells: <DataCell>[
+                                DataCell(Center(child: Text('${index+1}'))),
+                                DataCell(Center(child: Text('${allBankTransactionData[index].transactionDate??""}'))),
+                                DataCell(Center(child: Text('${allBankTransactionData[index].transactionNumber??""}'))),
+                                DataCell(Center(child: allBankTransactionData[index].bank=="null"||allBankTransactionData[index].bank==null? Text("N/A"):Text('${allBankTransactionData[index].bank!.accountName??""} - ${allBankTransactionData[index].bank!.accountNumber??""} - ${allBankTransactionData[index].bank!.bankName??""}'))),
+                                 DataCell(Center(child: Text('${allBankTransactionData[index].transactionType??""}'))),
+                                DataCell(Center(child: Text('${allBankTransactionData[index].amount??""}'))),
+                                DataCell(Center(child: Text('${allBankTransactionData[index].remark??""}'))),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 15.0.h),
                 // const SizedBox(height: 5.0),
                 // Container(
                 //   height: MediaQuery.of(context).size.height / 1.5,
@@ -909,7 +955,7 @@ class _BankTransactionEntryScreenState extends State<BankTransactionEntryScreen>
     );
   }
 
-  emtyMethod() {
+  emptyMethod() {
     setState(() {
       _amountController.text = '';
       accountController.text = '';
@@ -918,46 +964,59 @@ class _BankTransactionEntryScreenState extends State<BankTransactionEntryScreen>
     });
   }
 
-  // Future<String> fetchAddBankTransactions(
-  //   context,
-  //   String? amount,
-  //   int? bankAccountId,
-  //   String? date,
-  //   String? note,
-  //   String? type,
-  // ) async {
-  //   SharedPreferences? sharedPreferences;
-  //   sharedPreferences = await SharedPreferences.getInstance();
-  //   String Link = "${sharedPreferences.getString("BaseUrl")}/create-banktransaction";
-  //   try {
-  //     Response response = await Dio().post(
-  //       Link,
-  //       data: {
-  //         "amount": "$amount",
-  //         "bank_account_id": bankAccountId,
-  //         "date": "$date",
-  //         "note": "$note",
-  //         "type": "$type",
-  //       },
-  //       options: Options(
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //           "Authorization": "Bearer ${sharedPreferences.getString("token")}",
-  //           "Cookie": "laravel_session=${sharedPreferences.getString('sessionId')}",
-  //         },
-  //       ),
-  //     );
-  //     var data = response.data;
-  //     if (data['status'] == true) {
-  //       CustomSnackBar.showTopSnackBar(context, "${data["message"]}");
-  //       return "true";
-  //     } else {
-  //       Utils.errorSnackBar(context, "${data["message"]}");
-  //       return "";
-  //     }
-  //   } catch (e) {
-  //     Utils.errorSnackBar(context, e.toString());
-  //     return "";
-  //   }
-  // }
+  bool bankTrBtnClk = false;
+ Future<String> addBankTransaction(BuildContext context) async {
+  String link = AppUrl.addBankTrEndPoint;
+  print("transaction_number=>> $bankTrCode");
+  print("bank_account_id=>> $_selectedAccount");
+  print("transaction_type=>> $paymentType");
+  print("backEndFirstDate=>> $backEndFirstDate");
+  print("_descriptionController.text.trim()=>> ${_noteController.text.trim()}");
+  print("_amountController.text.trim()=>> ${_amountController.text.trim()}");
+  try {
+    final token = getToken();
+    var response = await Dio().post(link,
+      data: {
+          "transaction_number": bankTrCode.toString(),
+          "transaction_date": backEndFirstDate.toString(),
+          "transaction_type": paymentType.toString(),
+          "bank_account_id":_selectedAccount.toString(),
+          "amount": _amountController.text.trim(),
+          "remark": _noteController.text.trim(),
+      },
+      options: Options(
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
+        },
+      ),
+    );
+    var item = response.data;
+    print("API Response: $item");
+
+    if (item["success"] == true) {
+      setState(() {
+        bankTrBtnClk = false;
+      });
+      emptyMethod();
+      CustomSnackBar.showTopSnackBar(context, "${item["message"]}");
+      getBankTrCode();
+      return "true";
+    } else {
+      setState(() {
+        bankTrBtnClk = false;
+      });
+      Utils.showTopSnackBar(context,"${item["message"]}");
+      return "false";
+    }
+  } catch (e) {
+    setState(() {
+      bankTrBtnClk = false;
+    });
+    print("Exception caught: $e");
+    Utils.showTopSnackBar(context, "Something went wrong: $e");
+    return "false";
+  }
+ }
+
 }

@@ -7,6 +7,7 @@ import 'package:medical_trade/config/app_url.dart';
 import 'package:medical_trade/diagnostic_module/models/bank_account_model.dart';
 import 'package:medical_trade/diagnostic_module/models/patients_model.dart';
 import 'package:medical_trade/diagnostic_module/providers/bank_account_provider.dart';
+import 'package:medical_trade/diagnostic_module/providers/patient_payment_provider.dart';
 import 'package:medical_trade/diagnostic_module/providers/patients_provider.dart';
 import 'package:medical_trade/diagnostic_module/utils/all_textstyle.dart';
 import 'package:medical_trade/diagnostic_module/utils/animation_snackbar.dart';
@@ -52,8 +53,8 @@ class _PatientPaymentEntryScreenState extends State<PatientPaymentEntryScreen> {
       setState(() {
         firstPickedDate = Utils.formatFrontEndDate(selectedDate);
         backEndFirstDate = Utils.formatBackEndDate(selectedDate);
-        // SupplierPaymentProvider().on();
-        // Provider.of<SupplierPaymentProvider>(context,listen: false).getSupplierPayment("","$backEndFirstDate","$backEndFirstDate");
+        PatientPaymentProvider().on();
+        Provider.of<PatientPaymentProvider>(context,listen: false).getPatientPayment("$backEndFirstDate","$backEndFirstDate");
 
       });
     }
@@ -395,10 +396,9 @@ getMadicinePatientDue(String? patientId) async {
     backEndFirstDate = Utils.formatBackEndDate(DateTime.now());
     paymentType = 'Payment';
     getPaymentType = "Cash";
-    // SupplierPaymentProvider.isSupplierPaymentLoading = true;
-    // Provider.of<SupplierPaymentProvider>(context,listen: false).supplierPaymentList = [];
-    // Provider.of<SupplierDueProvider>(context,listen: false).getSupplierDue(context, "","");
-    // Provider.of<SupplierPaymentProvider>(context,listen: false).getSupplierPayment("",Utils.formatBackEndDate(DateTime.now()),"${Utils.formatBackEndDate(DateTime.now())}");
+    PatientPaymentProvider.isPatientPaymentLoading = true;
+    Provider.of<PatientPaymentProvider>(context,listen: false).patientPaymentList = [];
+    Provider.of<PatientPaymentProvider>(context,listen: false).getPatientPayment(Utils.formatBackEndDate(DateTime.now()),Utils.formatBackEndDate(DateTime.now()));
     Provider.of<BankAccountProvider>(context,listen: false).getBankAccount();
     Provider.of<PatientsProvider>(context,listen: false).getPatients();
     super.initState();
@@ -408,6 +408,7 @@ getMadicinePatientDue(String? patientId) async {
   Widget build(BuildContext context) {
     final allBankAccountData = Provider.of<BankAccountProvider>(context).allBankAccountList;
     final allPatientData = Provider.of<PatientsProvider>(context).allPatientList;
+    final allPatientPaymentData = Provider.of<PatientPaymentProvider>(context).patientPaymentList;
     return
     //  RefreshIndicator(
     //   onRefresh: () async {
@@ -892,7 +893,7 @@ getMadicinePatientDue(String? patientId) async {
                                         });
                                         var result = await patientPayEntry(context);
                                         if (result == "true") {
-                                         // Provider.of<TestEntryProvider>(context, listen: false).getTestEntry();
+                                         Provider.of<PatientPaymentProvider>(context, listen: false).getPatientPayment(backEndFirstDate,backEndFirstDate);
                                         }
                                         setState(() {});
                                       },
@@ -925,6 +926,60 @@ getMadicinePatientDue(String? patientId) async {
                     ),
                   ),
                 ),
+                PatientPaymentProvider.isPatientPaymentLoading ? CircularProgressIndicator()
+                  : Container(
+                  height: MediaQuery.of(context).size.height / 1.43,
+                  width: double.infinity,
+                  padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+                  child: SizedBox(
+                    width: double.infinity,
+                    height: double.infinity,
+                    child: SingleChildScrollView(
+                      // controller: _listViewScrollController,
+                      // physics: _physics,
+                      scrollDirection: Axis.vertical,
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: DataTable(
+                          headingRowHeight: 20.0,
+                          dataRowHeight: 20.0,
+                          headingRowColor: WidgetStateColor.resolveWith((states) => Color.fromARGB(255, 0, 64, 160),),
+                          showCheckboxColumn: true,
+                          border: TableBorder.all(color: Colors.grey.shade400, width: 1),
+                          columns: [
+                            DataColumn(label: Expanded(child: Center(child: Text('S/L No.',style: AllTextStyle.tableHeadTextStyle)))),
+                            DataColumn(label: Expanded(child: Center(child: Text('Transaction date',style: AllTextStyle.tableHeadTextStyle)))),
+                            DataColumn(label: Expanded(child: Center(child: Text('Transaction number',style: AllTextStyle.tableHeadTextStyle)))),
+                            DataColumn(label: Expanded(child: Center(child: Text('Patient',style: AllTextStyle.tableHeadTextStyle)))),
+                            DataColumn(label: Expanded(child: Center(child: Text('Payment Type',style: AllTextStyle.tableHeadTextStyle)))),
+                            DataColumn(label: Expanded(child: Center(child: Text('Account Name',style: AllTextStyle.tableHeadTextStyle)))),
+                            DataColumn(label: Expanded(child: Center(child: Text('Transaction Type',style: AllTextStyle.tableHeadTextStyle)))),
+                            DataColumn(label: Expanded(child: Center(child: Text('Amount',style: AllTextStyle.tableHeadTextStyle)))),
+                            DataColumn(label: Expanded(child: Center(child: Text('Note',style: AllTextStyle.tableHeadTextStyle)))),			
+                           ],
+                          rows: List.generate(
+                          allPatientPaymentData.length,
+                                (int index) => DataRow(
+                              color: index % 2 == 0 ? WidgetStateProperty.resolveWith(getColor) : WidgetStateProperty.resolveWith(getColors),
+                              cells: <DataCell>[
+                                DataCell(Center(child: Text('${index+1}'))),
+                                DataCell(Center(child: Text('${allPatientPaymentData[index].paymentDate??""}'))),
+                                DataCell(Center(child: Text('${allPatientPaymentData[index].transactionNumber??""}'))),
+                                DataCell(Center(child: allPatientPaymentData[index].patient=="null"||allPatientPaymentData[index].patient==null? Text("N/A"): Text('${allPatientPaymentData[index].patient!.patientCode??""} - ${allPatientPaymentData[index].patient!.name??""}'))),
+                                DataCell(Center(child: Text('${allPatientPaymentData[index].paymentType??""}'))),
+                                DataCell(Center(child: allPatientPaymentData[index].bank=="null"||allPatientPaymentData[index].bank==null? Text("N/A"):Text('${allPatientPaymentData[index].bank!.accountName??""} - ${allPatientPaymentData[index].bank!.accountNumber??""} - ${allPatientPaymentData[index].bank!.bankName??""}'))),
+                                DataCell(Center(child: Text('${allPatientPaymentData[index].transactionType??""}'))),
+                                DataCell(Center(child: Text('${allPatientPaymentData[index].amount??""}'))),
+                                DataCell(Center(child: Text('${allPatientPaymentData[index].remark??""}'))),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 15.0.h),
                 // Container(
                 //   height: MediaQuery.of(context).size.height/1.5,
                 //   padding: const EdgeInsets.symmetric(horizontal: 5.0,vertical: 5.0),
