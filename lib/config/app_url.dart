@@ -86,8 +86,13 @@ class AppUrl {
   
   static var getBankTrCodeEndPoint = '$baseUrl/get-bank-transaction-code';
   static var getBankTransactionEndPoint = '$baseUrl/get-bank-transactions';
-  // static var getAccountsEndPoint = '$baseUrl/get-accounts';
   static var addBankTrEndPoint = '$baseUrl/add-bank-transaction';
+
+  static var getAppointmentsEndPoint = '$baseUrl/get-appointments';
+  static var getAvailableSlotsEndPoint = '$baseUrl/get-available-slots';
+  static var getAppointmentTrIDEndPoint = '$baseUrl/get-appointment-tr-id';
+  static var getAppointSerialNumberEndPoint = '$baseUrl/get-appointment-serial-number';
+  static var addAppointmentEndPoint = '$baseUrl/add-appointment';
 
   //end
 }

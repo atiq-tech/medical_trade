@@ -1,12 +1,28 @@
 library;
+import 'package:dio/dio.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_typeahead/flutter_typeahead.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:intl/intl.dart';
+import 'package:medical_trade/config/app_url.dart';
+import 'package:medical_trade/diagnostic_module/models/agents_model.dart';
+import 'package:medical_trade/diagnostic_module/models/available_slots_model.dart';
+import 'package:medical_trade/diagnostic_module/models/department_module.dart';
+import 'package:medical_trade/diagnostic_module/models/doctors_model.dart';
+import 'package:medical_trade/diagnostic_module/models/patients_model.dart';
+import 'package:medical_trade/diagnostic_module/providers/agents_provider.dart';
+import 'package:medical_trade/diagnostic_module/providers/available_slots_provider.dart';
+import 'package:medical_trade/diagnostic_module/providers/department_provider.dart';
+import 'package:medical_trade/diagnostic_module/providers/doctors_provider.dart';
+import 'package:medical_trade/diagnostic_module/providers/patients_provider.dart';
 import 'package:medical_trade/diagnostic_module/utils/all_textstyle.dart';
 import 'package:medical_trade/diagnostic_module/utils/common_textfield.dart';
 import 'package:medical_trade/diagnostic_module/utils/utils.dart';
 import 'package:medical_trade/utilities/color_manager.dart';
+import 'package:medical_trade/view/auth/login_register_auth.dart';
+import 'package:provider/provider.dart';
 
 class AppointmentEntryScreen extends StatefulWidget {
   const AppointmentEntryScreen({super.key,});
@@ -28,13 +44,11 @@ class _AppointmentEntryScreenState extends State<AppointmentEntryScreen> {
   final _dayAgeController = TextEditingController();
   final _remarkController = TextEditingController();
   final _timeController = TextEditingController();
-   final _trIDController = TextEditingController();
    final _departmentController = TextEditingController();
   final _slotController = TextEditingController();
   final _conFeesController = TextEditingController();
   final _subTotalController = TextEditingController();
   final _remarkAppointController = TextEditingController();
-  final _sLNoController = TextEditingController();
   final _referenceController = TextEditingController();
   final _discountParcentController = TextEditingController();
   final _discountController = TextEditingController();
@@ -57,6 +71,40 @@ class _AppointmentEntryScreenState extends State<AppointmentEntryScreen> {
   String? userEmployeeId = "";
   String userName = "";
   String userType = "";
+  String? _selectedPatientId;
+  String? _departmentId;
+  String? _slotsId;
+  String? _doctorId;
+  String? _referenceId;
+  String dueAmmount = "0";
+   void _calculateAll() {
+    double subTotal = double.tryParse(_subTotalController.text) ?? 0;
+    double discountPercent = double.tryParse(_discountParcentController.text) ?? 0;
+    double discountAmount = double.tryParse(_discountController.text) ?? 0;
+    double advance = double.tryParse(_advanceController.text) ?? 0;
+
+    // Auto calculate discount amount when percentage changes
+    if (_discountParcentController.text.isNotEmpty) {
+      discountAmount = (subTotal * discountPercent) / 100;
+      _discountController.text = discountAmount.toStringAsFixed(2);
+    }
+
+    // Auto calculate discount percentage when amount changes
+    if (_discountController.text.isNotEmpty &&
+        _discountParcentController.text.isEmpty) {
+      discountPercent = (discountAmount / subTotal) * 100;
+      _discountParcentController.text = discountPercent.toStringAsFixed(2);
+    }
+
+    double netTotal = subTotal - discountAmount;
+
+    // Due = Net Total - Advance
+    double due = netTotal - advance;
+
+    setState(() {
+      dueAmmount = due.toStringAsFixed(2);
+    });
+  }
 
 
   String? firstPickedDate;
@@ -66,23 +114,31 @@ class _AppointmentEntryScreenState extends State<AppointmentEntryScreen> {
   var toDay = DateTime.now();
   void _firstSelectedDate() async {
     final selectedDate = await showDatePicker(
-        context: context,
-        initialDate: DateTime.now(),
-        firstDate: DateTime(1950),
-        lastDate: DateTime(2050));
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(1950),
+      lastDate: DateTime(2050),
+    );
+
     if (selectedDate != null) {
       setState(() {
-        firstPickedDate = Utils.formatFrontEndDate(selectedDate);
-        backEndFirstDate = Utils.formatBackEndDate(selectedDate);
+        firstPickedDate = Utils.formatFrontEndDate(selectedDate); // UI show
+        backEndFirstDate = Utils.formatBackEndDate(selectedDate); // yyyy-MM-dd
       });
-    }
-    else{
+
+      /// 🔥 এখানে অবশ্যই backend format পাঠাতে হবে
+      calculateAge(backEndFirstDate);
+    } else {
       setState(() {
         firstPickedDate = Utils.formatFrontEndDate(toDay);
         backEndFirstDate = Utils.formatBackEndDate(toDay);
       });
+
+      calculateAge(backEndFirstDate);
     }
   }
+
+
 
   String? secondPickedDate;
   void _secondSelectedDate() async {
@@ -127,9 +183,121 @@ class _AppointmentEntryScreenState extends State<AppointmentEntryScreen> {
   // ✅ Controller
   final TextEditingController _genderController = TextEditingController();
 
+void calculateAge(String dobString) {
+  try {
+    if (dobString.isEmpty) return;
+
+    DateTime dob = DateTime.parse(dobString);
+    DateTime now = DateTime.now();
+
+    int year = now.year - dob.year;
+    int month = now.month - dob.month;
+    int day = now.day - dob.day;
+
+    if (day < 0) {
+      month--;
+      int prevMonth = now.month == 1 ? 12 : now.month - 1;
+      int prevYear = now.month == 1 ? now.year - 1 : now.year;
+      day += DateTime(prevYear, prevMonth + 1, 0).day;
+    }
+
+    if (month < 0) {
+      year--;
+      month += 12;
+    }
+
+    setState(() {
+      _yearController.text = year.toString();
+      _monthController.text = month.toString();
+      _dayAgeController.text = day.toString();
+    });
+  } catch (e) {
+    print("Age Calculation Error: $e");
+  }
+}
+
+static String getToken() {
+  final box = GetStorage();
+  return box.read('loginToken') ?? "";
+}
+
+String? appointmentTrID = "";
+getAppointmentTrID() async {
+  try {
+    String link = AppUrl.getAppointmentTrIDEndPoint;
+    final token = getToken();
+
+    var response = await Dio().get(
+      link,
+      options: Options(
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
+        },
+        validateStatus: (status) {
+          return status! < 500;
+        },
+      ),
+    );
+
+    print("Response =====> ${response.data}");
+    if (response.statusCode == 401) {
+      Utils.showTopSnackBar(context, "Session expired. Please log in again.");
+      Navigator.pushReplacement(context,
+        MaterialPageRoute(builder: (context) => const LoginView(isLogin: true)),
+      );
+      return;
+    }
+    setState(() {
+      appointmentTrID = response.data["data"].toString();
+    });
+    print("appointmentTrID ID =========> $appointmentTrID");
+
+  } catch (e) {
+    print("appointmentTrID ERROR =======> $e");
+  }
+}
+
+String? appointmentSerialNo = "";
+getAppointSerialNumber() async {
+  try {
+    String link = AppUrl.getAppointSerialNumberEndPoint;
+    final token = getToken();
+
+    var response = await Dio().post(
+      link,
+      options: Options(
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
+        },
+        validateStatus: (status) => status! < 500,
+      ),
+    );
+    print("Response =====> ${response.data}");
+
+    if (response.statusCode == 401) {
+      Utils.showTopSnackBar(context, "Session expired. Please log in again.");
+      Navigator.pushReplacement(context,
+        MaterialPageRoute(builder: (context) => const LoginView(isLogin: true)),
+      );
+      return;
+    }
+    setState(() {
+      appointmentSerialNo = response.data.toString();
+    });
+    print("appointmentSerialNo =========> $appointmentSerialNo");
+  } catch (e) {
+    print("appointmentSerialNo ERROR =======> $e");
+  }
+}
+
 
    @override
   void initState() {
+    _calculateAll();
+    getAppointmentTrID();
+    getAppointSerialNumber();
     // TODO: implement initState
     super.initState();
     //_initializeData();
@@ -137,6 +305,11 @@ class _AppointmentEntryScreenState extends State<AppointmentEntryScreen> {
     backEndFirstDate = Utils.formatBackEndDate(DateTime.now());
     secondPickedDate = Utils.formatFrontEndDate(DateTime.now());
     backEndSecondtDate = Utils.formatBackEndDate(DateTime.now());
+    Provider.of<AgentsProvider>(context,listen: false).getAgents();
+    Provider.of<PatientsProvider>(context,listen: false).getPatients();
+    Provider.of<DoctorsProvider>(context,listen: false).getDoctors();
+    Provider.of<DepartmentProvider>(context,listen: false).getDepartment("Doctor");
+    Provider.of<AvailableSlotsProvider>(context,listen: false).getAvailableSlots("$_doctorId",""); 
   }
 
   ScrollController mainScrollController = ScrollController();
@@ -178,6 +351,11 @@ class _AppointmentEntryScreenState extends State<AppointmentEntryScreen> {
   @override
   Widget build(BuildContext context) {
     mainScrollController.addListener(mainScrollListener);
+    final allAgentsData = Provider.of<AgentsProvider>(context).allAgentsList;
+    final allDoctorData = Provider.of<DoctorsProvider>(context).allDoctorsList;
+    final allPatientData = Provider.of<PatientsProvider>(context).allPatientList;
+    final allDepartmentData = Provider.of<DepartmentProvider>(context).allDepartmentList;
+    final allAvailableSlotsData = Provider.of<AvailableSlotsProvider>(context).availableSlotsList; 
     return Scaffold(
       appBar:AppBar(
       backgroundColor: ColorManager.appbarColor,
@@ -200,7 +378,7 @@ class _AppointmentEntryScreenState extends State<AppointmentEntryScreen> {
         controller: mainScrollController,
         child: Column(
           children: [
-                  Container(
+              Container(
               padding: EdgeInsets.all(8.0.r),
               child: Container(
                 width: double.infinity,
@@ -236,10 +414,80 @@ class _AppointmentEntryScreenState extends State<AppointmentEntryScreen> {
                        padding: EdgeInsets.only(left: 5.0.w,right: 5.0.w,top: 0.0.h),
                       child: Column(
                         children: [
-                          CommonTextFieldRow(
-                            label: "Existing Patients",
-                            controller: _patientController,
-                            hintText: "Select Patient",
+                          Row(
+                            children: [
+                              Expanded(flex: 6, child: Text("Existing Patients",style: AllTextStyle.textFieldHeadStyle)),
+                              const Expanded(flex: 1, child: Text(":")),
+                              Expanded(
+                                flex: 16,
+                                child: Container(
+                                  height: 25.h,
+                                  width: MediaQuery.of(context).size.width / 2,
+                                  decoration: ContDecoration.contDecoration,
+                                    child: TypeAheadField<PatientsModel>(
+                                    controller: _patientController,
+                                    builder: (context, controller, focusNode) {
+                                    return TextField(
+                                      controller: controller,
+                                      focusNode: focusNode,
+                                      style: TextStyle(fontSize: 13, color: Colors.grey.shade800, overflow: TextOverflow.ellipsis),
+                                      decoration: InputDecoration(contentPadding: EdgeInsets.only(left: 5.0, top: 4.0),
+                                        isDense: true,
+                                        hintText: 'Select Patient',
+                                        hintStyle: TextStyle(fontSize: 13),
+                                        suffixIcon: _selectedPatientId == '' || _selectedPatientId == 'null' || _selectedPatientId == null || controller.text == '' ? null
+                                            : GestureDetector(
+                                          onTap: () {
+                                            setState(() {
+                                              _patientController.clear();
+                                              controller.clear();
+                                              _selectedPatientId = null;
+                                            });
+                                          },
+                                          child: Padding(padding: EdgeInsets.all(5), child: Icon(Icons.close, size: 16)),
+                                        ),
+                                        suffixIconConstraints: BoxConstraints(maxHeight: 30),
+                                        filled: false,
+                                        fillColor: Colors.white,
+                                        border: InputBorder.none,
+                                      ),
+                                    );
+                                  },
+                                  suggestionsCallback: (pattern) async {
+                                    return Future.delayed(const Duration(seconds: 1), () {
+                                  return allPatientData
+                                    .where((element) => element.name.toLowerCase().contains(pattern.toLowerCase()))
+                                  .toList().cast<PatientsModel>(); 
+                                    });
+                                    },
+                                
+                                  itemBuilder: (context, PatientsModel suggestion) {
+                                    return Padding(
+                                      padding: EdgeInsets.symmetric(horizontal: 6.w,vertical: 4.h),
+                                      child: Text("${suggestion.name} - ${suggestion.mobile} - ${suggestion.patientCode}",
+                                        style: TextStyle(fontSize: 12), maxLines: 1, overflow: TextOverflow.ellipsis,
+                                      ),
+                                    );
+                                  },
+                                  onSelected: (PatientsModel suggestion) {
+                                    _patientController.text = "${suggestion.name} - ${suggestion.mobile} - ${suggestion.patientCode}";
+                                      setState(() {
+                                        _selectedPatientId = suggestion.id.toString();
+                                        _nameController.text = suggestion.name.toString();
+                                        _mobileController.text = suggestion.mobile.toString();
+                                        _addressController.text = suggestion.address.toString();
+                                        _remarkController.text = suggestion.remark ?? "n/a";
+                                        _selectedGender = suggestion.gender;  
+                                        _genderController.text = suggestion.gender.toString();
+                                         firstPickedDate = suggestion.dateOfBirth ?? ""; 
+                                         calculateAge("$firstPickedDate"); 
+                                      });
+                                      print("_selectedPatientId ======>>> $_selectedPatientId");
+                                    },
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                           CommonTextFieldRow(
                             label: "Name",
@@ -489,10 +737,24 @@ class _AppointmentEntryScreenState extends State<AppointmentEntryScreen> {
                     padding: EdgeInsets.only(left: 5.0.w,right: 5.0.w,top: 5.0.h),
                     child: Column(
                       children: [
-                          CommonTextFieldRow(
-                            label: "Tr.ID",
-                            controller: _trIDController,
-                            hintText: "100059",
+                          Row(
+                            children: [
+                              Expanded(flex: 6,child: Text("Tr.ID",style: AllTextStyle.textFieldHeadStyle)),
+                              const Expanded(flex: 1,child: Text(":")),
+                              Expanded(
+                                flex: 16,
+                                child: Container(
+                                  height: 25.h,
+                                  decoration: ContDecoration.contDecoration,
+                                  child: Padding(
+                                    padding: EdgeInsets.only(left: 5.w, right: 5.w,top: 3.h),
+                                    child: Text(appointmentTrID.toString(),
+                                      style: AllTextStyle.dropDownlistStyle
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                           SizedBox(height: 4.0.h),
                           Row(children: [
@@ -529,16 +791,239 @@ class _AppointmentEntryScreenState extends State<AppointmentEntryScreen> {
                             ),
                           ),
                         ]),
-                         CommonTextFieldRow(
-                          label: "Department",
-                          controller: _departmentController,
-                          hintText: "Select Department",
-                        ),
+                       Row(
+                        children: [
+                          Expanded(flex: 6, child: Text("Doctor", style: AllTextStyle.textFieldHeadStyle)),
+                          const Expanded(flex: 1, child: Text(":")),
+                          Expanded(
+                            flex: 16,
+                            child: Container(
+                              height: 25.h,
+                              width: MediaQuery.of(context).size.width / 2,
+                              decoration: ContDecoration.contDecoration,
+                              child: TypeAheadField<DoctorsModel>(
+                                controller: _doctorNameController,
+                                builder: (context, controller, focusNode) {
+                                  return TextField(
+                                    controller: controller,
+                                    focusNode: focusNode,
+                                    style: TextStyle(fontSize: 13, color: Colors.grey.shade800, overflow: TextOverflow.ellipsis),
+                                    decoration: InputDecoration(
+                                      contentPadding: EdgeInsets.only(left: 5.0, top: 4.0),
+                                      isDense: true,
+                                      hintText: 'Select Doctor',
+                                      hintStyle: TextStyle(fontSize: 13),
+                                      suffixIcon: _doctorId == null || controller.text.isEmpty
+                                          ? null
+                                          : GestureDetector(
+                                              onTap: () {
+                                                setState(() {
+                                                  _doctorNameController.clear();
+                                                  controller.clear();
+
+                                                  _doctorId = null;
+
+                                                  /// Doctor clear করলে Department ও clear হবে
+                                                  _departmentId = null;
+                                                  _departmentController.clear();
+                                                });
+                                              },
+                                              child: Padding(
+                                                padding: EdgeInsets.all(5),
+                                                child: Icon(Icons.close, size: 16),
+                                              ),
+                                            ),
+                                      suffixIconConstraints: BoxConstraints(maxHeight: 30),
+                                      border: InputBorder.none,
+                                    ),
+                                  );
+                                },
+                                suggestionsCallback: (pattern) async {
+                                  return Future.delayed(const Duration(milliseconds: 300), () {
+                                    return allDoctorData
+                                        .where((element) =>
+                                            element.name.toLowerCase().contains(pattern.toLowerCase()))
+                                        .toList()
+                                        .cast<DoctorsModel>();
+                                  });
+                                },
+                                itemBuilder: (context, DoctorsModel suggestion) {
+                                  return Padding(
+                                    padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 4.h),
+                                    child: Text(
+                                      "${suggestion.doctorCode} ${suggestion.name != "" ? " - ${suggestion.name}" : ""}",
+                                      style: TextStyle(fontSize: 12),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  );
+                                },
+                                onSelected: (DoctorsModel suggestion) {
+                                  _doctorNameController.text = "${suggestion.doctorCode} ${suggestion.name != "" ? " - ${suggestion.name}" : ""}";
+
+                                  setState(() {
+                                    _doctorId = suggestion.id.toString();
+                                    _conFeesController.text =suggestion.fees.toString();
+                                    _subTotalController.text =suggestion.fees.toString();
+                                    dueAmmount =suggestion.fees.toString();
+                                    String doctorDeptId = suggestion.departmentId.toString();
+                                    var matchedDepartment = allDepartmentData.firstWhere(
+                                      (d) => d.id.toString() == doctorDeptId,
+                                      orElse: () => DepartmentModel(id: null, name: "", useFor: null, createdBy: null, updatedBy: null, createdAt: null, updatedAt: null, deletedAt: null, ipAddress: null, branchId: null),
+                                    );
+                                    if (matchedDepartment.id != null) {
+                                      _departmentId = matchedDepartment.id.toString();
+                                      _departmentController.text = matchedDepartment.name;
+                                    }
+                                  });
+                                  Provider.of<AvailableSlotsProvider>(context, listen: false).getAvailableSlots("$_doctorId", "$backEndFirstDate");
+                                },
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 4.0.h),
+                      Row(
+                        children: [
+                          Expanded(flex: 6, child: Text("Department", style: AllTextStyle.textFieldHeadStyle)),
+                          const Expanded(flex: 1, child: Text(":")),
+                          Expanded(
+                            flex: 16,
+                            child: Container(
+                              height: 25.h,
+                              width: MediaQuery.of(context).size.width / 2,
+                              decoration: ContDecoration.contDecoration,
+                              child: TypeAheadField<DepartmentModel>(
+                                controller: _departmentController,
+                                builder: (context, controller, focusNode) {
+                                  return TextField(
+                                    controller: controller,
+                                    focusNode: focusNode,
+                                    style: TextStyle(fontSize: 13, color: Colors.grey.shade800, overflow: TextOverflow.ellipsis),
+                                    decoration: InputDecoration(
+                                      contentPadding: EdgeInsets.only(left: 5.0, top: 4.0),
+                                      isDense: true,
+                                      hintText: 'Select Department',
+                                      hintStyle: TextStyle(fontSize: 13),
+                                      suffixIcon: _departmentId == null || controller.text.isEmpty
+                                          ? null
+                                          : GestureDetector(
+                                              onTap: () {
+                                                setState(() {
+                                                  _departmentController.clear();
+                                                  controller.clear();
+                                                  _departmentId = null;
+                                                });
+                                              },
+                                              child: Padding(
+                                                padding: EdgeInsets.all(5),
+                                                child: Icon(Icons.close, size: 16),
+                                              ),
+                                            ),
+                                      suffixIconConstraints: BoxConstraints(maxHeight: 30),
+                                      border: InputBorder.none,
+                                    ),
+                                  );
+                                },
+                                suggestionsCallback: (pattern) async {
+                                  return Future.delayed(const Duration(milliseconds: 300), () {
+                                    return allDepartmentData
+                                        .where((element) =>
+                                            element.name.toLowerCase().contains(pattern.toLowerCase()))
+                                        .toList()
+                                        .cast<DepartmentModel>();
+                                  });
+                                },
+                                itemBuilder: (context, DepartmentModel suggestion) {
+                                  return Padding(
+                                    padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 4.h),
+                                    child: Text(
+                                      suggestion.name,
+                                      style: TextStyle(fontSize: 12),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  );
+                                },
+                                onSelected: (DepartmentModel suggestion) {
+                                  setState(() {
+                                    _departmentController.text = suggestion.name;
+                                    _departmentId = suggestion.id.toString();
+                                  });
+                                },
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+
                         SizedBox(height: 4.0.h),
-                        CommonTextFieldRow(
-                          label: "Slot",
-                          controller: _slotController,
-                          hintText: "Select Slot",
+                        Row(
+                          children: [
+                            Expanded(flex: 6, child: Text("Slot",style: AllTextStyle.textFieldHeadStyle)),
+                            const Expanded(flex: 1, child: Text(":")),
+                            Expanded(
+                              flex: 16,
+                              child: Container(
+                                height: 25.h,
+                                width: MediaQuery.of(context).size.width / 2,
+                                decoration: ContDecoration.contDecoration,
+                                  child: TypeAheadField<AvailableSlotsModel>(
+                                  controller: _slotController,
+                                  builder: (context, controller, focusNode) {
+                                  return TextField(
+                                    controller: controller,
+                                    focusNode: focusNode,
+                                    style: TextStyle(fontSize: 13, color: Colors.grey.shade800, overflow: TextOverflow.ellipsis),
+                                    decoration: InputDecoration(contentPadding: EdgeInsets.only(left: 5.0, top: 4.0),
+                                      isDense: true,
+                                      hintText: 'Select Slot',
+                                      hintStyle: TextStyle(fontSize: 13),
+                                      suffixIcon: _slotsId == '' || _slotsId == 'null' || _slotsId == null || controller.text == '' ? null
+                                          : GestureDetector(
+                                        onTap: () {
+                                          setState(() {
+                                            _slotController.clear();
+                                            controller.clear();
+                                            _slotsId = null;
+                                          });
+                                        },
+                                        child: Padding(padding: EdgeInsets.all(5), child: Icon(Icons.close, size: 16)),
+                                      ),
+                                      suffixIconConstraints: BoxConstraints(maxHeight: 30),
+                                      filled: false,
+                                      fillColor: Colors.white,
+                                      border: InputBorder.none,
+                                    ),
+                                  );
+                                },
+                                suggestionsCallback: (pattern) async {
+                                  return Future.delayed(const Duration(seconds: 1), () {
+                                return allAvailableSlotsData
+                                  .where((element) => element.displayText.toLowerCase().contains(pattern.toLowerCase()))
+                                .toList().cast<AvailableSlotsModel>(); 
+                                  });
+                                  },
+                              
+                                itemBuilder: (context, AvailableSlotsModel suggestion) {
+                                  return Padding(
+                                    padding: EdgeInsets.symmetric(horizontal: 6.w,vertical: 4.h),
+                                    child: Text("${suggestion.displayText}",
+                                      style: TextStyle(fontSize: 12), maxLines: 1, overflow: TextOverflow.ellipsis,
+                                    ),
+                                  );
+                                },
+                                onSelected: (AvailableSlotsModel suggestion) {
+                                  _slotController.text = "${suggestion.displayText}";
+                                    setState(() {
+                                      _slotsId = suggestion.id.toString();
+                                    });
+                                },
+                              ),
+                              ),
+                            ),
+                          ],
                         ),
                         SizedBox(height: 4.0.h),
                         CommonTextFieldRow(
@@ -559,10 +1044,24 @@ class _AppointmentEntryScreenState extends State<AppointmentEntryScreen> {
                           hintText: "Enter Remark",
                         ),
                         SizedBox(height: 4.0.h),
-                        CommonTextFieldRow(
-                          label: "SL.No.",
-                          controller: _sLNoController,
-                          hintText: "01",
+                        Row(
+                          children: [
+                            Expanded(flex: 6,child: Text("SL.No.",style: AllTextStyle.textFieldHeadStyle)),
+                            const Expanded(flex: 1,child: Text(":")),
+                            Expanded(
+                              flex: 16,
+                              child: Container(
+                                height: 25.h,
+                                decoration: ContDecoration.contDecoration,
+                                child: Padding(
+                                  padding: EdgeInsets.only(left: 5.w, right: 5.w,top: 3.h),
+                                  child: Text(appointmentSerialNo.toString(),
+                                    style: AllTextStyle.dropDownlistStyle
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                         SizedBox(height: 4.0.h),
                         Row(children: [
@@ -591,112 +1090,275 @@ class _AppointmentEntryScreenState extends State<AppointmentEntryScreen> {
                           ),
                         ),
                        ),]),
-                        CommonTextFieldRow(
-                          label: "Doctor",
-                          controller: _doctorNameController,
-                          hintText: "Select Doctor",
-                        ),
-                        SizedBox(height: 4.0.h),
-                        CommonTextFieldRow(
-                          label: "Reference",
-                          controller: _referenceController,
-                          hintText: "Select Reference",
-                        ),
-                        SizedBox(height: 4.0.h),
                         Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
                           children: [
-                            Expanded(flex: 6, child: Text("Discount", style: AllTextStyle.textFieldHeadStyle)),
+                            Expanded(flex: 6, child: Text("Reference",style: AllTextStyle.textFieldHeadStyle)),
                             const Expanded(flex: 1, child: Text(":")),
                             Expanded(
-                              flex: 7,
-                              child: Container(
-                                height: 25.0.h,
-                                child: TextField(
-                                  style: AllTextStyle.textValueStyle,
-                                  controller: _discountParcentController,
-                                  onChanged: (value) {
-                                  },
-                                  keyboardType: TextInputType.phone,
-                                  decoration: InputDecoration(contentPadding: EdgeInsets.only(left: 3.w),
-                                      hintText: "0",
-                                      filled: true,
-                                      fillColor: Colors.white,
-                                      border: InputBorder.none,
-                                      focusedBorder:TextFieldInputBorder.focusEnabledBorder,
-                                      enabledBorder:TextFieldInputBorder.focusEnabledBorder
-                                  ),
-                                ),
-                              ),
-                            ),
-                            Expanded(flex: 3, child: Center(child: Text("%", style: AllTextStyle.textFieldHeadStyle))),
-                            Expanded(
-                              flex: 6,
-                              child: SizedBox(
-                                height: 25.0.h,
-                                child: TextField(
-                                  style: AllTextStyle.textValueStyle,
-                                  controller: _discountController,
-                                  keyboardType: TextInputType.number,
-                                  onChanged: (value) {
-                                  },
-                                  decoration: InputDecoration(
-                                    contentPadding: EdgeInsets.only(left: 3.w),
-                                    hintText: "0",
-                                    filled: true,
-                                    fillColor: Colors.white,
-                                    border: InputBorder.none,
-                                    focusedBorder:TextFieldInputBorder.focusEnabledBorder,
-                                    enabledBorder:TextFieldInputBorder.focusEnabledBorder
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 4.0.h),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Expanded(flex: 6, child: Text("Advance", style: AllTextStyle.textFieldHeadStyle)),
-                            const Expanded(flex: 1, child: Text(":")),
-                            Expanded(
-                              flex: 7,
-                              child: Container(
-                                height: 25.0.h,
-                                child: TextField(
-                                  style: AllTextStyle.textValueStyle,
-                                  controller: _advanceController,
-                                  onChanged: (value) {
-                                  },
-                                  keyboardType: TextInputType.phone,
-                                  decoration: InputDecoration(contentPadding: EdgeInsets.only(left: 3.w),
-                                      hintText: "0",
-                                      filled: true,
-                                      fillColor: Colors.white,
-                                      border: InputBorder.none,
-                                      focusedBorder:TextFieldInputBorder.focusEnabledBorder,
-                                      enabledBorder:TextFieldInputBorder.focusEnabledBorder
-                                  ),
-                                ),
-                              ),
-                            ),
-                            Expanded(
-                              flex: 3,
-                              child: Center(child: Text("Due:", style: AllTextStyle.textFieldHeadStyle))),
-                            Expanded(
-                              flex: 6,
+                              flex: 16,
                               child: Container(
                                 height: 25.h,
+                                width: MediaQuery.of(context).size.width / 2,
                                 decoration: ContDecoration.contDecoration,
-                                child: Padding(
-                                  padding: EdgeInsets.only(left: 5.w, top: 3.h),
-                                  child: Text("0",style: AllTextStyle.textValueStyle),
-                                ),
-                              )
+                                  child: TypeAheadField<AgentsModel>(
+                                  controller: _referenceController,
+                                  builder: (context, controller, focusNode) {
+                                  return TextField(
+                                    controller: controller,
+                                    focusNode: focusNode,
+                                    style: TextStyle(fontSize: 13, color: Colors.grey.shade800, overflow: TextOverflow.ellipsis),
+                                    decoration: InputDecoration(contentPadding: EdgeInsets.only(left: 5.0, top: 4.0),
+                                      isDense: true,
+                                      hintText: 'Select Reference',
+                                      hintStyle: TextStyle(fontSize: 13),
+                                      suffixIcon: _referenceId == '' || _referenceId == 'null' || _referenceId == null || controller.text == '' ? null
+                                          : GestureDetector(
+                                        onTap: () {
+                                          setState(() {
+                                            _referenceController.clear();
+                                            controller.clear();
+                                            _referenceId = null;
+                                          });
+                                        },
+                                        child: Padding(padding: EdgeInsets.all(5), child: Icon(Icons.close, size: 16)),
+                                      ),
+                                      suffixIconConstraints: BoxConstraints(maxHeight: 30),
+                                      filled: false,
+                                      fillColor: Colors.white,
+                                      border: InputBorder.none,
+                                    ),
+                                  );
+                                },
+                                suggestionsCallback: (pattern) async {
+                                  return Future.delayed(const Duration(seconds: 1), () {
+                                return allAgentsData
+                                  .where((element) => element.name.toLowerCase().contains(pattern.toLowerCase()))
+                                .toList().cast<AgentsModel>(); 
+                                  });
+                                  },
+                              
+                                itemBuilder: (context, AgentsModel suggestion) {
+                                  return Padding(
+                                    padding: EdgeInsets.symmetric(horizontal: 6.w,vertical: 4.h),
+                                    child: Text("${suggestion.agentCode} ${suggestion.name != "" ? " - ${suggestion.name}" : ""}",
+                                      style: TextStyle(fontSize: 12), maxLines: 1, overflow: TextOverflow.ellipsis,
+                                    ),
+                                  );
+                                },
+                                onSelected: (AgentsModel suggestion) {
+                                  _referenceController.text = "${suggestion.agentCode} ${suggestion.name != "" ? " - ${suggestion.name}" : ""}";
+                                    setState(() {
+                                      _referenceId = suggestion.id.toString();
+                                    });
+                                    print("_referenceId   Id======$_referenceId");
+                                },
+                              ),
+                              ),
                             ),
                           ],
                         ),
+                        SizedBox(height: 4.0.h),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Expanded(flex: 6, child: Text("Discount", style: AllTextStyle.textFieldHeadStyle)),
+            const Expanded(flex: 1, child: Text(":")),
+
+            Expanded(
+              flex: 7,
+              child: Container(
+                height: 25.0.h,
+                child: TextField(
+                  style: AllTextStyle.textValueStyle,
+                  controller: _discountParcentController,
+                  onChanged: (value) => _calculateAll(),
+                  keyboardType: TextInputType.phone,
+                  decoration: InputDecoration(
+                    contentPadding: EdgeInsets.only(left: 3.w),
+                    hintText: "0",
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: InputBorder.none,
+                    focusedBorder: TextFieldInputBorder.focusEnabledBorder,
+                    enabledBorder: TextFieldInputBorder.focusEnabledBorder,
+                  ),
+                ),
+              ),
+            ),
+
+            Expanded(flex: 3, child: Center(child: Text("%", style: AllTextStyle.textFieldHeadStyle))),
+
+            Expanded(
+              flex: 6,
+              child: SizedBox(
+                height: 25.0.h,
+                child: TextField(
+                  style: AllTextStyle.textValueStyle,
+                  controller: _discountController,
+                  keyboardType: TextInputType.number,
+                  onChanged: (value) {
+                    _discountParcentController.clear(); // percent reset
+                    _calculateAll();
+                  },
+                  decoration: InputDecoration(
+                    contentPadding: EdgeInsets.only(left: 3.w),
+                    hintText: "0",
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: InputBorder.none,
+                    focusedBorder: TextFieldInputBorder.focusEnabledBorder,
+                    enabledBorder: TextFieldInputBorder.focusEnabledBorder,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+
+        SizedBox(height: 4.0.h),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Expanded(flex: 6, child: Text("Advance", style: AllTextStyle.textFieldHeadStyle)),
+            const Expanded(flex: 1, child: Text(":")),
+
+            Expanded(
+              flex: 7,
+              child: Container(
+                height: 25.0.h,
+                child: TextField(
+                  style: AllTextStyle.textValueStyle,
+                  controller: _advanceController,
+                  onChanged: (value) => _calculateAll(),
+                  keyboardType: TextInputType.phone,
+                  decoration: InputDecoration(
+                    contentPadding: EdgeInsets.only(left: 3.w),
+                    hintText: "0",
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: InputBorder.none,
+                    focusedBorder: TextFieldInputBorder.focusEnabledBorder,
+                    enabledBorder: TextFieldInputBorder.focusEnabledBorder,
+                  ),
+                ),
+              ),
+            ),
+
+            Expanded(
+              flex: 3,
+              child: Center(child: Text("Due:", style: AllTextStyle.textFieldHeadStyle)),
+            ),
+
+            Expanded(
+              flex: 6,
+              child: Container(
+                height: 25.h,
+                decoration: ContDecoration.contDecoration,
+                child: Padding(
+                  padding: EdgeInsets.only(left: 5.w, top: 3.h),
+                  child: Text(
+                    dueAmmount,
+                    style: AllTextStyle.textValueStyle,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+                        // Row(
+                        //   mainAxisAlignment: MainAxisAlignment.start,
+                        //   children: [
+                        //     Expanded(flex: 6, child: Text("Discount", style: AllTextStyle.textFieldHeadStyle)),
+                        //     const Expanded(flex: 1, child: Text(":")),
+                        //     Expanded(
+                        //       flex: 7,
+                        //       child: Container(
+                        //         height: 25.0.h,
+                        //         child: TextField(
+                        //           style: AllTextStyle.textValueStyle,
+                        //           controller: _discountParcentController,
+                        //           onChanged: (value) {
+                        //           },
+                        //           keyboardType: TextInputType.phone,
+                        //           decoration: InputDecoration(contentPadding: EdgeInsets.only(left: 3.w),
+                        //               hintText: "0",
+                        //               filled: true,
+                        //               fillColor: Colors.white,
+                        //               border: InputBorder.none,
+                        //               focusedBorder:TextFieldInputBorder.focusEnabledBorder,
+                        //               enabledBorder:TextFieldInputBorder.focusEnabledBorder
+                        //           ),
+                        //         ),
+                        //       ),
+                        //     ),
+                        //     Expanded(flex: 3, child: Center(child: Text("%", style: AllTextStyle.textFieldHeadStyle))),
+                        //     Expanded(
+                        //       flex: 6,
+                        //       child: SizedBox(
+                        //         height: 25.0.h,
+                        //         child: TextField(
+                        //           style: AllTextStyle.textValueStyle,
+                        //           controller: _discountController,
+                        //           keyboardType: TextInputType.number,
+                        //           onChanged: (value) {
+                        //           },
+                        //           decoration: InputDecoration(
+                        //             contentPadding: EdgeInsets.only(left: 3.w),
+                        //             hintText: "0",
+                        //             filled: true,
+                        //             fillColor: Colors.white,
+                        //             border: InputBorder.none,
+                        //             focusedBorder:TextFieldInputBorder.focusEnabledBorder,
+                        //             enabledBorder:TextFieldInputBorder.focusEnabledBorder
+                        //           ),
+                        //         ),
+                        //       ),
+                        //     ),
+                        //   ],
+                        // ),
+                        // SizedBox(height: 4.0.h),
+                        // Row(
+                        //   mainAxisAlignment: MainAxisAlignment.start,
+                        //   children: [
+                        //     Expanded(flex: 6, child: Text("Advance", style: AllTextStyle.textFieldHeadStyle)),
+                        //     const Expanded(flex: 1, child: Text(":")),
+                        //     Expanded(
+                        //       flex: 7,
+                        //       child: Container(
+                        //         height: 25.0.h,
+                        //         child: TextField(
+                        //           style: AllTextStyle.textValueStyle,
+                        //           controller: _advanceController,
+                        //           onChanged: (value) {
+                        //           },
+                        //           keyboardType: TextInputType.phone,
+                        //           decoration: InputDecoration(contentPadding: EdgeInsets.only(left: 3.w),
+                        //               hintText: "0",
+                        //               filled: true,
+                        //               fillColor: Colors.white,
+                        //               border: InputBorder.none,
+                        //               focusedBorder:TextFieldInputBorder.focusEnabledBorder,
+                        //               enabledBorder:TextFieldInputBorder.focusEnabledBorder
+                        //           ),
+                        //         ),
+                        //       ),
+                        //     ),
+                        //     Expanded(
+                        //       flex: 3,
+                        //       child: Center(child: Text("Due:", style: AllTextStyle.textFieldHeadStyle))),
+                        //     Expanded(
+                        //       flex: 6,
+                        //       child: Container(
+                        //         height: 25.h,
+                        //         decoration: ContDecoration.contDecoration,
+                        //         child: Padding(
+                        //           padding: EdgeInsets.only(left: 5.w, top: 3.h),
+                        //           child: Text(dueAmmount,style: AllTextStyle.textValueStyle),
+                        //         ),
+                        //       )
+                        //     ),
+                        //   ],
+                        // ),
                         Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [

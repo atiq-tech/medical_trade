@@ -733,6 +733,7 @@ getMadicinePatientDue(String? patientId) async {
                                     ),
                                   ],
                                 ),
+                             
                                 SizedBox(height: 4.h),
                                   Row(
                                     children: [

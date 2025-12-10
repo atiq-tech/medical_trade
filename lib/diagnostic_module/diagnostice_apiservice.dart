@@ -3,6 +3,7 @@ import 'package:get_storage/get_storage.dart';
 import 'package:medical_trade/config/app_url.dart';
 import 'package:medical_trade/diagnostic_module/models/accounts_model.dart';
 import 'package:medical_trade/diagnostic_module/models/agents_model.dart';
+import 'package:medical_trade/diagnostic_module/models/available_slots_model.dart';
 import 'package:medical_trade/diagnostic_module/models/bank_account_model.dart';
 import 'package:medical_trade/diagnostic_module/models/bank_transaction_model.dart';
 import 'package:medical_trade/diagnostic_module/models/cash_transaction_model.dart';
@@ -288,4 +289,28 @@ class DiagnosticeApiservice {
     }
     return null;
   }
+
+ //==================get-Available-Slots List =======================
+  static fetchAvailableSlots(String? doctorId,String? appointmentDate) async {
+    String link = AppUrl.getAvailableSlotsEndPoint;
+    final token = getToken();
+    try {
+      Response response = await Dio().post(link,
+         data: {
+              "doctor_id": doctorId,
+              "appointment_date": appointmentDate
+          },
+          options: Options(headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer $token",
+          }));
+      var item = response.data;
+      print("All AvailableSlots Data======$item");
+      return List.from(item).map((e) => AvailableSlotsModel.fromMap(e)).toList();
+    } catch (e) {
+      print(e);
+    }
+    return null;
+  }
+  
 }

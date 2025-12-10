@@ -42,7 +42,7 @@ class _MyWallProductsDetailsState extends State<MyWallProductsDetails> {
     return Scaffold(
       appBar: CustomAppBar(
         onTap: _onAppBarTitleTap,
-        title: "Prducts Details",
+        title: "Products Details",
       ),
       body: SingleChildScrollView(
         child: Column(
