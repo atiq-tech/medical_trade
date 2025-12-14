@@ -23,14 +23,14 @@ class CustomToast {
   void _show() {
     OverlayEntry overlayEntry = OverlayEntry(
       builder: (context) => Padding(
-        padding: EdgeInsets.only(top: 30.h, left: 12.w, right: 12.w),
+        padding: EdgeInsets.only(top: 30.h, left: 5.w, right: 5.w),
         child: Align(
           alignment: Alignment.topCenter,
           child: Material(
             color: Colors.transparent,
             child: Container(
               padding:
-                  EdgeInsets.symmetric(horizontal: 12.0.w, vertical: 12.0.h),
+                  EdgeInsets.symmetric(horizontal: 5.0.w, vertical: 12.0.h),
               decoration: BoxDecoration(
                 color: isSuccess
                     ? const Color.fromARGB(255, 71, 184, 129)
@@ -52,10 +52,10 @@ class CustomToast {
                     color: Colors.white,
                     size: 16.sp,
                   ),
-                  SizedBox(width: 12.0.w),
+                  SizedBox(width: 6.0.w),
                   Text(
                     text,
-                    style: TextStyle(color: Colors.white, fontSize: 16.0.sp),
+                    style: TextStyle(color: Colors.white, fontSize: 12.0.sp),
                   ),
                 ],
               ),

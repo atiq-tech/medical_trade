@@ -10,7 +10,6 @@ import 'package:medical_trade/diagnostic_module/screens/patient_entry_screen.dar
 import 'package:medical_trade/diagnostic_module/screens/patient_list_screen.dart';
 import 'package:medical_trade/diagnostic_module/screens/patient_payment_entry_screen.dart';
 import 'package:medical_trade/diagnostic_module/screens/test_entry_screen.dart';
-import 'package:medical_trade/diagnostic_module/screens/test_receipt_screen.dart';
 import 'package:medical_trade/utilities/assets_manager.dart';
 import 'package:medical_trade/utilities/color_manager.dart';
 
@@ -45,11 +44,11 @@ class DiagnosticModuleScreen extends StatelessWidget {
         'icon': DiagnosticModule.patientList,
         'color': Colors.teal,
       },
-      {
-        'title': 'Test Receipt',
-        'icon': DiagnosticModule.testReceipt,
-        'color': Colors.indigo,
-      },
+      // {
+      //   'title': 'Test Receipt',
+      //   'icon': DiagnosticModule.testReceipt,
+      //   'color': Colors.indigo,
+      // },
       // {
       //   'title': 'Test Receipt List',
       //   'icon': DiagnosticModule.testReceiptList,
@@ -117,7 +116,7 @@ class DiagnosticModuleScreen extends StatelessWidget {
                :item['title']=="Test Entry" ? Navigator.push(context,MaterialPageRoute(builder: (_) => TestEntryScreen()))
                :item['title']=="Appointment Entry" ?Navigator.push(context,MaterialPageRoute(builder: (_) => AppointmentEntryScreen())) 
               // :item['title']=="Appointment List" ?Navigator.push(context,MaterialPageRoute(builder: (_) => AppointmentListScreen()))
-               :item['title']=="Test Receipt" ?Navigator.push(context,MaterialPageRoute(builder: (_) => TestReceiptScreen()))
+               //:item['title']=="Test Receipt" ?Navigator.push(context,MaterialPageRoute(builder: (_) => TestReceiptScreen()))
                //:item['title']=="Test Receipt List" ?Navigator.push(context,MaterialPageRoute(builder: (_) => TestReceiptListScreen()))
                :item['title']=="Cash Transaction" ?Navigator.push(context,MaterialPageRoute(builder: (_) => CashTransactionEntryScreen()))
                :item['title']=="Bank Transaction" ?Navigator.push(context,MaterialPageRoute(builder: (_) => BankTransactionEntryScreen()))

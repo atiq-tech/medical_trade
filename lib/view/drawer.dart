@@ -26,7 +26,8 @@ class _CustomDrawerState extends State<CustomDrawer> {
   void initState() {
     super.initState();
     final box = GetStorage();
-    userName = box.read('userName');
+    //userName = box.read('userName');
+    userName = box.read('username');
     // Fetch categories when the drawer is initialized
     WidgetsBinding.instance.addPostFrameCallback((_) {
       //Provider.of<GetCategoriesProvider>(context, listen: false).fetchData();

@@ -25,7 +25,9 @@ class AppUrl {
   static var registerEndPint = '$baseUrl/registration';
   static var getDivisionsEndPoint = '$baseUrl/get-divisions';
   static var getDistrictsEndPoint = '$baseUrl/get-districts';
-  static var getCustomerCodeEndPoint = '$baseUrl/get-customer-code';
+  //static var getCustomerCodeEndPoint = '$baseUrl/get-customer-code';
+  static var getBranchCodeEndPoint = '$baseUrl/get-branch-code';
+  
   //end
 
   //home Api All Detail & Categories

@@ -1150,7 +1150,7 @@ class _SalesYourOldMachineViewState extends State<SalesYourOldMachineView> {
                                     condition: _conditionController.text,
                                     origin: _originController.text,
                                     upazila: _upazilaController.text,
-                                    validityDate: firstPickedDate.toString(),
+                                    validityDate: backEndFirstDate.toString(),
                                     selectedDivisions: selectedDivisionIds,
                                     selectedDistricts: selectedDistrictIds,
                                     mobile: _contactNumberController.text,
@@ -1169,7 +1169,7 @@ class _SalesYourOldMachineViewState extends State<SalesYourOldMachineView> {
                                       _selectedDistricts.clear();
                                       _selectedDivisions.clear();
                                       _imagesList.clear();
-                                      firstPickedDate = "";  
+                                      backEndFirstDate = "";  
                                       setState(() {});
                                     },
                                   );

@@ -643,8 +643,10 @@ class _MyWallPostViewState extends State<MyWallPostView> {
   void initState() {
     super.initState();
     final box = GetStorage();
-    userName = box.read('userName');
-    userImageName = box.read('userImageName');
+    //userName = box.read('userName');
+    //userImageName = box.read('userImageName');
+    userName = box.read('username');
+    userImageName = box.read('image');
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<WallPostApiProvider>(context, listen: false).fetchWallData();
       Provider.of<ContactProvider>(context, listen: false).fetchContact();
@@ -711,14 +713,26 @@ class _MyWallPostViewState extends State<MyWallPostView> {
                           decoration: BoxDecoration(
                             border: Border.all(color: Colors.black, width: 1.w),
                             borderRadius: BorderRadius.circular(45.r),
-                            image: DecorationImage(
-                              image: userImageName != null
-                                  ? NetworkImage(
-                                      'https://soft.madicaltrade.com/uploads/customers/$userImageName')
-                                  : const AssetImage(ImageAssets.person)
-                                      as ImageProvider,
-                              fit: BoxFit.cover,
-                            ),
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(45.r),
+                            child: userImageName != null &&
+                                    userImageName.toString().isNotEmpty &&
+                                    userImageName != 'null'
+                                ? Image.network(
+                                    'https://app.madicaltrade.com/uploads/customers/$userImageName',
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (context, error, stackTrace) {
+                                      return Image.asset(
+                                        ImageAssets.person,
+                                        fit: BoxFit.cover,
+                                      );
+                                    },
+                                  )
+                                : Image.asset(
+                                    ImageAssets.person,
+                                    fit: BoxFit.cover,
+                                  ),
                           ),
                         ),
                         SizedBox(

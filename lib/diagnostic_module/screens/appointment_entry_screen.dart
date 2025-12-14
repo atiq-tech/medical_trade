@@ -18,6 +18,7 @@ import 'package:medical_trade/diagnostic_module/providers/department_provider.da
 import 'package:medical_trade/diagnostic_module/providers/doctors_provider.dart';
 import 'package:medical_trade/diagnostic_module/providers/patients_provider.dart';
 import 'package:medical_trade/diagnostic_module/utils/all_textstyle.dart';
+import 'package:medical_trade/diagnostic_module/utils/animation_snackbar.dart';
 import 'package:medical_trade/diagnostic_module/utils/common_textfield.dart';
 import 'package:medical_trade/diagnostic_module/utils/utils.dart';
 import 'package:medical_trade/utilities/color_manager.dart';
@@ -76,33 +77,41 @@ class _AppointmentEntryScreenState extends State<AppointmentEntryScreen> {
   String? _slotsId;
   String? _doctorId;
   String? _referenceId;
+  String? referenceName;
+  double consultationFees = 0;
+  double subTotal = 0;
   String dueAmmount = "0";
+
    void _calculateAll() {
-    double subTotal = double.tryParse(_subTotalController.text) ?? 0;
+    consultationFees = double.tryParse(_conFeesController.text) ?? 0;
+     
     double discountPercent = double.tryParse(_discountParcentController.text) ?? 0;
     double discountAmount = double.tryParse(_discountController.text) ?? 0;
     double advance = double.tryParse(_advanceController.text) ?? 0;
 
     // Auto calculate discount amount when percentage changes
     if (_discountParcentController.text.isNotEmpty) {
-      discountAmount = (subTotal * discountPercent) / 100;
+      discountAmount = (consultationFees * discountPercent) / 100;
       _discountController.text = discountAmount.toStringAsFixed(2);
     }
 
     // Auto calculate discount percentage when amount changes
     if (_discountController.text.isNotEmpty &&
         _discountParcentController.text.isEmpty) {
-      discountPercent = (discountAmount / subTotal) * 100;
+      discountPercent = (discountAmount / consultationFees) * 100;
       _discountParcentController.text = discountPercent.toStringAsFixed(2);
     }
 
-    double netTotal = subTotal - discountAmount;
+    double netTotal = consultationFees - discountAmount;
+    _subTotalController.text = netTotal.toString();
+
 
     // Due = Net Total - Advance
     double due = netTotal - advance;
 
     setState(() {
-      dueAmmount = due.toStringAsFixed(2);
+      dueAmmount = "$due" ;
+      print("due amount $dueAmmount");
     });
   }
 
@@ -171,7 +180,7 @@ class _AppointmentEntryScreenState extends State<AppointmentEntryScreen> {
     final dt = DateTime(now.year, now.month, now.day, picked.hour, picked.minute);
 
     setState(() {
-      _timeController.text = DateFormat('hh:mm a').format(dt);  // ✅ 12-hour format with AM/PM
+      _timeController.text = DateFormat('hh:mm').format(dt);  // ✅ 12-hour format with AM/PM
     });
   }
 }
@@ -863,9 +872,9 @@ getAppointSerialNumber() async {
 
                                   setState(() {
                                     _doctorId = suggestion.id.toString();
-                                    _conFeesController.text =suggestion.fees.toString();
-                                    _subTotalController.text =suggestion.fees.toString();
-                                    dueAmmount =suggestion.fees.toString();
+                                    _conFeesController.text = suggestion.fees.toString();
+                                    _subTotalController.text = suggestion.fees.toString();
+                                    dueAmmount = suggestion.fees.toString();
                                     String doctorDeptId = suggestion.departmentId.toString();
                                     var matchedDepartment = allDepartmentData.firstWhere(
                                       (d) => d.id.toString() == doctorDeptId,
@@ -875,6 +884,7 @@ getAppointSerialNumber() async {
                                       _departmentId = matchedDepartment.id.toString();
                                       _departmentController.text = matchedDepartment.name;
                                     }
+                                    _calculateAll();
                                   });
                                   Provider.of<AvailableSlotsProvider>(context, listen: false).getAvailableSlots("$_doctorId", "$backEndFirstDate");
                                 },
@@ -1148,9 +1158,11 @@ getAppointSerialNumber() async {
                                 onSelected: (AgentsModel suggestion) {
                                   _referenceController.text = "${suggestion.agentCode} ${suggestion.name != "" ? " - ${suggestion.name}" : ""}";
                                     setState(() {
+                                      referenceName = suggestion.name; 
                                       _referenceId = suggestion.id.toString();
                                     });
                                     print("_referenceId   Id======$_referenceId");
+                                    print("_name Id======${referenceName}");
                                 },
                               ),
                               ),
@@ -1158,207 +1170,113 @@ getAppointSerialNumber() async {
                           ],
                         ),
                         SizedBox(height: 4.0.h),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Expanded(flex: 6, child: Text("Discount", style: AllTextStyle.textFieldHeadStyle)),
-            const Expanded(flex: 1, child: Text(":")),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Expanded(flex: 6, child: Text("Discount", style: AllTextStyle.textFieldHeadStyle)),
+                            const Expanded(flex: 1, child: Text(":")),
 
-            Expanded(
-              flex: 7,
-              child: Container(
-                height: 25.0.h,
-                child: TextField(
-                  style: AllTextStyle.textValueStyle,
-                  controller: _discountParcentController,
-                  onChanged: (value) => _calculateAll(),
-                  keyboardType: TextInputType.phone,
-                  decoration: InputDecoration(
-                    contentPadding: EdgeInsets.only(left: 3.w),
-                    hintText: "0",
-                    filled: true,
-                    fillColor: Colors.white,
-                    border: InputBorder.none,
-                    focusedBorder: TextFieldInputBorder.focusEnabledBorder,
-                    enabledBorder: TextFieldInputBorder.focusEnabledBorder,
-                  ),
-                ),
-              ),
-            ),
+                            Expanded(
+                              flex: 7,
+                              child: Container(
+                                height: 25.0.h,
+                                child: TextField(
+                                  style: AllTextStyle.textValueStyle,
+                                  controller: _discountParcentController,
+                                  onChanged: (value) => _calculateAll(),
+                                  keyboardType: TextInputType.phone,
+                                  decoration: InputDecoration(
+                                    contentPadding: EdgeInsets.only(left: 3.w),
+                                    hintText: "0",
+                                    filled: true,
+                                    fillColor: Colors.white,
+                                    border: InputBorder.none,
+                                    focusedBorder: TextFieldInputBorder.focusEnabledBorder,
+                                    enabledBorder: TextFieldInputBorder.focusEnabledBorder,
+                                  ),
+                                ),
+                              ),
+                            ),
 
-            Expanded(flex: 3, child: Center(child: Text("%", style: AllTextStyle.textFieldHeadStyle))),
+                            Expanded(flex: 3, child: Center(child: Text("%", style: AllTextStyle.textFieldHeadStyle))),
 
-            Expanded(
-              flex: 6,
-              child: SizedBox(
-                height: 25.0.h,
-                child: TextField(
-                  style: AllTextStyle.textValueStyle,
-                  controller: _discountController,
-                  keyboardType: TextInputType.number,
-                  onChanged: (value) {
-                    _discountParcentController.clear(); // percent reset
-                    _calculateAll();
-                  },
-                  decoration: InputDecoration(
-                    contentPadding: EdgeInsets.only(left: 3.w),
-                    hintText: "0",
-                    filled: true,
-                    fillColor: Colors.white,
-                    border: InputBorder.none,
-                    focusedBorder: TextFieldInputBorder.focusEnabledBorder,
-                    enabledBorder: TextFieldInputBorder.focusEnabledBorder,
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
+                            Expanded(
+                              flex: 6,
+                              child: SizedBox(
+                                height: 25.0.h,
+                                child: TextField(
+                                  style: AllTextStyle.textValueStyle,
+                                  controller: _discountController,
+                                  keyboardType: TextInputType.number,
+                                  onChanged: (value) {
+                                    _discountParcentController.clear(); // percent reset
+                                    _calculateAll();
+                                  },
+                                  decoration: InputDecoration(
+                                    contentPadding: EdgeInsets.only(left: 3.w),
+                                    hintText: "0",
+                                    filled: true,
+                                    fillColor: Colors.white,
+                                    border: InputBorder.none,
+                                    focusedBorder: TextFieldInputBorder.focusEnabledBorder,
+                                    enabledBorder: TextFieldInputBorder.focusEnabledBorder,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
 
-        SizedBox(height: 4.0.h),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Expanded(flex: 6, child: Text("Advance", style: AllTextStyle.textFieldHeadStyle)),
-            const Expanded(flex: 1, child: Text(":")),
+                        SizedBox(height: 4.0.h),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Expanded(flex: 6, child: Text("Advance", style: AllTextStyle.textFieldHeadStyle)),
+                            const Expanded(flex: 1, child: Text(":")),
 
-            Expanded(
-              flex: 7,
-              child: Container(
-                height: 25.0.h,
-                child: TextField(
-                  style: AllTextStyle.textValueStyle,
-                  controller: _advanceController,
-                  onChanged: (value) => _calculateAll(),
-                  keyboardType: TextInputType.phone,
-                  decoration: InputDecoration(
-                    contentPadding: EdgeInsets.only(left: 3.w),
-                    hintText: "0",
-                    filled: true,
-                    fillColor: Colors.white,
-                    border: InputBorder.none,
-                    focusedBorder: TextFieldInputBorder.focusEnabledBorder,
-                    enabledBorder: TextFieldInputBorder.focusEnabledBorder,
-                  ),
-                ),
-              ),
-            ),
+                            Expanded(
+                              flex: 7,
+                              child: Container(
+                                height: 25.0.h,
+                                child: TextField(
+                                  style: AllTextStyle.textValueStyle,
+                                  controller: _advanceController,
+                                  onChanged: (value) => _calculateAll(),
+                                  keyboardType: TextInputType.phone,
+                                  decoration: InputDecoration(
+                                    contentPadding: EdgeInsets.only(left: 3.w),
+                                    hintText: "0",
+                                    filled: true,
+                                    fillColor: Colors.white,
+                                    border: InputBorder.none,
+                                    focusedBorder: TextFieldInputBorder.focusEnabledBorder,
+                                    enabledBorder: TextFieldInputBorder.focusEnabledBorder,
+                                  ),
+                                ),
+                              ),
+                            ),
 
-            Expanded(
-              flex: 3,
-              child: Center(child: Text("Due:", style: AllTextStyle.textFieldHeadStyle)),
-            ),
+                            Expanded(
+                              flex: 3,
+                              child: Center(child: Text("Due:", style: AllTextStyle.textFieldHeadStyle)),
+                            ),
 
-            Expanded(
-              flex: 6,
-              child: Container(
-                height: 25.h,
-                decoration: ContDecoration.contDecoration,
-                child: Padding(
-                  padding: EdgeInsets.only(left: 5.w, top: 3.h),
-                  child: Text(
-                    dueAmmount,
-                    style: AllTextStyle.textValueStyle,
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-                        // Row(
-                        //   mainAxisAlignment: MainAxisAlignment.start,
-                        //   children: [
-                        //     Expanded(flex: 6, child: Text("Discount", style: AllTextStyle.textFieldHeadStyle)),
-                        //     const Expanded(flex: 1, child: Text(":")),
-                        //     Expanded(
-                        //       flex: 7,
-                        //       child: Container(
-                        //         height: 25.0.h,
-                        //         child: TextField(
-                        //           style: AllTextStyle.textValueStyle,
-                        //           controller: _discountParcentController,
-                        //           onChanged: (value) {
-                        //           },
-                        //           keyboardType: TextInputType.phone,
-                        //           decoration: InputDecoration(contentPadding: EdgeInsets.only(left: 3.w),
-                        //               hintText: "0",
-                        //               filled: true,
-                        //               fillColor: Colors.white,
-                        //               border: InputBorder.none,
-                        //               focusedBorder:TextFieldInputBorder.focusEnabledBorder,
-                        //               enabledBorder:TextFieldInputBorder.focusEnabledBorder
-                        //           ),
-                        //         ),
-                        //       ),
-                        //     ),
-                        //     Expanded(flex: 3, child: Center(child: Text("%", style: AllTextStyle.textFieldHeadStyle))),
-                        //     Expanded(
-                        //       flex: 6,
-                        //       child: SizedBox(
-                        //         height: 25.0.h,
-                        //         child: TextField(
-                        //           style: AllTextStyle.textValueStyle,
-                        //           controller: _discountController,
-                        //           keyboardType: TextInputType.number,
-                        //           onChanged: (value) {
-                        //           },
-                        //           decoration: InputDecoration(
-                        //             contentPadding: EdgeInsets.only(left: 3.w),
-                        //             hintText: "0",
-                        //             filled: true,
-                        //             fillColor: Colors.white,
-                        //             border: InputBorder.none,
-                        //             focusedBorder:TextFieldInputBorder.focusEnabledBorder,
-                        //             enabledBorder:TextFieldInputBorder.focusEnabledBorder
-                        //           ),
-                        //         ),
-                        //       ),
-                        //     ),
-                        //   ],
-                        // ),
-                        // SizedBox(height: 4.0.h),
-                        // Row(
-                        //   mainAxisAlignment: MainAxisAlignment.start,
-                        //   children: [
-                        //     Expanded(flex: 6, child: Text("Advance", style: AllTextStyle.textFieldHeadStyle)),
-                        //     const Expanded(flex: 1, child: Text(":")),
-                        //     Expanded(
-                        //       flex: 7,
-                        //       child: Container(
-                        //         height: 25.0.h,
-                        //         child: TextField(
-                        //           style: AllTextStyle.textValueStyle,
-                        //           controller: _advanceController,
-                        //           onChanged: (value) {
-                        //           },
-                        //           keyboardType: TextInputType.phone,
-                        //           decoration: InputDecoration(contentPadding: EdgeInsets.only(left: 3.w),
-                        //               hintText: "0",
-                        //               filled: true,
-                        //               fillColor: Colors.white,
-                        //               border: InputBorder.none,
-                        //               focusedBorder:TextFieldInputBorder.focusEnabledBorder,
-                        //               enabledBorder:TextFieldInputBorder.focusEnabledBorder
-                        //           ),
-                        //         ),
-                        //       ),
-                        //     ),
-                        //     Expanded(
-                        //       flex: 3,
-                        //       child: Center(child: Text("Due:", style: AllTextStyle.textFieldHeadStyle))),
-                        //     Expanded(
-                        //       flex: 6,
-                        //       child: Container(
-                        //         height: 25.h,
-                        //         decoration: ContDecoration.contDecoration,
-                        //         child: Padding(
-                        //           padding: EdgeInsets.only(left: 5.w, top: 3.h),
-                        //           child: Text(dueAmmount,style: AllTextStyle.textValueStyle),
-                        //         ),
-                        //       )
-                        //     ),
-                        //   ],
-                        // ),
+                            Expanded(
+                              flex: 6,
+                              child: Container(
+                                height: 25.h,
+                                decoration: ContDecoration.contDecoration,
+                                child: Padding(
+                                  padding: EdgeInsets.only(left: 5.w, top: 3.h),
+                                  child: Text(
+                                    dueAmmount ,
+                                    style: AllTextStyle.textValueStyle,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                         Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
@@ -1423,8 +1341,8 @@ getAppointSerialNumber() async {
                       alignment: Alignment.bottomRight,
                       child: InkWell(
                         onTap: () async {
-                          // Utils.closeKeyBoard(context);
-                          // print("Tapped Save");
+                          Utils.closeKeyBoard(context);
+                          print("Tapped Save");
                           // if (_customerNameController.text == '') {
                           //   Utils.showTopSnackBar(context, "Customer name is required");
                           //   return;
@@ -1457,14 +1375,14 @@ getAppointSerialNumber() async {
                           //   Utils.showTopSnackBar(context, "Account No. field is required");
                           //   return;
                           // }
-                          // setState(() {
-                          //   customerEntryBtnClk = true;
-                          // });
-                          // var result = await customerEntry(context);
-                          // if (result == "true") {
-                          //   Provider.of<CustomerListProvider>(context, listen: false).getCustomerList("", "", "");
-                          // }
-                          // setState(() {});
+                          setState(() {
+                            addAppointmentBtnClk = true;
+                          });
+                          var result = await addAppointmentEntry(context);
+                          if (result == "true") {
+                           // Provider.of<CustomerListProvider>(context, listen: false).getCustomerList("", "", "");
+                          }
+                          setState(() {});
                         },
                         child: Container(
                           height: 28.0.h,
@@ -1482,7 +1400,7 @@ getAppointSerialNumber() async {
                             ],
                           ),
                           child: Center(
-                            child: customerEntryBtnClk
+                            child: addAppointmentBtnClk
                                 ? SizedBox(
                                     height: 20.0.h,
                                     width: 20.0.w,
@@ -1592,69 +1510,80 @@ getAppointSerialNumber() async {
     employeeId = "";
   });
 }
-bool customerEntryBtnClk = false;
-// Future<String> customerEntry(BuildContext context) async {
-//   String link = "${baseUrl}add_customer";
-//   SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-//   try {
-//     var response = await Dio().post(link,
-//       data:{
-//         "Customer_SlNo": 0,
-//         "Customer_Code": "",
-//         "Customer_Name": _customerNameController.text.trim(),
-//         "Customer_Type": customerType.toString().trim(),
-//         "Customer_Phone": '',
-//         "Customer_Mobile": _ownerMobileController.text.trim(),
-//         "cheque_number": _chequeDetailsController.text.trim(),
-//         "Customer_Email": _emailController.text.trim(),
-//         "Customer_OfficePhone": _pMMobileController.text.trim(),
-//         "Customer_Address": _deliveryAddressController.text.trim(),
-//         "Customer_Address_Others": _officeAddressController.text.trim(),
-//         "owner_name": _ownerNameController.text.trim(),
-//         "bank_name": _bankNameController.text.trim(),
-//         "check_no": _checkNoController.text.trim(),
-//         "brunch_name": _bankBranchNameController.text.trim(),
-//         "account_no": _accountNoController.text.trim(),
-//         "unit_area_id": regionId.toString().trim(),
-//         "territory_id": territoriesId.toString().trim(),
-//         "Customer_Credit_Limit": _creditLimitController.text.trim(),
-//         "previous_due": _previousDueController.text.trim(),
-//       },
-//       options: Options(
-//         headers: {
-//           "Content-Type": "application/json",
-//           'Cookie': 'ci_session=${sharedPreferences.getString("sessionId")}',
-//           "Authorization": "Bearer ${sharedPreferences.getString("token")}",
-//         },
-//       ),
-//     );
+bool addAppointmentBtnClk = false;
+Future<String> addAppointmentEntry(BuildContext context) async {
+  String link = AppUrl.addAppointmentEndPoint;
 
-//     var item = response.data;
-//     print("API Response: $item");
+  try {
+    final token = getToken();
 
-//     if (item["success"] == true) {
-//       setState(() {
-//         customerEntryBtnClk = false;
-//       });
-//       emptyMethod();
-//       CustomSnackBar.showTopSnackBar(context, "${item["message"]}");
-//       Navigator.push(context,MaterialPageRoute(builder:(context) => const CustomerEntryScreen()));
-//       return "true";
-//     } else {
-//       setState(() {
-//         customerEntryBtnClk = false;
-//       });
-//       Utils.showTopSnackBar(context,"${item["message"]}");
-//       return "false";
-//     }
-//   } catch (e) {
-//     setState(() {
-//       customerEntryBtnClk = false;
-//     });
-//     print("Exception caught: $e");
-//     Utils.showTopSnackBar(context, "Something went wrong: $e");
-//     return "false";
-//   }
-// }
- 
+    /// ====== BODY DATA READY ======
+    Map<String, dynamic> bodyData = {
+      "patient": {
+        "id": _selectedPatientId.toString(),   // Row theke neya ID
+        "name": _nameController.text.trim(),
+        "mobile": _mobileController.text.trim(),
+        "gender": _selectedGender.toString(),
+        "date_of_birth": firstPickedDate,
+      },
+      "appointment": {
+        "token_number": appointmentTrID.toString(),
+        "appointment_date": backEndSecondtDate,
+        "appointment_time": _timeController.text.trim(),
+        "serial_number": appointmentSerialNo,
+        "department_id": _departmentId.toString(),
+        "doctor_id": _doctorId.toString(),
+        "reference_id": _referenceId.toString(),
+        "fees": _conFeesController.text.trim(),
+        "subtotal": _subTotalController.text.trim(),
+        "commission_by": "Agent",
+        "slot_id": _slotsId.toString(),
+      }
+    };
+
+    print("Sending Body: $bodyData");
+
+    /// ====== API CALL ======
+    var response = await Dio().post(
+      link,
+      data: bodyData,
+      options: Options(
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
+        },
+      ),
+    );
+
+    var item = response.data;
+    print("API Response: $item");
+
+    if (item["success"] == true) {
+      setState(() {
+        addAppointmentBtnClk = false;
+      });
+
+      emptyMethod();
+      CustomSnackBar.showTopSnackBar(context, "${item["message"]}");
+
+      return "true";
+    } else {
+      setState(() {
+        addAppointmentBtnClk = false;
+      });
+
+      Utils.showTopSnackBar(context, "${item["message"]}");
+      return "false";
+    }
+  } catch (e) {
+    setState(() {
+      addAppointmentBtnClk = false;
+    });
+    print("Exception caught: $e");
+    Utils.showTopSnackBar(context, "Something went wrong: $e");
+
+    return "false";
+  }
+}
+
 }

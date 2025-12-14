@@ -19,7 +19,7 @@ class RegisterAuthProvider extends ChangeNotifier {
   String? get errorMessage => _errorMessage;
 
   Future<void> fetchCustomerCode() async {
-  final url = AppUrl.getCustomerCodeEndPoint;
+  final url = AppUrl.getBranchCodeEndPoint;
   try {
     final response = await http.get(Uri.parse(url));
 
@@ -98,9 +98,9 @@ class RegisterAuthProvider extends ChangeNotifier {
       var request = http.MultipartRequest('POST', Uri.parse(url))
         ..headers['Accept'] = 'application/json'
         ..headers['Content-Type'] = 'multipart/form-data'
-        ..fields['customer_id'] = _customerCode!
+        ..fields['code'] = _customerCode!
         ..fields['organization_name'] = organizationName
-        ..fields['customer_name'] = customerName
+        ..fields['name'] = customerName
         ..fields['title'] = title
         ..fields['username'] = username
         ..fields['mobile'] = mobile
@@ -129,7 +129,7 @@ class RegisterAuthProvider extends ChangeNotifier {
         }
 
         var imageFile = await http.MultipartFile.fromPath(
-          'image',
+          'branch_logo',
           image.path,
           contentType: MediaType.parse(contentType),
         );
@@ -143,7 +143,7 @@ class RegisterAuthProvider extends ChangeNotifier {
       print("RESPONSE BODY = $responseBody");
 
 
-      if (response.statusCode == 200) {
+      if (response.statusCode == 201) {
         final responseData = jsonDecode(responseBody);
         if (responseData['status'] == "success") {
           _isLoading = false;
