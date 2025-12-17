@@ -13,9 +13,8 @@ import 'package:provider/provider.dart';
 
 class Details extends StatefulWidget {
   final NewCategoryModel item;
-  // final GetCategoryModel item;
-  final String categoryType;
-  const Details({super.key, required this.item, required this.categoryType});
+  
+  const Details({super.key, required this.item});
 
   @override
   State<Details> createState() => _DetailsState();
@@ -31,12 +30,7 @@ class _DetailsState extends State<Details> {
     super.initState();
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      // await Provider.of<ProductDetailsProvider>(context, listen: false)
-      //     .fetchProduct(
-      //   categoryId: widget.item.id.toString(),
-      //   categoryType: widget.categoryType,
-      // );
-      Provider.of<AllProductsProvider>(context, listen: false).getProducts(widget.item.id.toString(),widget.categoryType);
+      Provider.of<AllProductsProvider>(context, listen: false).getProducts(widget.item.id.toString());
     });
   }
 
@@ -153,103 +147,6 @@ class _DetailsState extends State<Details> {
                 ),
               ),
             )
-
-            //   ///=====old TypeAheadFormField code
-            // Container(
-            //     decoration: BoxDecoration(
-            //       borderRadius: BorderRadius.all(Radius.circular(30.r)),
-            //     ),
-            //     height: 35.h,
-            //     child: TypeAheadFormField<ProductModel>(
-            //       textFieldConfiguration: TextFieldConfiguration(
-            //         controller: _productController,
-            //         decoration: InputDecoration(
-            //           prefixIcon: Padding(
-            //             padding: EdgeInsets.only(right: 12.w),
-            //             child: Container(
-            //               decoration: BoxDecoration(
-            //                 color: Colors.orange,
-            //                 borderRadius: BorderRadius.only(
-            //                   topLeft: Radius.circular(30.r),
-            //                   bottomLeft: Radius.circular(30.r),
-            //                 ),
-            //               ),
-            //               child: Padding(
-            //                 padding: EdgeInsets.symmetric(horizontal: 8.w),
-            //                 child: Icon(Icons.search,
-            //                     size: 18.sp, color: Colors.white),
-            //               ),
-            //             ),
-            //           ),
-            //           hintText: 'Search In...',
-            //           hintStyle: TextStyle(fontSize: 14.sp, color: Colors.grey),
-            //           contentPadding:
-            //               EdgeInsets.only(left: 12.w, top: 2.h, bottom: 2.h),
-            //           border: OutlineInputBorder(
-            //             borderSide: BorderSide.none,
-            //             borderRadius: BorderRadius.circular(30.r),
-            //           ),
-            //           filled: true,
-            //           fillColor: const Color(0xFFFFC107).withOpacity(0.2),
-            //           isDense: true,
-            //         ),
-            //       ),
-            //       suggestionsCallback: (pattern) async {
-            //         // Use a Consumer to fetch products
-            //         final data = Provider.of<ProductDetailsProvider>(context,
-            //             listen: false);
-            //         final products = data.categories;
-            //         return products
-            //             .where((product) => product.productName!
-            //                 .toLowerCase()
-            //                 .contains(pattern.toLowerCase()))
-            //             .toList();
-            //       },
-            //       itemBuilder: (context, ProductModel suggestion) {
-            //         return Padding(
-            //           padding:
-            //               EdgeInsets.symmetric(vertical: 5.h, horizontal: 10.w),
-            //           child: Text(
-            //             suggestion.productName.toString(),
-            //             style: TextStyle(fontSize: 14.sp),
-            //             maxLines: 1,
-            //             overflow: TextOverflow.ellipsis,
-            //           ),
-            //         );
-            //       },
-            //       onSuggestionSelected: (ProductModel suggestion) {
-            //         setState(() {
-            //           _productController.text =
-            //               suggestion.productName.toString();
-            //         });
-            //         Navigator.push(
-            //           context,
-            //           MaterialPageRoute(
-            //             builder: (context) => DetaislAllItems(item: suggestion),
-            //           ),
-            //         );
-            //         _productController.clear();
-            //         setState(() {
-            //           _isSearching = false;
-            //         });
-            //       },
-            //       noItemsFoundBuilder: (context) {
-            //         return Padding(
-            //           padding: EdgeInsets.all(8.h),
-            //           child: Text(
-            //             'No Products Found',
-            //             style: TextStyle(fontSize: 14.sp),
-            //           ),
-            //         );
-            //       },
-            //       transitionBuilder: (context, suggestionsBox, controller) {
-            //         return suggestionsBox;
-            //       },
-            //       suggestionsBoxDecoration: const SuggestionsBoxDecoration(
-            //         color: Colors.white,
-            //       ),
-            //     ),            
-            //   )
            
             : Text(widget.item.name),
         actions: [

@@ -55,6 +55,7 @@ dependencies:
   intl: ^0.18.0
   dropdown_button2: ^2.3.9
   dio: ^5.0.2
+  shared_preferences: ^2.2.0
   # flutter_keyboard_visibility: ^5.0.0
 
 dev_dependencies:

@@ -96,15 +96,14 @@ class ApiServiceNew {
 
 
     //========= fetch categories
- static Future<List<GetCategoryProductModel>?> fetchGetProductsApi(String? productCategoryId,String? type) async { 
+ static Future<List<GetCategoryProductModel>?> fetchGetProductsApi(String? productCategoryId) async { 
   try {
     String url = AppUrl.getProductsEndPoint;
     final token = getToken();
 
-    Response response = await Dio().get(url,
+    Response response = await Dio().post(url,
       data: {
           "product_category_id": productCategoryId,
-          "type": type
       },
       options: Options(
         headers: {

@@ -211,7 +211,6 @@ getDoctorCode() async {
     setState(() {
       doctorId = response.data["data"].toString();
     });
-    CustomSnackBar.showTopSnackBar(context, "${response.data["message"]}");
     print("doctorId ID =========> $doctorId");
 
   } catch (e) {

@@ -339,7 +339,6 @@ getPatientPayCode() async {
     setState(() {
       patientPayCode = response.data["data"].toString();
     });
-    CustomSnackBar.showTopSnackBar(context, "${response.data["message"]}");
     print("Patient ID =========> $patientPayCode");
 
   } catch (e) {

@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:medical_trade/controller/login_auth.dart';
+import 'package:medical_trade/diagnostic_module/screens/diagnostic_module_screen.dart';
+import 'package:medical_trade/diagnostic_module/utils/permission_helper.dart';
 import 'package:medical_trade/new_part/providers/category_provider.dart';
 import 'package:medical_trade/view/auth/login_register_auth.dart';
-import 'package:medical_trade/view/by_reagent_category_view.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:medical_trade/utilities/color_manager.dart';
-import 'package:medical_trade/utilities/custom_drawer_subitem_container.dart';
 import 'package:medical_trade/utilities/routes/routes_name.dart';
 import 'package:medical_trade/utilities/sizebox_manager.dart';
 import 'package:medical_trade/utilities/values_manager.dart';
@@ -20,7 +20,7 @@ class CustomDrawer extends StatefulWidget {
 }
 
 class _CustomDrawerState extends State<CustomDrawer> {
-  bool _isByReagentExpanded = false;
+ // bool _isByReagentExpanded = false;
   String? userName;
   @override
   void initState() {
@@ -35,15 +35,15 @@ class _CustomDrawerState extends State<CustomDrawer> {
     });
   }
 
-  void _toggleByReagentModule() {
-    setState(() {
-      _isByReagentExpanded = !_isByReagentExpanded;
-    });
-  }
+  // void _toggleByReagentModule() {
+  //   setState(() {
+  //     _isByReagentExpanded = !_isByReagentExpanded;
+  //   });
+  // }
 
   @override
   Widget build(BuildContext context) {
-    final categoryProvider = Provider.of<CategoryProvider>(context);
+   // final categoryProvider = Provider.of<CategoryProvider>(context);
 
     return Drawer(
       shape: RoundedRectangleBorder(
@@ -105,90 +105,98 @@ class _CustomDrawerState extends State<CustomDrawer> {
                 ),
               ),
             ),
+            // Divider(color: Colors.grey,height: 0.5.h),
+            // InkWell(
+            //   onTap: () => Navigator.pushNamed(context, RoutesName.newMachine),
+            //   child: SizedBox(
+            //     height: AppSize.s35.h,
+            //     child: Padding(
+            //       padding: EdgeInsets.symmetric(horizontal: 24.w),
+            //       child: Row(
+            //         mainAxisAlignment: MainAxisAlignment.start,
+            //         children: [
+            //           Icon(Icons.medical_information,size: 16.sp, color: Colors.black),
+            //           SizedBoxManager.width24(),
+            //           Text("New Machine",style: TextStyle(fontSize: 14.sp, color: Colors.black)),
+            //           const Spacer(),
+            //           Icon(Icons.arrow_forward,size: 16.sp, color: Colors.black),
+            //         ],
+            //       ),
+            //     ),
+            //   ),
+            // ),
+            // Divider(color: Colors.grey,height: 0.5.h),
+            // InkWell(
+            //   onTap: () => Navigator.pushNamed(context, RoutesName.oldMachine),
+            //   child: SizedBox(
+            //     height: AppSize.s35.h,
+            //     child: Padding(
+            //       padding: EdgeInsets.symmetric(horizontal: 24.w),
+            //       child: Row(
+            //         mainAxisAlignment: MainAxisAlignment.start,
+            //         children: [
+            //           Icon(Icons.history, size: 16.sp, color: Colors.black),
+            //           SizedBoxManager.width24(),
+            //           Text("Old Machine",style: TextStyle(fontSize: 14.sp,color: Colors.black)),
+            //           const Spacer(),
+            //           Icon(Icons.arrow_forward,size: 16.sp, color: Colors.black),
+            //         ],
+            //       ),
+            //     ),
+            //   ),
+            // ),
+           
+            // Divider(color: Colors.grey,height: 0.5.h),
+            // InkWell(
+            //   onTap: _toggleByReagentModule,
+            //   child: SizedBox(
+            //     height: AppSize.s35.h,
+            //     child: Padding(
+            //       padding: EdgeInsets.symmetric(horizontal: 24.w),
+            //       child: Row(
+            //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            //         children: [
+            //           Icon(Icons.support, size: 16.sp, color: Colors.black),
+            //           SizedBoxManager.width24(),
+            //           Text("Buy Reagent",style: TextStyle(fontSize: 14.sp,color: Colors.black)),
+            //           const Spacer(),
+            //           Icon(_isByReagentExpanded ? Icons.arrow_drop_up : Icons.arrow_drop_down,size: 24.sp,color: Colors.black),
+            //         ],
+            //       ),
+            //     ),
+            //   ),
+            // ),
+            // if (_isByReagentExpanded) ...[
+            //   if (CategoryProvider.isAllCategoriesLoading) ...[
+            //     Center(
+            //       child: CircularProgressIndicator(
+            //         valueColor: AlwaysStoppedAnimation<Color>(ColorManager.red),
+            //       ),
+            //     ),
+            //   ] else ...[
+            //     for (var category in categoryProvider.getFilteredCategories(["4", "5", "6", "7"])) ...[
+            //       Divider(color: Colors.grey,height: 0.5.h),
+            //       CustomDrawerSubitem(
+            //         onTap: () {
+            //           Navigator.push(context,MaterialPageRoute(builder: (_) => ByReagentCategoryView(item: category)));
+            //         },
+            //         color: const Color(0xFFBACCDF).withOpacity(0.6),
+            //         title: category.name,
+            //       ),
+            //       Divider(color: Colors.grey,height: 0.5.h),
+            //     ],
+            //   ],
+            // ],
             Divider(color: Colors.grey,height: 0.5.h),
             InkWell(
-              onTap: () => Navigator.pushNamed(context, RoutesName.newMachine),
-              child: SizedBox(
-                height: AppSize.s35.h,
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 24.w),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Icon(Icons.medical_information,size: 16.sp, color: Colors.black),
-                      SizedBoxManager.width24(),
-                      Text("New Machine",style: TextStyle(fontSize: 14.sp, color: Colors.black)),
-                      const Spacer(),
-                      Icon(Icons.arrow_forward,size: 16.sp, color: Colors.black),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            Divider(color: Colors.grey,height: 0.5.h),
-            InkWell(
-              onTap: () => Navigator.pushNamed(context, RoutesName.oldMachine),
-              child: SizedBox(
-                height: AppSize.s35.h,
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 24.w),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Icon(Icons.history, size: 16.sp, color: Colors.black),
-                      SizedBoxManager.width24(),
-                      Text("Old Machine",style: TextStyle(fontSize: 14.sp,color: Colors.black)),
-                      const Spacer(),
-                      Icon(Icons.arrow_forward,size: 16.sp, color: Colors.black),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            Divider(color: Colors.grey,height: 0.5.h),
-            InkWell(
-              onTap: _toggleByReagentModule,
-              child: SizedBox(
-                height: AppSize.s35.h,
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 24.w),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Icon(Icons.support, size: 16.sp, color: Colors.black),
-                      SizedBoxManager.width24(),
-                      Text("Buy Reagent",style: TextStyle(fontSize: 14.sp,color: Colors.black)),
-                      const Spacer(),
-                      Icon(_isByReagentExpanded ? Icons.arrow_drop_up : Icons.arrow_drop_down,size: 24.sp,color: Colors.black),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            if (_isByReagentExpanded) ...[
-              if (CategoryProvider.isAllCategoriesLoading) ...[
-                Center(
-                  child: CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(ColorManager.red),
-                  ),
-                ),
-              ] else ...[
-                for (var category in categoryProvider.getFilteredCategories(["4", "5", "6", "7"])) ...[
-                  Divider(color: Colors.grey,height: 0.5.h),
-                  CustomDrawerSubitem(
-                    onTap: () {
-                      Navigator.push(context,MaterialPageRoute(builder: (_) => ByReagentCategoryView(item: category)));
-                    },
-                    color: const Color(0xFFBACCDF).withOpacity(0.6),
-                    title: category.name,
-                  ),
-                  Divider(color: Colors.grey,height: 0.5.h),
-                ],
-              ],
-            ],
-            Divider(color: Colors.grey,height: 0.5.h),
-            InkWell(
-              onTap: () => Navigator.pushNamed(context, RoutesName.engineeringSupport),
+              onTap: () async {
+                  final access = await PermissionHelper.engineerSupport();
+                if (access == "true") {
+                   Navigator.pushNamed(context, RoutesName.engineeringSupport);
+                } else {
+                  showWarningDialog(context);
+                }
+              },
               child: SizedBox(
                 height: AppSize.s35.h,
                 child: Padding(
@@ -206,49 +214,56 @@ class _CustomDrawerState extends State<CustomDrawer> {
                 ),
               ),
             ),
-            Divider(color: Colors.black,height: 0.5.h),
-            InkWell(
-              onTap: () =>Navigator.pushNamed(context, RoutesName.allAccessories),
-              child: SizedBox(
-                height: AppSize.s35.h,
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 24.w),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Icon(Icons.category, size: 16.sp, color: Colors.black),
-                      SizedBoxManager.width24(),
-                      Text("All Accessories",style: TextStyle(fontSize: 14.sp,color: Colors.black)),
-                      const Spacer(),
-                      Icon(Icons.arrow_forward,size: 16.sp, color: Colors.black),
-                    ],
-                  ),
-                ),
-              ),
-            ),
+            // Divider(color: Colors.black,height: 0.5.h),
+            // InkWell(
+            //   onTap: () =>Navigator.pushNamed(context, RoutesName.allAccessories),
+            //   child: SizedBox(
+            //     height: AppSize.s35.h,
+            //     child: Padding(
+            //       padding: EdgeInsets.symmetric(horizontal: 24.w),
+            //       child: Row(
+            //         mainAxisAlignment: MainAxisAlignment.start,
+            //         children: [
+            //           Icon(Icons.category, size: 16.sp, color: Colors.black),
+            //           SizedBoxManager.width24(),
+            //           Text("All Accessories",style: TextStyle(fontSize: 14.sp,color: Colors.black)),
+            //           const Spacer(),
+            //           Icon(Icons.arrow_forward,size: 16.sp, color: Colors.black),
+            //         ],
+            //       ),
+            //     ),
+            //   ),
+            // ),
+            // Divider(color: Colors.grey,height: 0.5.h),
+            // InkWell(
+            //   onTap: () => Navigator.pushNamed(context, RoutesName.others),
+            //   child: SizedBox(
+            //     height: AppSize.s35.h,
+            //     child: Padding(
+            //       padding: EdgeInsets.symmetric(horizontal: 24.w),
+            //       child: Row(
+            //         mainAxisAlignment: MainAxisAlignment.start,
+            //         children: [
+            //           Icon(Icons.devices_other,size: 16.sp, color: Colors.black),
+            //           SizedBoxManager.width24(),
+            //           Text("Dental Equipment",style: TextStyle(fontSize: 14.sp,color: Colors.black)),
+            //           const Spacer(),
+            //           Icon(Icons.arrow_forward,size: 16.sp, color: Colors.black),
+            //         ],
+            //       ),
+            //     ),
+            //   ),
+            // ),
             Divider(color: Colors.grey,height: 0.5.h),
             InkWell(
-              onTap: () => Navigator.pushNamed(context, RoutesName.others),
-              child: SizedBox(
-                height: AppSize.s35.h,
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 24.w),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Icon(Icons.devices_other,size: 16.sp, color: Colors.black),
-                      SizedBoxManager.width24(),
-                      Text("Dental Equipment",style: TextStyle(fontSize: 14.sp,color: Colors.black)),
-                      const Spacer(),
-                      Icon(Icons.arrow_forward,size: 16.sp, color: Colors.black),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            Divider(color: Colors.grey,height: 0.5.h),
-            InkWell(
-              onTap: () => Navigator.pushNamed(context, RoutesName.salesOldMachine),
+              onTap: ()async{
+                final access = await PermissionHelper.saleYourOldMachine();
+                if (access == "true") {
+                    Navigator.pushNamed(context, RoutesName.salesOldMachine);
+                } else {
+                  showWarningDialog(context);
+                }
+              }, 
               child: SizedBox(
                 height: AppSize.s35.h,
                 child: Padding(

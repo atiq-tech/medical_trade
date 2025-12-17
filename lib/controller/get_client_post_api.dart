@@ -168,19 +168,19 @@ class GetClientPostProvider with ChangeNotifier {
         _clientCode = null;
         return true;
       } else {
-        CustomToast.show(
-          context: context,
-          text: "Failed to post data",
-          isSuccess: false,
-        );
+        // CustomToast.show(
+        //   context: context,
+        //   text: "Failed to post data",
+        //   isSuccess: false,
+        // );
         return false;
       }
     } catch (e) {
-      CustomToast.show(
-        context: context,
-        text: 'Error: $e',
-        isSuccess: false,
-      );
+      // CustomToast.show(
+      //   context: context,
+      //   text: 'Error: $e',
+      //   isSuccess: false,
+      // );
       return false;
     } finally {
       setLoading(false);

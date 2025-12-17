@@ -58,13 +58,13 @@ class _CategoryListScreenState extends State<CategoryListScreen> {
     final clinicalMachine = allCategoriesData.firstWhere(
       (category) => category.id.toString() == "1",
       orElse: () => NewCategoryModel(
-        id: "1",
+        id: 1,
         name: "Clinical Machine",
         description: "",
-        createdBy: "0",
+        createdBy: 0,
         updatedBy: "0",
         ipAddress: "",
-        branchId: "0",
+        branchId: 0,
         deletedAt: "",
         createdAt: "",
         updatedAt: "",
@@ -75,13 +75,13 @@ class _CategoryListScreenState extends State<CategoryListScreen> {
      final pathologyMachine = allCategoriesData.firstWhere(
       (category) => category.id.toString() == "2",
       orElse: () => NewCategoryModel(
-        id: "2",
+        id: 2,
         name: "Pathology Machine",
         description: "",
-        createdBy: "0",
+        createdBy: 0,
         updatedBy: "0",
         ipAddress: "",
-        branchId: "0",
+        branchId: 0,
         deletedAt: "",
         createdAt: "",
         updatedAt: "",

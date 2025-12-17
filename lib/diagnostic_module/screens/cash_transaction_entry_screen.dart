@@ -338,7 +338,6 @@ getCashTrCode() async {
     setState(() {
       cashTrCode = response.data["data"].toString();
     });
-    CustomSnackBar.showTopSnackBar(context, "${response.data["message"]}");
     print("cashTrCode =========> $cashTrCode");
 
   } catch (e) {

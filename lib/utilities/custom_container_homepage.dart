@@ -5,7 +5,13 @@ class CustomContainer extends StatelessWidget {
   final Color? backgroundColor;
   final String text;
   final Color textColor;
-  final String iconPath;
+
+  /// 🔹 Asset icon (optional)
+  final String? iconPath;
+
+  /// 🔹 Flutter icon (optional)
+  final IconData? iconData;
+
   final VoidCallback? onTap;
 
   const CustomContainer({
@@ -13,7 +19,8 @@ class CustomContainer extends StatelessWidget {
     required this.backgroundColor,
     required this.text,
     required this.textColor,
-    required this.iconPath,
+    this.iconPath,
+    this.iconData,
     this.onTap,
   });
 
@@ -32,21 +39,9 @@ class CustomContainer extends StatelessWidget {
             border: Border.all(
               color: Colors.black.withOpacity(0.1),
             ),
-            // boxShadow: [
-            //   BoxShadow(
-            //     color: Colors.grey.withOpacity(0.3),
-            //     blurRadius: 12.r,
-            //     offset: const Offset(2, 2),
-            //   ),
-            //   BoxShadow(
-            //     color: Colors.grey.withOpacity(0.3),
-            //     blurRadius: 12.r,
-            //     offset: const Offset(-2, -2),
-            //   ),
-            // ],
           ),
           child: Padding(
-            padding: EdgeInsets.all(6.0.r),
+            padding: EdgeInsets.all(6.r),
             child: Container(
               decoration: BoxDecoration(
                 color: backgroundColor,
@@ -54,15 +49,35 @@ class CustomContainer extends StatelessWidget {
               ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Image.asset(iconPath,height: 35.h, width: 35.w),
+
+                  /// 🔹 ICON SECTION
+                  if (iconPath != null)
+                    Image.asset(
+                      iconPath!,
+                      height: 35.h,
+                      width: 35.w,
+                    )
+                  else if (iconData != null)
+                    Icon(
+                      iconData,
+                      size: 35.sp,
+                      color: textColor,
+                    ),
+
+                  SizedBox(height: 6.h),
+
+                  /// 🔹 TITLE
                   Padding(
                     padding: const EdgeInsets.all(5.0),
                     child: Text(
                       text,
                       textAlign: TextAlign.center,
-                      style: TextStyle(color: textColor,fontSize: 15.sp,fontWeight: FontWeight.w500),
+                      style: TextStyle(
+                        color: textColor,
+                        fontSize: 15.sp,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                   ),
                 ],
@@ -74,3 +89,4 @@ class CustomContainer extends StatelessWidget {
     );
   }
 }
+

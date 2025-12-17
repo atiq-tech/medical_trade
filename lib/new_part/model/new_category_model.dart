@@ -51,7 +51,7 @@ class NewCategoryModel {
         "ip_address": ipAddress,
         "branch_id": branchId,
         "deleted_at": deletedAt,
-        "created_at": createdAt.toIso8601String(),
-        "updated_at": updatedAt.toIso8601String(),
+        "created_at": createdAt,
+        "updated_at": updatedAt,
     };
 }

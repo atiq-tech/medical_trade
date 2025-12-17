@@ -26,7 +26,6 @@ class _NewMachineState extends State<NewMachine> {
     CategoryProvider.isAllCategoriesLoading = true;
     Provider.of<CategoryProvider>(context, listen: false).getCategories();
   }
-
   void _onAppBarTitleTap() {
     Navigator.pop(context);
   }
@@ -39,13 +38,13 @@ class _NewMachineState extends State<NewMachine> {
     final clinicalMachine = allCategoriesData.firstWhere(
       (category) => category.id.toString() == "1",
       orElse: () => NewCategoryModel(
-        id: "1",
+        id: 1,
         name: "Clinical Machine",
         description: "",
-        createdBy: "0",
+        createdBy: 0,
         updatedBy: "0",
         ipAddress: "",
-        branchId: "0",
+        branchId: 0,
         deletedAt: "",
         createdAt: "",
         updatedAt: "",
@@ -56,13 +55,13 @@ class _NewMachineState extends State<NewMachine> {
      final pathologyMachine = allCategoriesData.firstWhere(
       (category) => category.id.toString() == "2",
       orElse: () => NewCategoryModel(
-        id: "2",
+        id: 2,
         name: "Pathology Machine",
         description: "",
-        createdBy: "0",
+        createdBy: 0,
         updatedBy: "0",
         ipAddress: "",
-        branchId: "0",
+        branchId: 0,
         deletedAt: "",
         createdAt: "",
         updatedAt: "",
@@ -89,7 +88,6 @@ class _NewMachineState extends State<NewMachine> {
                     MaterialPageRoute(
                       builder: (context) => Details(
                         item: clinicalMachine,
-                        categoryType: "new",
                       ),
                     ),
                   );
@@ -109,7 +107,6 @@ class _NewMachineState extends State<NewMachine> {
                     MaterialPageRoute(
                       builder: (context) => Details(
                         item: pathologyMachine,
-                        categoryType: "new",
                       ),
                     ),
                   );

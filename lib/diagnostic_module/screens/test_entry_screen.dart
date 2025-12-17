@@ -143,7 +143,6 @@ class _TestEntryScreenState extends State<TestEntryScreen> {
       setState(() {
         testId = response.data["data"].toString();
       });
-      CustomSnackBar.showTopSnackBar(context, "${response.data["message"]}");
       print("testId ID =========> $testId");
 
     } catch (e) {

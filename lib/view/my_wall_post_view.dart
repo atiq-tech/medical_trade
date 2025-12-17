@@ -677,7 +677,7 @@ class _MyWallPostViewState extends State<MyWallPostView> {
             },
           ),
         ),
-        leadingWidth: 35.0.w,
+        leadingWidth: 25.0.w,
         title: Padding(
           padding: EdgeInsets.only(
             top: AppPadding.p4.h,

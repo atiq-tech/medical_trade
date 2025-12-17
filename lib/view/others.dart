@@ -28,7 +28,7 @@ class _OthersState extends State<Others> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       // Provider.of<GetCategoryProductProvider>(context, listen: false)
       //     .fetchDataProduct("8");
-      Provider.of<AllProductsProvider>(context, listen: false).getProducts("8","");
+      Provider.of<AllProductsProvider>(context, listen: false).getProducts("8");
     });
   }
 

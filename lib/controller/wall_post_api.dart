@@ -1,9 +1,7 @@
 import 'dart:convert';
-import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:medical_trade/config/api_service.dart';
 import 'package:medical_trade/config/app_url.dart';
-import 'package:medical_trade/config/api_error_service.dart';
 import 'package:medical_trade/model/wall_post_model.dart';
 
 class WallPostApiProvider extends ChangeNotifier {
@@ -34,17 +32,16 @@ class WallPostApiProvider extends ChangeNotifier {
 
         notifyListeners();
       } else {
-        final errorMessage =
-            'Failed to fetch wall posts: ${response?.reasonPhrase}';
-        ErrorHandling.handleError(ApiException(errorMessage));
+        // final errorMessage = 'Failed to fetch wall posts: ${response?.reasonPhrase}';
+        // ErrorHandling.handleError(ApiException(errorMessage));
       }
     } catch (e) {
-      if (e is SocketException) {
-        ErrorHandling.handleError(e);
-      } else {
-        ErrorHandling.handleError(
-            e is Exception ? e : Exception(e.toString()));
-      }
+      // if (e is SocketException) {
+      //   ErrorHandling.handleError(e);
+      // } else {
+      //   ErrorHandling.handleError(
+      //       e is Exception ? e : Exception(e.toString()));
+      // }
     } finally {
       _isLoading = false;
       notifyListeners();

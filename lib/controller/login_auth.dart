@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:medical_trade/config/app_url.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginAuthProvider extends ChangeNotifier {
   bool _isLoading = false;
@@ -35,11 +36,9 @@ class LoginAuthProvider extends ChangeNotifier {
       return false;
     }
 
-    final url = AppUrl.loginEndPint;
-
     try {
       final response = await http.post(
-        Uri.parse(url),
+        Uri.parse(AppUrl.loginEndPint),
         body: {
           "username": userName,
           "password": password,
@@ -53,12 +52,11 @@ class LoginAuthProvider extends ChangeNotifier {
 
         if (responseData['status'] == "success") {
           final box = GetStorage();
+          final prefs = await SharedPreferences.getInstance();
 
-          /// ✅ FIXED HERE
           final token = responseData['token'];
           final userData = responseData['user'];
 
-          /// Safely extract values
           final id = userData['id']?.toString() ?? '';
           final name = userData['name'] ?? '';
           final username = userData['username'] ?? '';
@@ -66,7 +64,24 @@ class LoginAuthProvider extends ChangeNotifier {
           final role = userData['role'] ?? '';
           final branchId = userData['branch_id']?.toString() ?? '';
 
-          /// Save to storage
+          /// ✅ PERMISSIONS
+          List permissionList = userData['permissions'] ?? [];
+
+          prefs.setString("saleYourOldMachine","${permissionList.contains("client_post")}");
+          prefs.setString("wallPost","${permissionList.contains("wall_post")}");
+          prefs.setString("engineerSupport","${permissionList.contains("engineer_support")}");
+          prefs.setString("patientEntry","${permissionList.contains("patient_entry")}");
+          prefs.setString("doctorEntry","${permissionList.contains("doctor_entry")}");
+          prefs.setString("testEntry","${permissionList.contains("test_entry")}");
+          prefs.setString("appointmentEntry","${permissionList.contains("outdoor_patient")}");
+          prefs.setString("bankTrEntry","${permissionList.contains("bank_transaction_entry")}");
+          prefs.setString("cashTrEntry","${permissionList.contains("cash_transaction_entry")}");
+          prefs.setString("patientPayment", "${permissionList.contains("patient_payment_medicine")}");
+          prefs.setString("commissionPayment", "${permissionList.contains("commission_payment")}");
+          prefs.setString("patientList","${permissionList.contains("patient_list",)}");
+    
+
+          /// ✅ SAVE USER INFO
           box.write('loginToken', token);
           box.write('userId', id);
           box.write('name', name);
@@ -76,9 +91,8 @@ class LoginAuthProvider extends ChangeNotifier {
           box.write('branchId', branchId);
 
           print("Login Success ✅");
+          print("User: $name");
           print("Token: $token");
-          print("User ID: $id");
-          print("Name: $name");
 
           _errorMessage = null;
           _setLoading(false);
@@ -103,6 +117,122 @@ class LoginAuthProvider extends ChangeNotifier {
     notifyListeners();
   }
 }
+
+
+
+
+
+
+
+
+
+
+//-----------13----------
+// import 'dart:convert';
+
+// import 'package:connectivity_plus/connectivity_plus.dart';
+// import 'package:flutter/material.dart';
+// import 'package:get_storage/get_storage.dart';
+// import 'package:http/http.dart' as http;
+// import 'package:medical_trade/config/app_url.dart';
+
+// class LoginAuthProvider extends ChangeNotifier {
+//   bool _isLoading = false;
+//   String? _errorMessage;
+
+//   bool get isLoading => _isLoading;
+//   String? get errorMessage => _errorMessage;
+
+//   bool isLoggedIn() {
+//     final box = GetStorage();
+//     return box.read('loginToken') != null;
+//   }
+
+//   void logout() {
+//     final box = GetStorage();
+//     box.erase();
+//     _errorMessage = null;
+//     notifyListeners();
+//   }
+
+//   Future<bool> login(String userName, String password) async {
+//     _setLoading(true);
+
+//     var connectivityResult = await Connectivity().checkConnectivity();
+//     if (connectivityResult == ConnectivityResult.none) {
+//       _errorMessage = 'No internet connection';
+//       _setLoading(false);
+//       return false;
+//     }
+
+//     final url = AppUrl.loginEndPint;
+
+//     try {
+//       final response = await http.post(
+//         Uri.parse(url),
+//         body: {
+//           "username": userName,
+//           "password": password,
+//         },
+//       );
+
+//       print("Response Body: ${response.body}");
+
+//       if (response.statusCode == 200) {
+//         final responseData = jsonDecode(response.body);
+
+//         if (responseData['status'] == "success") {
+//           final box = GetStorage();
+
+//           /// ✅ FIXED HERE
+//           final token = responseData['token'];
+//           final userData = responseData['user'];
+
+//           /// Safely extract values
+//           final id = userData['id']?.toString() ?? '';
+//           final name = userData['name'] ?? '';
+//           final username = userData['username'] ?? '';
+//           final image = userData['image'] ?? '';
+//           final role = userData['role'] ?? '';
+//           final branchId = userData['branch_id']?.toString() ?? '';
+
+//           /// Save to storage
+//           box.write('loginToken', token);
+//           box.write('userId', id);
+//           box.write('name', name);
+//           box.write('username', username);
+//           box.write('image', image);
+//           box.write('role', role);
+//           box.write('branchId', branchId);
+
+//           print("Login Success ✅");
+//           print("Token: $token");
+//           print("User ID: $id");
+//           print("Name: $name");
+
+//           _errorMessage = null;
+//           _setLoading(false);
+//           return true;
+//         } else {
+//           _errorMessage = responseData['message'] ?? 'Login failed';
+//         }
+//       } else {
+//         _errorMessage = 'Server Error: ${response.statusCode}';
+//       }
+//     } catch (e) {
+//       _errorMessage = e.toString();
+//     } finally {
+//       _setLoading(false);
+//     }
+
+//     return false;
+//   }
+
+//   void _setLoading(bool loading) {
+//     _isLoading = loading;
+//     notifyListeners();
+//   }
+// }
 
 
 

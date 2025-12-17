@@ -29,7 +29,7 @@ class _AllAccessoriesState extends State<AllAccessories> {
       // Provider.of<GetCategoryProductProvider>(context, listen: false)
       //     .fetchDataProduct("3");
     });
-    Provider.of<AllProductsProvider>(context, listen: false).getProducts("3","");
+    Provider.of<AllProductsProvider>(context, listen: false).getProducts("3");
   }
 
   @override

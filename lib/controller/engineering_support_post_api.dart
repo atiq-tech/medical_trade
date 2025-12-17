@@ -4,7 +4,6 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:http/http.dart' as http;
-import 'package:medical_trade/config/api_error_service.dart';
 import 'package:medical_trade/config/app_url.dart';
 import 'package:medical_trade/utilities/custom_message.dart';
 
@@ -125,13 +124,13 @@ class EngineeringSupportProvider with ChangeNotifier {
         );
       }
     } catch (e) {
-      print("Error occurred: $e");
-      await ErrorHandling.handleError(e as Exception);
-      CustomToast.show(
-        context: context,
-        text: "Failed to save data. Please try again.",
-        isSuccess: false,
-      );
+      // print("Error occurred: $e");
+      // await ErrorHandling.handleError(e as Exception);
+      // CustomToast.show(
+      //   context: context,
+      //   text: "Failed to save data. Please try again.",
+      //   isSuccess: false,
+      // );
     } finally {
       _isLoading = false;
       notifyListeners();

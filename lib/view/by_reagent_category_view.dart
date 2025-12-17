@@ -32,7 +32,7 @@ class _ByReagentCategoryViewState extends State<ByReagentCategoryView> {
     Future.microtask(() {
       // ignore: use_build_context_synchronously
       //Provider.of<GetCategoryProductProvider>(context, listen: false).fetchDataProduct(widget.item.id.toString());
-      Provider.of<AllProductsProvider>(context, listen: false).getProducts(widget.item.id.toString(),"");
+      Provider.of<AllProductsProvider>(context, listen: false).getProducts(widget.item.id.toString());
     });
   }
 

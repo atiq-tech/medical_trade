@@ -272,7 +272,6 @@ static String getToken() {
     setState(() {
       bankTrCode = response.data["data"].toString();
     });
-    CustomSnackBar.showTopSnackBar(context, "${response.data["message"]}");
     print("bankTrCode =========> $bankTrCode");
 
   } catch (e) {
