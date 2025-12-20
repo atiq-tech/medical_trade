@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:medical_trade/diagnostic_module/screens/diagnostic_module_screen.dart';
 import 'package:medical_trade/utilities/routes/routes_name.dart';
 import 'package:medical_trade/view/all_accessories.dart';
 import 'package:medical_trade/view/auth/login_register_auth.dart';
@@ -70,9 +71,9 @@ class Routes {
         return MaterialPageRoute(
             builder: (BuildContext context) => const SalesYourOldMachineView());
 
-      // case RoutesName.categorylist:
-      //   return MaterialPageRoute(
-      //       builder: (BuildContext context) => const CategoryListScreen());
+      case RoutesName.diagnosticModule:
+        return MaterialPageRoute(
+            builder: (BuildContext context) => const DiagnosticModuleScreen());
 
       // case RoutesName.diagnostic:
       //   return MaterialPageRoute(

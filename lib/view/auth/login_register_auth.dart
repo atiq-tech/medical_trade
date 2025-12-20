@@ -3,7 +3,6 @@ import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
-//import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:medical_trade/controller/get_district_api.dart';
 import 'package:medical_trade/controller/get_division_api.dart';
@@ -17,7 +16,7 @@ import 'package:medical_trade/utilities/custom_textfromfield_register.dart';
 import 'package:medical_trade/utilities/font_manager.dart';
 import 'package:medical_trade/utilities/sizebox_manager.dart';
 import 'package:medical_trade/utilities/values_manager.dart';
-import 'package:medical_trade/view/my_wall_post_view.dart';
+import 'package:medical_trade/view/home_view.dart';
 import 'package:provider/provider.dart';
 
 class LoginView extends StatefulWidget {
@@ -1370,7 +1369,7 @@ class _LoginWidgetsState extends State<_LoginWidgets> {
                         );
 
                         Navigator.pushAndRemoveUntil(context,
-                          MaterialPageRoute(builder: (context) => const MyWallPostView()),
+                          MaterialPageRoute(builder: (context) => const HomeView()),
                           (Route<dynamic> route) => false,
                         );
                       }

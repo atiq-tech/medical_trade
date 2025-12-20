@@ -40,6 +40,7 @@ class RoutesName {
 
   //home view routes name
   static const String diagnostic = 'diagnostic_view';
+  static const String diagnosticModule = 'diagnostic_module';
   //home view routes name
   static const String diagnosticDetailsView = 'diagnostic_Details_view';
   //home view routes name

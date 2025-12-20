@@ -1,16 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:medical_trade/controller/login_auth.dart';
 import 'package:medical_trade/diagnostic_module/screens/diagnostic_module_screen.dart';
+import 'package:provider/provider.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+
+import 'package:medical_trade/controller/login_auth.dart';
 import 'package:medical_trade/diagnostic_module/utils/permission_helper.dart';
 import 'package:medical_trade/new_part/providers/category_provider.dart';
 import 'package:medical_trade/view/auth/login_register_auth.dart';
-import 'package:provider/provider.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:medical_trade/utilities/color_manager.dart';
 import 'package:medical_trade/utilities/routes/routes_name.dart';
 import 'package:medical_trade/utilities/sizebox_manager.dart';
 import 'package:medical_trade/utilities/values_manager.dart';
+
+// ===== Diagnostic Screens =====
+import 'package:medical_trade/diagnostic_module/screens/patient_entry_screen.dart';
+import 'package:medical_trade/diagnostic_module/screens/doctor_entry_screen.dart';
+import 'package:medical_trade/diagnostic_module/screens/test_entry_screen.dart';
+import 'package:medical_trade/diagnostic_module/screens/doctor_list_screen.dart';
+import 'package:medical_trade/diagnostic_module/screens/patient_list_screen.dart';
+import 'package:medical_trade/diagnostic_module/screens/appointment_entry_screen.dart';
+import 'package:medical_trade/diagnostic_module/screens/cash_transaction_entry_screen.dart';
+import 'package:medical_trade/diagnostic_module/screens/bank_transaction_entry_screen.dart';
+import 'package:medical_trade/diagnostic_module/screens/commission_payment_entry_screen.dart';
+import 'package:medical_trade/diagnostic_module/screens/patient_payment_entry_screen.dart';
 
 class CustomDrawer extends StatefulWidget {
   const CustomDrawer({super.key});
@@ -20,273 +32,130 @@ class CustomDrawer extends StatefulWidget {
 }
 
 class _CustomDrawerState extends State<CustomDrawer> {
- // bool _isByReagentExpanded = false;
   String? userName;
+  bool _isDiagnosticOpen = false;
+
+  final List<String> diagnosticTitles = [
+    "Patient Entry",
+    "Doctor Entry",
+    "Test Entry",
+    "Doctor List",
+    "Patient List",
+    "Appointment Entry",
+    "Cash Transaction",
+    "Bank Transaction",
+    "Commission Payment",
+    "Patient Payment",
+  ];
+
   @override
   void initState() {
     super.initState();
     final box = GetStorage();
-    //userName = box.read('userName');
     userName = box.read('username');
-    // Fetch categories when the drawer is initialized
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      //Provider.of<GetCategoriesProvider>(context, listen: false).fetchData();
-      Provider.of<CategoryProvider>(context, listen: false).getCategories();
+      context.read<CategoryProvider>().getCategories();
     });
   }
 
-  // void _toggleByReagentModule() {
-  //   setState(() {
-  //     _isByReagentExpanded = !_isByReagentExpanded;
-  //   });
-  // }
-
   @override
   Widget build(BuildContext context) {
-   // final categoryProvider = Provider.of<CategoryProvider>(context);
-
     return Drawer(
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.only(topRight: Radius.circular(AppSize.s50.r),bottomRight: Radius.circular(AppSize.s50.r)),
+        borderRadius: BorderRadius.only(
+          topRight: Radius.circular(AppSize.s50.r),
+          bottomRight: Radius.circular(AppSize.s50.r),
+        ),
       ),
       child: Container(
         color: Colors.white,
         child: Column(
           children: [
+
+            /// ================= HEADER =================
             Container(
               height: AppSize.s150.h,
-              width: double.infinity.w,
-              color: ColorManager.white,
-              child: Padding(
-                padding: EdgeInsets.only(left: AppPadding.p12.w),
-                child: Row(
-                  children: [
-                    CircleAvatar(
-                      backgroundColor: Colors.white,
-                      backgroundImage:const AssetImage("assets/icons/medical.png"),
-                      radius: 35.r,
-                    ),
-                    SizedBoxManager.width12(),
-                    Padding(
-                      padding: EdgeInsets.only(top: 55.h),
-                      child: Column(
-                        children: [
-                          Text("Medical Trade",style: TextStyle(fontSize: 18.sp,fontWeight: FontWeight.bold)),
-                          Text(
-                            userName ?? "Unknown User",
-                            maxLines: 1,
-                            style: TextStyle(fontSize: 12.sp,fontWeight: FontWeight.bold,color: Colors.black),
-                            overflow: TextOverflow.ellipsis,
-                          )
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            Divider(color: Colors.grey,height: 0.5.h),
-            InkWell(
-              onTap: () => Navigator.pushNamed(context, RoutesName.home),
-              child: SizedBox(
-                height: AppSize.s35.h,
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 24.w),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Icon(Icons.home, size: 16.sp, color: Colors.black),
-                      SizedBoxManager.width24(),
-                      Text("My Page",style: TextStyle(fontSize: 14.sp,color: Colors.black)),
-                      const Spacer(),
-                      Icon(Icons.arrow_forward,size: 16.sp, color: Colors.black),
-                    ],
+              width: double.infinity,
+              padding: EdgeInsets.only(left: AppPadding.p12.w),
+              child: Row(
+                children: [
+                  CircleAvatar(
+                    radius: 35.r,
+                    backgroundImage:
+                        const AssetImage("assets/icons/medical.png"),
                   ),
-                ),
+                  SizedBoxManager.width12(),
+                  Padding(
+                    padding: EdgeInsets.only(top: 55.h),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Medical Trade",
+                          style: TextStyle(
+                              fontSize: 18.sp,
+                              fontWeight: FontWeight.bold),
+                        ),
+                        Text(
+                          userName ?? "Unknown User",
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(fontSize: 12.sp),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ),
-            // Divider(color: Colors.grey,height: 0.5.h),
-            // InkWell(
-            //   onTap: () => Navigator.pushNamed(context, RoutesName.newMachine),
-            //   child: SizedBox(
-            //     height: AppSize.s35.h,
-            //     child: Padding(
-            //       padding: EdgeInsets.symmetric(horizontal: 24.w),
-            //       child: Row(
-            //         mainAxisAlignment: MainAxisAlignment.start,
-            //         children: [
-            //           Icon(Icons.medical_information,size: 16.sp, color: Colors.black),
-            //           SizedBoxManager.width24(),
-            //           Text("New Machine",style: TextStyle(fontSize: 14.sp, color: Colors.black)),
-            //           const Spacer(),
-            //           Icon(Icons.arrow_forward,size: 16.sp, color: Colors.black),
-            //         ],
-            //       ),
-            //     ),
-            //   ),
-            // ),
-            // Divider(color: Colors.grey,height: 0.5.h),
-            // InkWell(
-            //   onTap: () => Navigator.pushNamed(context, RoutesName.oldMachine),
-            //   child: SizedBox(
-            //     height: AppSize.s35.h,
-            //     child: Padding(
-            //       padding: EdgeInsets.symmetric(horizontal: 24.w),
-            //       child: Row(
-            //         mainAxisAlignment: MainAxisAlignment.start,
-            //         children: [
-            //           Icon(Icons.history, size: 16.sp, color: Colors.black),
-            //           SizedBoxManager.width24(),
-            //           Text("Old Machine",style: TextStyle(fontSize: 14.sp,color: Colors.black)),
-            //           const Spacer(),
-            //           Icon(Icons.arrow_forward,size: 16.sp, color: Colors.black),
-            //         ],
-            //       ),
-            //     ),
-            //   ),
-            // ),
-           
-            // Divider(color: Colors.grey,height: 0.5.h),
-            // InkWell(
-            //   onTap: _toggleByReagentModule,
-            //   child: SizedBox(
-            //     height: AppSize.s35.h,
-            //     child: Padding(
-            //       padding: EdgeInsets.symmetric(horizontal: 24.w),
-            //       child: Row(
-            //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            //         children: [
-            //           Icon(Icons.support, size: 16.sp, color: Colors.black),
-            //           SizedBoxManager.width24(),
-            //           Text("Buy Reagent",style: TextStyle(fontSize: 14.sp,color: Colors.black)),
-            //           const Spacer(),
-            //           Icon(_isByReagentExpanded ? Icons.arrow_drop_up : Icons.arrow_drop_down,size: 24.sp,color: Colors.black),
-            //         ],
-            //       ),
-            //     ),
-            //   ),
-            // ),
-            // if (_isByReagentExpanded) ...[
-            //   if (CategoryProvider.isAllCategoriesLoading) ...[
-            //     Center(
-            //       child: CircularProgressIndicator(
-            //         valueColor: AlwaysStoppedAnimation<Color>(ColorManager.red),
-            //       ),
-            //     ),
-            //   ] else ...[
-            //     for (var category in categoryProvider.getFilteredCategories(["4", "5", "6", "7"])) ...[
-            //       Divider(color: Colors.grey,height: 0.5.h),
-            //       CustomDrawerSubitem(
-            //         onTap: () {
-            //           Navigator.push(context,MaterialPageRoute(builder: (_) => ByReagentCategoryView(item: category)));
-            //         },
-            //         color: const Color(0xFFBACCDF).withOpacity(0.6),
-            //         title: category.name,
-            //       ),
-            //       Divider(color: Colors.grey,height: 0.5.h),
-            //     ],
-            //   ],
-            // ],
-            Divider(color: Colors.grey,height: 0.5.h),
-            InkWell(
+
+            Divider(height: 0.5.h),
+
+            /// ================= MY PAGE =================
+            _drawerItem(
+              icon: Icons.home,
+              title: "My Page",
+              onTap: () =>
+                  Navigator.pushNamed(context, RoutesName.home),
+            ),
+
+            Divider(height: 0.5.h),
+
+            /// ================= ENGINEERING SUPPORT =================
+            _drawerItem(
+              icon: Icons.build,
+              title: "Engineering Support",
               onTap: () async {
-                  final access = await PermissionHelper.engineerSupport();
-                if (access == "true") {
-                   Navigator.pushNamed(context, RoutesName.engineeringSupport);
-                } else {
-                  showWarningDialog(context);
-                }
+                final access =
+                    await PermissionHelper.engineerSupport();
+                access == "true"
+                    ? Navigator.pushNamed(
+                        context, RoutesName.engineeringSupport)
+                    : showWarningDialog(context);
               },
-              child: SizedBox(
-                height: AppSize.s35.h,
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 24.w),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Icon(Icons.build, size: 16.sp, color: Colors.black),
-                      SizedBoxManager.width24(),
-                      Text("Engineering Support",style: TextStyle(fontSize: 14.sp, color: Colors.black)),
-                      const Spacer(),
-                      Icon(Icons.arrow_forward,size: 16.sp, color: Colors.black),
-                    ],
-                  ),
-                ),
-              ),
             ),
-            // Divider(color: Colors.black,height: 0.5.h),
-            // InkWell(
-            //   onTap: () =>Navigator.pushNamed(context, RoutesName.allAccessories),
-            //   child: SizedBox(
-            //     height: AppSize.s35.h,
-            //     child: Padding(
-            //       padding: EdgeInsets.symmetric(horizontal: 24.w),
-            //       child: Row(
-            //         mainAxisAlignment: MainAxisAlignment.start,
-            //         children: [
-            //           Icon(Icons.category, size: 16.sp, color: Colors.black),
-            //           SizedBoxManager.width24(),
-            //           Text("All Accessories",style: TextStyle(fontSize: 14.sp,color: Colors.black)),
-            //           const Spacer(),
-            //           Icon(Icons.arrow_forward,size: 16.sp, color: Colors.black),
-            //         ],
-            //       ),
-            //     ),
-            //   ),
-            // ),
-            // Divider(color: Colors.grey,height: 0.5.h),
-            // InkWell(
-            //   onTap: () => Navigator.pushNamed(context, RoutesName.others),
-            //   child: SizedBox(
-            //     height: AppSize.s35.h,
-            //     child: Padding(
-            //       padding: EdgeInsets.symmetric(horizontal: 24.w),
-            //       child: Row(
-            //         mainAxisAlignment: MainAxisAlignment.start,
-            //         children: [
-            //           Icon(Icons.devices_other,size: 16.sp, color: Colors.black),
-            //           SizedBoxManager.width24(),
-            //           Text("Dental Equipment",style: TextStyle(fontSize: 14.sp,color: Colors.black)),
-            //           const Spacer(),
-            //           Icon(Icons.arrow_forward,size: 16.sp, color: Colors.black),
-            //         ],
-            //       ),
-            //     ),
-            //   ),
-            // ),
-            Divider(color: Colors.grey,height: 0.5.h),
-            InkWell(
-              onTap: ()async{
+            Divider(height: 0.5.h),
+            /// ================= SALES OLD MACHINE =================
+            _drawerItem(
+              icon: Icons.monetization_on,
+              title: "Sales Old Machine",
+              onTap: () async {
                 final access = await PermissionHelper.saleYourOldMachine();
-                if (access == "true") {
-                    Navigator.pushNamed(context, RoutesName.salesOldMachine);
-                } else {
-                  showWarningDialog(context);
-                }
-              }, 
-              child: SizedBox(
-                height: AppSize.s35.h,
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 24.w),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Icon(Icons.monetization_on,size: 16.sp, color: Colors.black),
-                      SizedBoxManager.width24(),
-                      Text("Sales Old Machine",style: TextStyle(fontSize: 14.sp,color: Colors.black)),
-                      const Spacer(),
-                      Icon(Icons.arrow_forward,size: 16.sp, color: Colors.black),
-                    ],
-                  ),
-                ),
-              ),
+                access == "true"
+                    ? Navigator.pushNamed(context, RoutesName.salesOldMachine)
+                    : showWarningDialog(context);
+              },
             ),
-            Divider(color: Colors.grey,height: 0.5.h),
+
+            Divider(height: 0.5.h),
+
+            /// ================= DIAGNOSTIC MODULE =================
             InkWell(
               onTap: () {
-                context.read<LoginAuthProvider>().logout();
-                Navigator.pushAndRemoveUntil(context,MaterialPageRoute(builder: (context) => const LoginView(isLogin: true)),(Route<dynamic> route) => false, // Remove all previous routes
-                );
+                setState(() {
+                  _isDiagnosticOpen = !_isDiagnosticOpen;
+                });
               },
               child: SizedBox(
                 height: AppSize.s35.h,
@@ -294,22 +163,356 @@ class _CustomDrawerState extends State<CustomDrawer> {
                   padding: EdgeInsets.symmetric(horizontal: 24.w),
                   child: Row(
                     children: [
-                      Icon(Icons.logout, size: 16.sp, color: Colors.black),
+                      Icon(Icons.category, size: 16.sp),
                       SizedBoxManager.width24(),
-                      Text("Log Out",style: TextStyle(fontSize: 14.sp,color: Colors.black),
+                      Text("Diagnostic Module", style: TextStyle(fontSize: 14.sp)),
+                      const Spacer(),
+                      Icon(_isDiagnosticOpen? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
                       ),
                     ],
                   ),
                 ),
               ),
             ),
-            Divider(color: Colors.grey,height: 0.5.h),
+
+            /// ================= DIAGNOSTIC CHILD =================
+            if (_isDiagnosticOpen)
+            Column(children: diagnosticTitles.map((title) => _diagnosticItem(title)).toList()),
+            Divider(height: 0.5.h),
+            /// ================= LOGOUT =================
+            _drawerItem(
+              icon: Icons.logout,
+              title: "Log Out",
+              showArrow: false,
+              onTap: () {
+                context.read<LoginAuthProvider>().logout();
+                Navigator.pushAndRemoveUntil(context,
+                  MaterialPageRoute(builder: (_) => const LoginView(isLogin: true)),(_) => false,
+                );
+              },
+            ),
+            Divider(height: 0.5.h),
           ],
         ),
       ),
     );
   }
+  /// ================= DRAWER ITEM =================
+  Widget _drawerItem({
+    required IconData icon,
+    required String title,
+    required VoidCallback onTap,
+    bool showArrow = true,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      child: SizedBox(
+        height: AppSize.s35.h,
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 24.w),
+          child: Row(
+            children: [
+              Icon(icon, size: 16.sp),
+              SizedBoxManager.width24(),
+              Text(title, style: TextStyle(fontSize: 14.sp)),
+              const Spacer(),
+              if (showArrow)
+                Icon(Icons.arrow_forward, size: 16.sp),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+  /// ================= DIAGNOSTIC ITEM =================
+  Widget _diagnosticItem(String title) {
+    return InkWell(
+      onTap: () async => _handleDiagnosticNavigation(title),
+      child: Padding(
+        padding:EdgeInsets.only(left: 56.w, right: 24.w, top: 8.h, bottom: 8.h),
+        child: Row(
+          children: [
+            Icon(Icons.circle, size: 6.sp),
+            SizedBox(width: 12.w),
+            Text(title, style: TextStyle(fontSize: 13.sp)),
+          ],
+        ),
+      ),
+    );
+  }
+  /// ================= NAVIGATION LOGIC =================
+  Future<void> _handleDiagnosticNavigation(String title) async {
+    if (title == "Patient Entry") {
+      final access = await PermissionHelper.patientEntry();
+      access == "true"
+          ? Navigator.push(context, MaterialPageRoute(builder: (_) => PatientEntryScreen()))
+          : showWarningDialog(context);
+
+    } else if (title == "Doctor Entry") {
+      final access = await PermissionHelper.doctorEntry();
+      access == "true"
+          ? Navigator.push(context, MaterialPageRoute(builder: (_) => DoctorEntryScreen()))
+          : showWarningDialog(context);
+
+    } else if (title == "Test Entry") {
+      final access = await PermissionHelper.testEntry();
+      access == "true"
+          ? Navigator.push(context, MaterialPageRoute(builder: (_) => TestEntryScreen()))
+          : showWarningDialog(context);
+
+    } else if (title == "Doctor List") {
+      final access = await PermissionHelper.doctorEntry();
+      access == "true"
+          ? Navigator.push(context, MaterialPageRoute(builder: (_) => DoctorListScreen()))
+          : showWarningDialog(context);
+
+    } else if (title == "Patient List") {
+      final access = await PermissionHelper.patientList();
+      access == "true"
+          ? Navigator.push(context, MaterialPageRoute(builder: (_) => PatientListScreen()))
+          : showWarningDialog(context);
+
+    } else if (title == "Appointment Entry") {
+      final access = await PermissionHelper.appointmentEntry();
+      access == "true"
+          ? Navigator.push(context, MaterialPageRoute(builder: (_) => AppointmentEntryScreen()))
+          : showWarningDialog(context);
+          
+    } else if (title == "Cash Transaction") {
+      final access = await PermissionHelper.cashTrEntry();
+      access == "true"
+          ? Navigator.push(context, MaterialPageRoute(builder: (_) => CashTransactionEntryScreen()))
+          : showWarningDialog(context);
+
+    } else if (title == "Bank Transaction") {
+      final access = await PermissionHelper.bankTrEntry();
+      access == "true"
+          ? Navigator.push(context, MaterialPageRoute(builder: (_) => BankTransactionEntryScreen()))
+          : showWarningDialog(context);
+
+    } else if (title == "Commission Payment") {
+      final access = await PermissionHelper.commissionPayment();
+      access == "true"
+          ? Navigator.push(context, MaterialPageRoute(builder: (_) =>CommissionPaymentEntryScreen()))
+          : showWarningDialog(context);
+
+    } else if (title == "Patient Payment") {
+      final access = await PermissionHelper.patientPayment();
+      access == "true"
+          ? Navigator.push(context, MaterialPageRoute(builder: (_) => PatientPaymentEntryScreen()))
+          : showWarningDialog(context);
+    }
+  }
 }
+
+
+
+
+
+
+
+
+
+
+
+// import 'package:flutter/material.dart';
+// import 'package:get_storage/get_storage.dart';
+// import 'package:medical_trade/controller/login_auth.dart';
+// import 'package:medical_trade/diagnostic_module/screens/diagnostic_module_screen.dart';
+// import 'package:medical_trade/diagnostic_module/utils/permission_helper.dart';
+// import 'package:medical_trade/new_part/providers/category_provider.dart';
+// import 'package:medical_trade/view/auth/login_register_auth.dart';
+// import 'package:provider/provider.dart';
+// import 'package:flutter_screenutil/flutter_screenutil.dart';
+// import 'package:medical_trade/utilities/color_manager.dart';
+// import 'package:medical_trade/utilities/routes/routes_name.dart';
+// import 'package:medical_trade/utilities/sizebox_manager.dart';
+// import 'package:medical_trade/utilities/values_manager.dart';
+
+// class CustomDrawer extends StatefulWidget {
+//   const CustomDrawer({super.key});
+
+//   @override
+//   State<CustomDrawer> createState() => _CustomDrawerState();
+// }
+
+// class _CustomDrawerState extends State<CustomDrawer> {
+//   String? userName;
+//   @override
+//   void initState() {
+//     super.initState();
+//     final box = GetStorage();
+//     userName = box.read('username');
+//     WidgetsBinding.instance.addPostFrameCallback((_) {
+//       Provider.of<CategoryProvider>(context, listen: false).getCategories();
+//     });
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Drawer(
+//       shape: RoundedRectangleBorder(
+//         borderRadius: BorderRadius.only(topRight: Radius.circular(AppSize.s50.r),bottomRight: Radius.circular(AppSize.s50.r)),
+//       ),
+//       child: Container(
+//         color: Colors.white,
+//         child: Column(
+//           children: [
+//             Container(
+//               height: AppSize.s150.h,
+//               width: double.infinity.w,
+//               color: ColorManager.white,
+//               child: Padding(
+//                 padding: EdgeInsets.only(left: AppPadding.p12.w),
+//                 child: Row(
+//                   children: [
+//                     CircleAvatar(
+//                       backgroundColor: Colors.white,
+//                       backgroundImage:const AssetImage("assets/icons/medical.png"),
+//                       radius: 35.r,
+//                     ),
+//                     SizedBoxManager.width12(),
+//                     Padding(
+//                       padding: EdgeInsets.only(top: 55.h),
+//                       child: Column(
+//                         children: [
+//                           Text("Medical Trade",style: TextStyle(fontSize: 18.sp,fontWeight: FontWeight.bold)),
+//                           Text(
+//                             userName ?? "Unknown User",
+//                             maxLines: 1,
+//                             style: TextStyle(fontSize: 12.sp,fontWeight: FontWeight.bold,color: Colors.black),
+//                             overflow: TextOverflow.ellipsis,
+//                           )
+//                         ],
+//                       ),
+//                     ),
+//                   ],
+//                 ),
+//               ),
+//             ),
+//             Divider(color: Colors.grey,height: 0.5.h),
+//             InkWell(
+//               onTap: () => Navigator.pushNamed(context, RoutesName.home),
+//               child: SizedBox(
+//                 height: AppSize.s35.h,
+//                 child: Padding(
+//                   padding: EdgeInsets.symmetric(horizontal: 24.w),
+//                   child: Row(
+//                     mainAxisAlignment: MainAxisAlignment.start,
+//                     children: [
+//                       Icon(Icons.home, size: 16.sp, color: Colors.black),
+//                       SizedBoxManager.width24(),
+//                       Text("My Page",style: TextStyle(fontSize: 14.sp,color: Colors.black)),
+//                       const Spacer(),
+//                       Icon(Icons.arrow_forward,size: 16.sp, color: Colors.black),
+//                     ],
+//                   ),
+//                 ),
+//               ),
+//             ),
+//             Divider(color: Colors.grey,height: 0.5.h),
+//             InkWell(
+//               onTap: () async {
+//                   final access = await PermissionHelper.engineerSupport();
+//                 if (access == "true") {
+//                    Navigator.pushNamed(context, RoutesName.engineeringSupport);
+//                 } else {
+//                   showWarningDialog(context);
+//                 }
+//               },
+//               child: SizedBox(
+//                 height: AppSize.s35.h,
+//                 child: Padding(
+//                   padding: EdgeInsets.symmetric(horizontal: 24.w),
+//                   child: Row(
+//                     mainAxisAlignment: MainAxisAlignment.start,
+//                     children: [
+//                       Icon(Icons.build, size: 16.sp, color: Colors.black),
+//                       SizedBoxManager.width24(),
+//                       Text("Engineering Support",style: TextStyle(fontSize: 14.sp, color: Colors.black)),
+//                       const Spacer(),
+//                       Icon(Icons.arrow_forward,size: 16.sp, color: Colors.black),
+//                     ],
+//                   ),
+//                 ),
+//               ),
+//             ),
+//             Divider(color: Colors.grey,height: 0.5.h),
+//             InkWell(
+//               onTap: ()async{
+//                 final access = await PermissionHelper.saleYourOldMachine();
+//                 if (access == "true") {
+//                     Navigator.pushNamed(context, RoutesName.salesOldMachine);
+//                 } else {
+//                   showWarningDialog(context);
+//                 }
+//               }, 
+//               child: SizedBox(
+//                 height: AppSize.s35.h,
+//                 child: Padding(
+//                   padding: EdgeInsets.symmetric(horizontal: 24.w),
+//                   child: Row(
+//                     mainAxisAlignment: MainAxisAlignment.start,
+//                     children: [
+//                       Icon(Icons.monetization_on,size: 16.sp, color: Colors.black),
+//                       SizedBoxManager.width24(),
+//                       Text("Sales Old Machine",style: TextStyle(fontSize: 14.sp,color: Colors.black)),
+//                       const Spacer(),
+//                       Icon(Icons.arrow_forward,size: 16.sp, color: Colors.black),
+//                     ],
+//                   ),
+//                 ),
+//               ),
+//             ),
+//             Divider(color: Colors.black,height: 0.5.h),
+//             InkWell(
+//               onTap: () =>Navigator.pushNamed(context, RoutesName.diagnosticModule),
+//               child: SizedBox(
+//                 height: AppSize.s35.h,
+//                 child: Padding(
+//                   padding: EdgeInsets.symmetric(horizontal: 24.w),
+//                   child: Row(
+//                     mainAxisAlignment: MainAxisAlignment.start,
+//                     children: [
+//                       Icon(Icons.category, size: 16.sp, color: Colors.black),
+//                       SizedBoxManager.width24(),
+//                       Text("Diagnostic Module",style: TextStyle(fontSize: 14.sp,color: Colors.black)),
+//                       const Spacer(),
+//                       Icon(Icons.arrow_forward,size: 16.sp, color: Colors.black),
+//                     ],
+//                   ),
+//                 ),
+//               ),
+//             ),
+//             Divider(color: Colors.grey,height: 0.5.h),
+//             InkWell(
+//               onTap: () {
+//                 context.read<LoginAuthProvider>().logout();
+//                 Navigator.pushAndRemoveUntil(context,MaterialPageRoute(builder: (context) => const LoginView(isLogin: true)),(Route<dynamic> route) => false, // Remove all previous routes
+//                 );
+//               },
+//               child: SizedBox(
+//                 height: AppSize.s35.h,
+//                 child: Padding(
+//                   padding: EdgeInsets.symmetric(horizontal: 24.w),
+//                   child: Row(
+//                     children: [
+//                       Icon(Icons.logout, size: 16.sp, color: Colors.black),
+//                       SizedBoxManager.width24(),
+//                       Text("Log Out",style: TextStyle(fontSize: 14.sp,color: Colors.black),
+//                       ),
+//                     ],
+//                   ),
+//                 ),
+//               ),
+//             ),
+//             Divider(color: Colors.grey,height: 0.5.h),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+// }
 
 
 
@@ -553,6 +756,322 @@ class _CustomDrawerState extends State<CustomDrawer> {
 //             Divider(color: Colors.grey,height: 0.5.h),
 //             InkWell(
 //               onTap: () => Navigator.pushNamed(context, RoutesName.salesOldMachine),
+//               child: SizedBox(
+//                 height: AppSize.s35.h,
+//                 child: Padding(
+//                   padding: EdgeInsets.symmetric(horizontal: 24.w),
+//                   child: Row(
+//                     mainAxisAlignment: MainAxisAlignment.start,
+//                     children: [
+//                       Icon(Icons.monetization_on,size: 16.sp, color: Colors.black),
+//                       SizedBoxManager.width24(),
+//                       Text("Sales Old Machine",style: TextStyle(fontSize: 14.sp,color: Colors.black)),
+//                       const Spacer(),
+//                       Icon(Icons.arrow_forward,size: 16.sp, color: Colors.black),
+//                     ],
+//                   ),
+//                 ),
+//               ),
+//             ),
+//             Divider(color: Colors.grey,height: 0.5.h),
+//             InkWell(
+//               onTap: () {
+//                 context.read<LoginAuthProvider>().logout();
+//                 Navigator.pushAndRemoveUntil(context,MaterialPageRoute(builder: (context) => const LoginView(isLogin: true)),(Route<dynamic> route) => false, // Remove all previous routes
+//                 );
+//               },
+//               child: SizedBox(
+//                 height: AppSize.s35.h,
+//                 child: Padding(
+//                   padding: EdgeInsets.symmetric(horizontal: 24.w),
+//                   child: Row(
+//                     children: [
+//                       Icon(Icons.logout, size: 16.sp, color: Colors.black),
+//                       SizedBoxManager.width24(),
+//                       Text("Log Out",style: TextStyle(fontSize: 14.sp,color: Colors.black),
+//                       ),
+//                     ],
+//                   ),
+//                 ),
+//               ),
+//             ),
+//             Divider(color: Colors.grey,height: 0.5.h),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+// }
+
+
+
+
+// import 'package:flutter/material.dart';
+// import 'package:get_storage/get_storage.dart';
+// import 'package:medical_trade/controller/login_auth.dart';
+// import 'package:medical_trade/diagnostic_module/screens/diagnostic_module_screen.dart';
+// import 'package:medical_trade/diagnostic_module/utils/permission_helper.dart';
+// import 'package:medical_trade/new_part/providers/category_provider.dart';
+// import 'package:medical_trade/view/auth/login_register_auth.dart';
+// import 'package:provider/provider.dart';
+// import 'package:flutter_screenutil/flutter_screenutil.dart';
+// import 'package:medical_trade/utilities/color_manager.dart';
+// import 'package:medical_trade/utilities/routes/routes_name.dart';
+// import 'package:medical_trade/utilities/sizebox_manager.dart';
+// import 'package:medical_trade/utilities/values_manager.dart';
+
+// class CustomDrawer extends StatefulWidget {
+//   const CustomDrawer({super.key});
+
+//   @override
+//   State<CustomDrawer> createState() => _CustomDrawerState();
+// }
+
+// class _CustomDrawerState extends State<CustomDrawer> {
+//  // bool _isByReagentExpanded = false;
+//   String? userName;
+//   @override
+//   void initState() {
+//     super.initState();
+//     final box = GetStorage();
+//     //userName = box.read('userName');
+//     userName = box.read('username');
+//     // Fetch categories when the drawer is initialized
+//     WidgetsBinding.instance.addPostFrameCallback((_) {
+//       //Provider.of<GetCategoriesProvider>(context, listen: false).fetchData();
+//       Provider.of<CategoryProvider>(context, listen: false).getCategories();
+//     });
+//   }
+
+//   // void _toggleByReagentModule() {
+//   //   setState(() {
+//   //     _isByReagentExpanded = !_isByReagentExpanded;
+//   //   });
+//   // }
+
+//   @override
+//   Widget build(BuildContext context) {
+//    // final categoryProvider = Provider.of<CategoryProvider>(context);
+
+//     return Drawer(
+//       shape: RoundedRectangleBorder(
+//         borderRadius: BorderRadius.only(topRight: Radius.circular(AppSize.s50.r),bottomRight: Radius.circular(AppSize.s50.r)),
+//       ),
+//       child: Container(
+//         color: Colors.white,
+//         child: Column(
+//           children: [
+//             Container(
+//               height: AppSize.s150.h,
+//               width: double.infinity.w,
+//               color: ColorManager.white,
+//               child: Padding(
+//                 padding: EdgeInsets.only(left: AppPadding.p12.w),
+//                 child: Row(
+//                   children: [
+//                     CircleAvatar(
+//                       backgroundColor: Colors.white,
+//                       backgroundImage:const AssetImage("assets/icons/medical.png"),
+//                       radius: 35.r,
+//                     ),
+//                     SizedBoxManager.width12(),
+//                     Padding(
+//                       padding: EdgeInsets.only(top: 55.h),
+//                       child: Column(
+//                         children: [
+//                           Text("Medical Trade",style: TextStyle(fontSize: 18.sp,fontWeight: FontWeight.bold)),
+//                           Text(
+//                             userName ?? "Unknown User",
+//                             maxLines: 1,
+//                             style: TextStyle(fontSize: 12.sp,fontWeight: FontWeight.bold,color: Colors.black),
+//                             overflow: TextOverflow.ellipsis,
+//                           )
+//                         ],
+//                       ),
+//                     ),
+//                   ],
+//                 ),
+//               ),
+//             ),
+//             Divider(color: Colors.grey,height: 0.5.h),
+//             InkWell(
+//               onTap: () => Navigator.pushNamed(context, RoutesName.home),
+//               child: SizedBox(
+//                 height: AppSize.s35.h,
+//                 child: Padding(
+//                   padding: EdgeInsets.symmetric(horizontal: 24.w),
+//                   child: Row(
+//                     mainAxisAlignment: MainAxisAlignment.start,
+//                     children: [
+//                       Icon(Icons.home, size: 16.sp, color: Colors.black),
+//                       SizedBoxManager.width24(),
+//                       Text("My Page",style: TextStyle(fontSize: 14.sp,color: Colors.black)),
+//                       const Spacer(),
+//                       Icon(Icons.arrow_forward,size: 16.sp, color: Colors.black),
+//                     ],
+//                   ),
+//                 ),
+//               ),
+//             ),
+//             // Divider(color: Colors.grey,height: 0.5.h),
+//             // InkWell(
+//             //   onTap: () => Navigator.pushNamed(context, RoutesName.newMachine),
+//             //   child: SizedBox(
+//             //     height: AppSize.s35.h,
+//             //     child: Padding(
+//             //       padding: EdgeInsets.symmetric(horizontal: 24.w),
+//             //       child: Row(
+//             //         mainAxisAlignment: MainAxisAlignment.start,
+//             //         children: [
+//             //           Icon(Icons.medical_information,size: 16.sp, color: Colors.black),
+//             //           SizedBoxManager.width24(),
+//             //           Text("New Machine",style: TextStyle(fontSize: 14.sp, color: Colors.black)),
+//             //           const Spacer(),
+//             //           Icon(Icons.arrow_forward,size: 16.sp, color: Colors.black),
+//             //         ],
+//             //       ),
+//             //     ),
+//             //   ),
+//             // ),
+//             // Divider(color: Colors.grey,height: 0.5.h),
+//             // InkWell(
+//             //   onTap: () => Navigator.pushNamed(context, RoutesName.oldMachine),
+//             //   child: SizedBox(
+//             //     height: AppSize.s35.h,
+//             //     child: Padding(
+//             //       padding: EdgeInsets.symmetric(horizontal: 24.w),
+//             //       child: Row(
+//             //         mainAxisAlignment: MainAxisAlignment.start,
+//             //         children: [
+//             //           Icon(Icons.history, size: 16.sp, color: Colors.black),
+//             //           SizedBoxManager.width24(),
+//             //           Text("Old Machine",style: TextStyle(fontSize: 14.sp,color: Colors.black)),
+//             //           const Spacer(),
+//             //           Icon(Icons.arrow_forward,size: 16.sp, color: Colors.black),
+//             //         ],
+//             //       ),
+//             //     ),
+//             //   ),
+//             // ),
+           
+//             // Divider(color: Colors.grey,height: 0.5.h),
+//             // InkWell(
+//             //   onTap: _toggleByReagentModule,
+//             //   child: SizedBox(
+//             //     height: AppSize.s35.h,
+//             //     child: Padding(
+//             //       padding: EdgeInsets.symmetric(horizontal: 24.w),
+//             //       child: Row(
+//             //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//             //         children: [
+//             //           Icon(Icons.support, size: 16.sp, color: Colors.black),
+//             //           SizedBoxManager.width24(),
+//             //           Text("Buy Reagent",style: TextStyle(fontSize: 14.sp,color: Colors.black)),
+//             //           const Spacer(),
+//             //           Icon(_isByReagentExpanded ? Icons.arrow_drop_up : Icons.arrow_drop_down,size: 24.sp,color: Colors.black),
+//             //         ],
+//             //       ),
+//             //     ),
+//             //   ),
+//             // ),
+//             // if (_isByReagentExpanded) ...[
+//             //   if (CategoryProvider.isAllCategoriesLoading) ...[
+//             //     Center(
+//             //       child: CircularProgressIndicator(
+//             //         valueColor: AlwaysStoppedAnimation<Color>(ColorManager.red),
+//             //       ),
+//             //     ),
+//             //   ] else ...[
+//             //     for (var category in categoryProvider.getFilteredCategories(["4", "5", "6", "7"])) ...[
+//             //       Divider(color: Colors.grey,height: 0.5.h),
+//             //       CustomDrawerSubitem(
+//             //         onTap: () {
+//             //           Navigator.push(context,MaterialPageRoute(builder: (_) => ByReagentCategoryView(item: category)));
+//             //         },
+//             //         color: const Color(0xFFBACCDF).withOpacity(0.6),
+//             //         title: category.name,
+//             //       ),
+//             //       Divider(color: Colors.grey,height: 0.5.h),
+//             //     ],
+//             //   ],
+//             // ],
+//             Divider(color: Colors.grey,height: 0.5.h),
+//             InkWell(
+//               onTap: () async {
+//                   final access = await PermissionHelper.engineerSupport();
+//                 if (access == "true") {
+//                    Navigator.pushNamed(context, RoutesName.engineeringSupport);
+//                 } else {
+//                   showWarningDialog(context);
+//                 }
+//               },
+//               child: SizedBox(
+//                 height: AppSize.s35.h,
+//                 child: Padding(
+//                   padding: EdgeInsets.symmetric(horizontal: 24.w),
+//                   child: Row(
+//                     mainAxisAlignment: MainAxisAlignment.start,
+//                     children: [
+//                       Icon(Icons.build, size: 16.sp, color: Colors.black),
+//                       SizedBoxManager.width24(),
+//                       Text("Engineering Support",style: TextStyle(fontSize: 14.sp, color: Colors.black)),
+//                       const Spacer(),
+//                       Icon(Icons.arrow_forward,size: 16.sp, color: Colors.black),
+//                     ],
+//                   ),
+//                 ),
+//               ),
+//             ),
+//             // Divider(color: Colors.black,height: 0.5.h),
+//             // InkWell(
+//             //   onTap: () =>Navigator.pushNamed(context, RoutesName.allAccessories),
+//             //   child: SizedBox(
+//             //     height: AppSize.s35.h,
+//             //     child: Padding(
+//             //       padding: EdgeInsets.symmetric(horizontal: 24.w),
+//             //       child: Row(
+//             //         mainAxisAlignment: MainAxisAlignment.start,
+//             //         children: [
+//             //           Icon(Icons.category, size: 16.sp, color: Colors.black),
+//             //           SizedBoxManager.width24(),
+//             //           Text("All Accessories",style: TextStyle(fontSize: 14.sp,color: Colors.black)),
+//             //           const Spacer(),
+//             //           Icon(Icons.arrow_forward,size: 16.sp, color: Colors.black),
+//             //         ],
+//             //       ),
+//             //     ),
+//             //   ),
+//             // ),
+//             // Divider(color: Colors.grey,height: 0.5.h),
+//             // InkWell(
+//             //   onTap: () => Navigator.pushNamed(context, RoutesName.others),
+//             //   child: SizedBox(
+//             //     height: AppSize.s35.h,
+//             //     child: Padding(
+//             //       padding: EdgeInsets.symmetric(horizontal: 24.w),
+//             //       child: Row(
+//             //         mainAxisAlignment: MainAxisAlignment.start,
+//             //         children: [
+//             //           Icon(Icons.devices_other,size: 16.sp, color: Colors.black),
+//             //           SizedBoxManager.width24(),
+//             //           Text("Dental Equipment",style: TextStyle(fontSize: 14.sp,color: Colors.black)),
+//             //           const Spacer(),
+//             //           Icon(Icons.arrow_forward,size: 16.sp, color: Colors.black),
+//             //         ],
+//             //       ),
+//             //     ),
+//             //   ),
+//             // ),
+//             Divider(color: Colors.grey,height: 0.5.h),
+//             InkWell(
+//               onTap: ()async{
+//                 final access = await PermissionHelper.saleYourOldMachine();
+//                 if (access == "true") {
+//                     Navigator.pushNamed(context, RoutesName.salesOldMachine);
+//                 } else {
+//                   showWarningDialog(context);
+//                 }
+//               }, 
 //               child: SizedBox(
 //                 height: AppSize.s35.h,
 //                 child: Padding(

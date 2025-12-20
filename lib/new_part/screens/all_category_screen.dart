@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:medical_trade/new_part/model/new_category_model.dart';
 import 'package:medical_trade/new_part/providers/category_provider.dart';
-import 'package:medical_trade/utilities/assets_manager.dart';
 import 'package:medical_trade/utilities/color_manager.dart';
 import 'package:medical_trade/utilities/custom_appbar.dart';
 import 'package:medical_trade/utilities/custom_container_homepage.dart';
@@ -60,6 +59,7 @@ class _CategoryListScreenState extends State<CategoryListScreen> {
       orElse: () => NewCategoryModel(
         id: 1,
         name: "Clinical Machine",
+        image: "",
         description: "",
         createdBy: 0,
         updatedBy: "0",
@@ -77,6 +77,7 @@ class _CategoryListScreenState extends State<CategoryListScreen> {
       orElse: () => NewCategoryModel(
         id: 2,
         name: "Pathology Machine",
+        image: "",
         description: "",
         createdBy: 0,
         updatedBy: "0",
@@ -115,7 +116,7 @@ class _CategoryListScreenState extends State<CategoryListScreen> {
                 },
                 text: clinicalMachine.name,
                 textColor: ColorManager.white,
-                iconPath: ImageAssets.diagnostic,
+                //iconPath: ImageAssets.diagnostic,
               ),
             ),
             SizedBoxManager.width(AppMargin.m8),
@@ -135,7 +136,7 @@ class _CategoryListScreenState extends State<CategoryListScreen> {
                 },
                 text: pathologyMachine.name,
                 textColor: ColorManager.white,
-                iconPath: ImageAssets.pathology,
+                //iconPath: ImageAssets.pathology,
               ),
             ),
           ],

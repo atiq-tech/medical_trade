@@ -13,8 +13,8 @@ class GetSalesOldMachineProvider extends ChangeNotifier {
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 
-  String? _errorMessage; // Add an errorMessage variable
-  String? get errorMessage => _errorMessage; // Add a getter for errorMessage
+  String? _errorMessage; 
+  String? get errorMessage => _errorMessage; 
 
   final ApiService _apiService = ApiService();
 
@@ -25,14 +25,10 @@ class GetSalesOldMachineProvider extends ChangeNotifier {
     final url = AppUrl.getClientPostEndPoint;
 
     final box = GetStorage();
-    final division = box.read('userDivision'); // Only using division
+    final division = box.read('userDivision');
 
-    final divisionValue =
-        (division == null || division == 'null' || division.isEmpty)
-            ? null
-            : division;
-
-    final body = <String, String>{}; // Change to Map<String, String>
+    final divisionValue = (division == null || division == 'null' || division.isEmpty) ? null : division;
+    final body = <String, String>{};
 
     if (divisionValue != null) {
       body['division_id'] = divisionValue;
@@ -45,18 +41,14 @@ class GetSalesOldMachineProvider extends ChangeNotifier {
 
       if (response != null && response.statusCode == 200) {
         final List<dynamic> data = jsonDecode(response.body);
-
-        // Map data to instances of GetSalesOldMachineModel
-        _categories =
-            data.map((item) => GetSalesOldMachineModel.fromJson(item)).toList();
+        _categories = data.map((item) => GetSalesOldMachineModel.fromJson(item)).toList();
 
         _errorMessage = null;
-        // print("Fetched and filtered sales old machine products successfully.");
       } else {
         _categories = [];
         _errorMessage = 'Failed to load data';
-        ErrorHandling.handleError(ApiException(
-            'API responded with status code ${response?.statusCode}'));
+        // ErrorHandling.handleError(ApiException(
+        //     'API responded with status code ${response?.statusCode}'));
       }
     } catch (e) {
       _categories = [];

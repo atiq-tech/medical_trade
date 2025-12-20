@@ -30,8 +30,8 @@ class GetEngineerSupportProductProvider extends ChangeNotifier {
             .toList();
       } else {
         // Handle API error
-        ErrorHandling.handleError(ApiException(
-            'API responded with status code ${response?.statusCode ?? 'No Response'}'));
+        // ErrorHandling.handleError(ApiException(
+        //     'API responded with status code ${response?.statusCode ?? 'No Response'}'));
       }
     } catch (e) {
       // Handle generic errors

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:medical_trade/diagnostic_module/screens/appointment_entry_screen.dart';
 import 'package:medical_trade/diagnostic_module/screens/bank_transaction_entry_screen.dart';
 import 'package:medical_trade/diagnostic_module/screens/cash_transaction_entry_screen.dart';
@@ -14,9 +15,23 @@ import 'package:medical_trade/diagnostic_module/utils/permission_helper.dart';
 import 'package:medical_trade/utilities/assets_manager.dart';
 import 'package:medical_trade/utilities/color_manager.dart';
 
-class DiagnosticModuleScreen extends StatelessWidget {
+class DiagnosticModuleScreen extends StatefulWidget {
   const DiagnosticModuleScreen({super.key});
 
+  @override
+  State<DiagnosticModuleScreen> createState() => _DiagnosticModuleScreenState();
+}
+
+class _DiagnosticModuleScreenState extends State<DiagnosticModuleScreen> {
+  String? role;
+  @override
+  void initState() {
+    final box = GetStorage();
+    role = box.read('role');
+    // TODO: implement initState
+    super.initState();
+    print("Role================$role");
+  }
   @override
   Widget build(BuildContext context) {
     final items = [
@@ -101,7 +116,7 @@ class DiagnosticModuleScreen extends StatelessWidget {
               if (index == 0) {
                 // Patient Entry
                 final access = await PermissionHelper.patientEntry();
-                if (access == "true") {
+                if (access == "true" || role == "Admin" || role == "Super Admin") {
                   Navigator.push(context,
                     MaterialPageRoute(builder: (_) => PatientEntryScreen()));
                 } else {
@@ -111,7 +126,7 @@ class DiagnosticModuleScreen extends StatelessWidget {
               } else if (index == 1) {
                 // Doctor Entry
                 final access = await PermissionHelper.doctorEntry();
-                if (access == "true") {
+                if (access == "true" || role == "Admin" || role == "Super Admin") {
                   Navigator.push(context,MaterialPageRoute(builder: (_) => DoctorEntryScreen()));
                 } else {
                   showWarningDialog(context);
@@ -120,7 +135,7 @@ class DiagnosticModuleScreen extends StatelessWidget {
               } else if (index == 2) {
                 // Test Entry
                 final access = await PermissionHelper.testEntry();
-                if (access == "true") {
+                if (access == "true" || role == "Admin" || role == "Super Admin") {
                   Navigator.push(context,MaterialPageRoute(builder: (_) => TestEntryScreen()));
                 } else {
                   showWarningDialog(context);
@@ -129,7 +144,7 @@ class DiagnosticModuleScreen extends StatelessWidget {
               } else if (index == 3) {
                  // Doctor list
                 final access = await PermissionHelper.doctorEntry();
-                if (access == "true") {
+                if (access == "true" || role == "Admin" || role == "Super Admin") {
                   Navigator.push(context,MaterialPageRoute(builder: (_) => DoctorListScreen()));
                 } else {
                   showWarningDialog(context);
@@ -137,7 +152,7 @@ class DiagnosticModuleScreen extends StatelessWidget {
 
               } else if (index == 4) {
                 final access = await PermissionHelper.patientList();
-                if (access == "true") {
+                if (access == "true" || role == "Admin" || role == "Super Admin") {
                   Navigator.push(context, MaterialPageRoute(builder: (_) => PatientListScreen()));
                 } else {
                   showWarningDialog(context);
@@ -145,7 +160,7 @@ class DiagnosticModuleScreen extends StatelessWidget {
 
               } else if (index == 5) {
                 final access = await PermissionHelper.appointmentEntry();
-                if (access == "true") {
+                if (access == "true" || role == "Admin" || role == "Super Admin") {
                   Navigator.push(context,MaterialPageRoute(builder: (_) => AppointmentEntryScreen()));
                 } else {
                   showWarningDialog(context);
@@ -153,7 +168,7 @@ class DiagnosticModuleScreen extends StatelessWidget {
 
               } else if (index == 6) {
                 final access = await PermissionHelper.cashTrEntry();
-                if (access == "true") {
+                if (access == "true" || role == "Admin" || role == "Super Admin") {
                   Navigator.push(context,MaterialPageRoute(builder: (_) => CashTransactionEntryScreen()));
                 } else {
                   showWarningDialog(context);
@@ -161,7 +176,7 @@ class DiagnosticModuleScreen extends StatelessWidget {
 
               } else if (index == 7) {
                 final access = await PermissionHelper.bankTrEntry();
-                if (access == "true") {
+                if (access == "true" || role == "Admin" || role == "Super Admin") {
                   Navigator.push(context,MaterialPageRoute(builder: (_) => BankTransactionEntryScreen()));
                 } else {
                   showWarningDialog(context);
@@ -169,7 +184,7 @@ class DiagnosticModuleScreen extends StatelessWidget {
 
               } else if (index == 8) {
                 final access = await PermissionHelper.commissionPayment();
-                if (access == "true") {
+                if (access == "true" || role == "Admin" || role == "Super Admin") {
                   Navigator.push(context,MaterialPageRoute(builder: (_) => CommissionPaymentEntryScreen()));
                 } else {
                   showWarningDialog(context);
@@ -177,14 +192,13 @@ class DiagnosticModuleScreen extends StatelessWidget {
 
               } else if (index == 9) {
                 final access = await PermissionHelper.patientPayment();
-                if (access == "true") {
+                if (access == "true" || role == "Admin" || role == "Super Admin") {
                   Navigator.push(context,MaterialPageRoute(builder: (_) => PatientPaymentEntryScreen()));
                 } else {
                   showWarningDialog(context);
                 }
               }
             },
-
             child: Card(
                 elevation: 4,
                 child: Container(

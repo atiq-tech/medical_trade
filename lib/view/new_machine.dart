@@ -40,6 +40,7 @@ class _NewMachineState extends State<NewMachine> {
       orElse: () => NewCategoryModel(
         id: 1,
         name: "Clinical Machine",
+        image: "",
         description: "",
         createdBy: 0,
         updatedBy: "0",
@@ -57,6 +58,7 @@ class _NewMachineState extends State<NewMachine> {
       orElse: () => NewCategoryModel(
         id: 2,
         name: "Pathology Machine",
+        image: "",
         description: "",
         createdBy: 0,
         updatedBy: "0",

@@ -12,6 +12,9 @@ class CustomContainer extends StatelessWidget {
   /// 🔹 Flutter icon (optional)
   final IconData? iconData;
 
+  /// 🔹 API / Network image (optional)
+  final String? networkImageUrl;
+
   final VoidCallback? onTap;
 
   const CustomContainer({
@@ -21,6 +24,7 @@ class CustomContainer extends StatelessWidget {
     required this.textColor,
     this.iconPath,
     this.iconData,
+    this.networkImageUrl,
     this.onTap,
   });
 
@@ -51,8 +55,17 @@ class CustomContainer extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
 
-                  /// 🔹 ICON SECTION
-                  if (iconPath != null)
+                  /// 🔹 ICON / IMAGE SECTION
+                  if (networkImageUrl != null && networkImageUrl!.isNotEmpty)
+                    Image.network(
+                      networkImageUrl!,
+                      height: 35.h,
+                      width: 35.w,
+                      fit: BoxFit.contain,
+                      errorBuilder: (_, __, ___) =>
+                          Icon(iconData, size: 35.sp, color: textColor),
+                    )
+                  else if (iconPath != null)
                     Image.asset(
                       iconPath!,
                       height: 35.h,
@@ -89,4 +102,3 @@ class CustomContainer extends StatelessWidget {
     );
   }
 }
-

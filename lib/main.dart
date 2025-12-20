@@ -131,7 +131,7 @@ class _MyAppState extends State<MyApp> {
           //initialRoute: RoutesName.categorylist,
           // initialRoute: RoutesName.myWallPost,
           initialRoute: GetStorage().read('loginToken') != null
-              ? RoutesName.myWallPost
+              ? RoutesName.home
               : RoutesName.splash,
         ),
       ),

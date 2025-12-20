@@ -3,6 +3,7 @@ import 'dart:convert';
 class NewCategoryModel {
     final dynamic id;
     final dynamic name;
+    final dynamic image;
     final dynamic description;
     final dynamic createdBy;
     final dynamic updatedBy;
@@ -15,6 +16,7 @@ class NewCategoryModel {
     NewCategoryModel({
         required this.id,
         required this.name,
+        required this.image,
         required this.description,
         required this.createdBy,
         required this.updatedBy,
@@ -32,6 +34,7 @@ class NewCategoryModel {
     factory NewCategoryModel.fromMap(Map<String, dynamic> json) => NewCategoryModel(
         id: json["id"],
         name: json["name"],
+        image: json["image"],
         description: json["description"],
         createdBy: json["created_by"],
         updatedBy: json["updated_by"],
@@ -45,6 +48,7 @@ class NewCategoryModel {
     Map<String, dynamic> toMap() => {
         "id": id,
         "name": name,
+        "image": image,
         "description": description,
         "created_by": createdBy,
         "updated_by": updatedBy,
@@ -55,3 +59,4 @@ class NewCategoryModel {
         "updated_at": updatedAt,
     };
 }
+
