@@ -5,8 +5,8 @@ import 'package:medical_trade/diagnostic_module/models/cash_transaction_model.da
 class CashTransactionProvider extends ChangeNotifier{
   List<CashTransactionModel> cashTransactionList = [];
   static bool isCashTransactionLoading = false;
-  getCashTransaction(String? dateFrom,String? dateTo) async {
-    cashTransactionList = await DiagnosticeApiservice.fetchCashTransaction(dateFrom,dateTo);
+  getCashTransaction(String? accountId,String? dateFrom,String? dateTo,String? transactionType,String? paymentType,String? bankAccountId) async {
+    cashTransactionList = await DiagnosticeApiservice.fetchCashTransaction(accountId,dateFrom,dateTo,transactionType,paymentType,bankAccountId);
   off();
   notifyListeners();
   }

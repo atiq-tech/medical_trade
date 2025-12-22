@@ -5,8 +5,8 @@ import 'package:medical_trade/diagnostic_module/models/bank_transaction_model.da
 class BankTransactionProvider extends ChangeNotifier{
   List<BankTransactionModel> bankTransactionList = [];
   static bool isBankTransactionLoading = false;
-  getBankTransaction(String? dateFrom,String? dateTo) async {
-    bankTransactionList = await DiagnosticeApiservice.fetchBankTransaction(dateFrom,dateTo);
+  getBankTransaction(String? dateFrom,String? dateTo,String? transactionType,String? bankAccountId) async {
+    bankTransactionList = await DiagnosticeApiservice.fetchBankTransaction(dateFrom,dateTo,transactionType,bankAccountId);
   off();
   notifyListeners();
   }

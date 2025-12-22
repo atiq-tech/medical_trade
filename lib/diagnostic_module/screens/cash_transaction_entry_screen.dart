@@ -267,8 +267,7 @@ final LayerLink _pTypeLayerLink = LayerLink();
         firstPickedDate = Utils.formatFrontEndDate(selectedDate);
         backEndFirstDate = Utils.formatBackEndDate(selectedDate);
         CashTransactionProvider.isCashTransactionLoading = true;
-        Provider.of<CashTransactionProvider>(context, listen: false).getCashTransaction("$backEndFirstDate","$backEndFirstDate");
-      
+        Provider.of<CashTransactionProvider>(context, listen: false).getCashTransaction("","$backEndFirstDate","$backEndFirstDate","","","");
       });
     }
     else{
@@ -361,7 +360,7 @@ getCashTrCode() async {
     Provider.of<CashTransactionProvider>(context, listen: false).cashTransactionList = [];
     Provider.of<AccountsProvider>(context, listen: false).getAccounts();
     Provider.of<BankAccountProvider>(context, listen: false).getBankAccount();
-    Provider.of<CashTransactionProvider>(context, listen: false).getCashTransaction(Utils.formatBackEndDate(DateTime.now()),Utils.formatBackEndDate(DateTime.now()));
+    Provider.of<CashTransactionProvider>(context, listen: false).getCashTransaction("",Utils.formatBackEndDate(DateTime.now()),Utils.formatBackEndDate(DateTime.now()),"","","");
     super.initState();
   }
 
@@ -841,7 +840,7 @@ getCashTrCode() async {
                                   });
                                   var result = await addCashTransaction(context);
                                   if (result == "true") {
-                                   Provider.of<CashTransactionProvider>(context, listen: false).getCashTransaction(backEndFirstDate,backEndFirstDate);
+                                   Provider.of<CashTransactionProvider>(context, listen: false).getCashTransaction("",backEndFirstDate,backEndFirstDate,"","","");
                                   }
                                   setState(() {});
                               },

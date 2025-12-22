@@ -55,6 +55,7 @@ class _BankTransactionEntryScreenState extends State<BankTransactionEntryScreen>
         ).getBankTransaction(
           "$backEndFirstDate",
           "$backEndFirstDate",
+          "",""
         );
       });
     } else {
@@ -292,10 +293,8 @@ static String getToken() {
     Provider.of<BankTransactionProvider>(
       context,
       listen: false,
-    ).getBankTransaction(
-      Utils.formatBackEndDate(DateTime.now()),
-      Utils.formatBackEndDate(DateTime.now()),
-    );
+    ).getBankTransaction(Utils.formatBackEndDate(DateTime.now()),
+      Utils.formatBackEndDate(DateTime.now()),"","");
     Provider.of<BankAccountProvider>(context, listen: false).getBankAccount();
     super.initState();
   }
@@ -693,7 +692,7 @@ static String getToken() {
                                   });
                                   var result = await addBankTransaction(context);
                                   if (result == "true") {
-                                   Provider.of<BankTransactionProvider>(context, listen: false).getBankTransaction(backEndFirstDate,backEndFirstDate);
+                                   Provider.of<BankTransactionProvider>(context, listen: false).getBankTransaction(backEndFirstDate,backEndFirstDate,"","");
                                   }
                                   setState(() {});
                               },

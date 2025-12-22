@@ -3,7 +3,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:medical_trade/diagnostic_module/screens/appointment_entry_screen.dart';
 import 'package:medical_trade/diagnostic_module/screens/bank_transaction_entry_screen.dart';
+import 'package:medical_trade/diagnostic_module/screens/bank_transaction_report_screen.dart';
 import 'package:medical_trade/diagnostic_module/screens/cash_transaction_entry_screen.dart';
+import 'package:medical_trade/diagnostic_module/screens/cash_transaction_report_screen.dart';
 import 'package:medical_trade/diagnostic_module/screens/commission_payment_entry_screen.dart';
 import 'package:medical_trade/diagnostic_module/screens/doctor_entry_screen.dart';
 import 'package:medical_trade/diagnostic_module/screens/doctor_list_screen.dart';
@@ -63,7 +65,7 @@ class _DiagnosticModuleScreenState extends State<DiagnosticModuleScreen> {
       {
         'title': 'Appointment Entry',
         'icon': DiagnosticModule.appointment,
-        'color': const Color.fromARGB(255, 162, 173, 2),
+        'color': Colors.blue,
       },
       {
         'title': 'Cash Transaction',
@@ -82,6 +84,16 @@ class _DiagnosticModuleScreenState extends State<DiagnosticModuleScreen> {
       },
        {
         'title': 'Patient Payment',
+        'icon': DiagnosticModule.patientPay,
+        'color': const Color.fromARGB(255, 1, 160, 192),
+      },
+       {
+        'title': 'Cash Transaction Report',
+        'icon': DiagnosticModule.supplierPay,
+        'color': Color.fromARGB(255, 98, 44, 148),
+      },
+       {
+        'title': 'Bank Transaction Report',
         'icon': DiagnosticModule.patientPay,
         'color': const Color.fromARGB(255, 1, 160, 192),
       },
@@ -105,14 +117,12 @@ class _DiagnosticModuleScreenState extends State<DiagnosticModuleScreen> {
             crossAxisCount: 3,
             crossAxisSpacing: 8,
             mainAxisSpacing: 6,
-            childAspectRatio: 1.3,
+            childAspectRatio: 1.01,
           ),
         itemBuilder: (context, index) {
           return GestureDetector(
             onTap: () async {
-
               /// ================= INDEX BASED ACCESS =================
-
               if (index == 0) {
                 // Patient Entry
                 final access = await PermissionHelper.patientEntry();
@@ -194,6 +204,22 @@ class _DiagnosticModuleScreenState extends State<DiagnosticModuleScreen> {
                 final access = await PermissionHelper.patientPayment();
                 if (access == "true" || role == "Admin" || role == "Super Admin") {
                   Navigator.push(context,MaterialPageRoute(builder: (_) => PatientPaymentEntryScreen()));
+                } else {
+                  showWarningDialog(context);
+                }
+              }
+              else if (index == 10) {
+                final access = await PermissionHelper.commissionPayment();
+                if (access == "true" || role == "Admin" || role == "Super Admin") {
+                  Navigator.push(context,MaterialPageRoute(builder: (_) => CashTransactionReportScreen()));
+                } else {
+                  showWarningDialog(context);
+                }
+
+              } else {
+                final access = await PermissionHelper.patientPayment();
+                if (access == "true" || role == "Admin" || role == "Super Admin") {
+                  Navigator.push(context,MaterialPageRoute(builder: (_) => BankTransactionReportScreen()));
                 } else {
                   showWarningDialog(context);
                 }

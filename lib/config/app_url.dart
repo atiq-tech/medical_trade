@@ -7,6 +7,9 @@ class AppUrl {
   static var baseImageUrlTwo = 'https://madicaltrade.com/uploads/clientposts/';
   // Login Api
   static var loginEndPint = '$baseUrl/login';
+  static var uploadProfileImgEndPint = '$baseUrl/upload-profile-image';
+  static var updatePasswordEndPint = '$baseUrl/update-password';
+  
   //end
   // Contact Api
   static var contactEndPint = '$baseUrl/get-company-profile';

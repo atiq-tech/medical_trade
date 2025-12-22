@@ -245,14 +245,25 @@ class DiagnosticeApiservice {
   }
 
  //==================get-cash-transactions List =======================
-  static fetchCashTransaction(String? dateFrom,String? dateTo) async {
+  static fetchCashTransaction(
+    String? accountId,
+    String? dateFrom,
+    String? dateTo,
+    String? transactionType,
+    String? paymentType,
+    String? bankAccountId
+    ) async {
     String link = AppUrl.getCashTransactionEndPoint;
     final token = getToken();
     try {
-      Response response = await Dio().get(link,
+      Response response = await Dio().post(link,
          data: {
+            "accountId": "$accountId",
             "start_date":"$dateFrom",
             "end_date":"$dateTo",
+            "transactionType": "$transactionType",
+            "payment_type": "$paymentType",
+            "bank_account_id": "$bankAccountId"
           },
           options: Options(headers: {
             "Content-Type": "application/json",
@@ -268,15 +279,18 @@ class DiagnosticeApiservice {
   }
   
   //==================get-bank-transactions List =======================
-  static fetchBankTransaction(String? dateFrom,String? dateTo) async {
+  static fetchBankTransaction(String? dateFrom,String? dateTo,String? transactionType,String? bankAccountId) async {
     String link = AppUrl.getBankTransactionEndPoint;
     final token = getToken();
     try {
-      Response response = await Dio().get(link,
+      Response response = await Dio().post(link,
          data: {
             "start_date":"$dateFrom",
             "end_date":"$dateTo",
+            "transactionType": "$transactionType",
+            "bank_account_id": "$bankAccountId"
           },
+    
           options: Options(headers: {
             "Content-Type": "application/json",
             "Authorization": "Bearer $token",

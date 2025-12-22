@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:medical_trade/diagnostic_module/screens/diagnostic_module_screen.dart';
+import 'package:medical_trade/view/auth/profile_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -178,6 +179,16 @@ class _CustomDrawerState extends State<CustomDrawer> {
             /// ================= DIAGNOSTIC CHILD =================
             if (_isDiagnosticOpen)
             Column(children: diagnosticTitles.map((title) => _diagnosticItem(title)).toList()),
+             Divider(height: 0.5.h),
+            /// ================= LOGOUT =================
+            _drawerItem(
+              icon: Icons.person,
+              title: "Profile",
+              showArrow: false,
+              onTap: () {
+                Navigator.push(context,MaterialPageRoute(builder: (_) => ProfileScreen()));
+              },
+            ),
             Divider(height: 0.5.h),
             /// ================= LOGOUT =================
             _drawerItem(
