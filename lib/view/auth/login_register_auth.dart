@@ -3,7 +3,6 @@ import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:medical_trade/controller/get_district_api.dart';
 import 'package:medical_trade/controller/get_division_api.dart';
 import 'package:medical_trade/controller/login_auth.dart';
@@ -324,16 +323,17 @@ class _RegisterWidgetsState extends State<_RegisterWidgets> {
   }
 
   File? _image;
-  final ImagePicker _picker = ImagePicker();
-
-  Future<void> _pickImage() async {
-    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
-    if (pickedFile != null) {
-      setState(() {
-        _image = File(pickedFile.path);
-      });
-    }
-  }
+  //final ImagePicker _picker = ImagePicker();
+  // Future<void> _pickImage() async {
+  //   final pickedFile = await _picker.pickImage(source: ImageSource.camera);
+  //   if (pickedFile != null) {
+  //     setState(() {
+  //       _image = File(pickedFile.path);
+  //     });
+  //     print("Image Path: ${pickedFile.path}");
+  //     print("Image : ${_image}");
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -354,66 +354,66 @@ class _RegisterWidgetsState extends State<_RegisterWidgets> {
             padding: EdgeInsets.symmetric(horizontal: 30.0.w, vertical: 12.0.h),
             child: Column(
               children: [
-                Center(
-                  child: GestureDetector(
-                    onTap: _pickImage,
-                    child: Stack(
-                      clipBehavior: Clip.none,
-                      children: [
-                        Container(
-                          width: 80.0.w,
-                          height: 80.0.h,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: Colors.black,
-                              width: 2.0.w,
-                            ),
-                          ),
-                          child: CircleAvatar(
-                            radius: 38.0.r,
-                            backgroundColor: Colors.transparent,
-                            backgroundImage:
-                                _image != null ? FileImage(_image!) : null,
-                            child: _image == null
-                                ? Padding(
-                                    padding: EdgeInsets.all(12.0.r),
-                                    child: Image.asset(
-                                      "assets/icons/machine.png",
-                                      fit: BoxFit.cover,
-                                    ),
-                                  )
-                                : null,
-                          ),
-                        ),
-                        Positioned(
-                          bottom: 0,
-                          right: 0,
-                          child: Container(
-                            width: 30.0.w,
-                            height: 30.0.h,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Colors.white,
-                              border: Border.all(
-                                color: Colors.grey,
-                                width: 1.0.w,
-                              ),
-                            ),
-                            child: InkWell(
-                              onTap: _pickImage,
-                              child: Icon(
-                                Icons.camera_alt,
-                                color: Colors.black,
-                                size: 16.0.sp,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
+                // Center(
+                //   child: GestureDetector(
+                //     onTap: _pickImage,
+                //     child: Stack(
+                //       clipBehavior: Clip.none,
+                //       children: [
+                //         Container(
+                //           width: 80.0.w,
+                //           height: 80.0.h,
+                //           decoration: BoxDecoration(
+                //             shape: BoxShape.circle,
+                //             border: Border.all(
+                //               color: Colors.black,
+                //               width: 2.0.w,
+                //             ),
+                //           ),
+                //           child: CircleAvatar(
+                //             radius: 38.0.r,
+                //             backgroundColor: Colors.transparent,
+                //             backgroundImage:
+                //                 _image != null ? FileImage(_image!) : null,
+                //             child: _image == null
+                //                 ? Padding(
+                //                     padding: EdgeInsets.all(12.0.r),
+                //                     child: Image.asset(
+                //                       "assets/icons/machine.png",
+                //                       fit: BoxFit.cover,
+                //                     ),
+                //                   )
+                //                 : null,
+                //           ),
+                //         ),
+                //         Positioned(
+                //           bottom: 0,
+                //           right: 0,
+                //           child: Container(
+                //             width: 30.0.w,
+                //             height: 30.0.h,
+                //             decoration: BoxDecoration(
+                //               shape: BoxShape.circle,
+                //               color: Colors.white,
+                //               border: Border.all(
+                //                 color: Colors.grey,
+                //                 width: 1.0.w,
+                //               ),
+                //             ),
+                //             child: InkWell(
+                //               onTap: _pickImage,
+                //               child: Icon(
+                //                 Icons.camera_alt,
+                //                 color: Colors.black,
+                //                 size: 16.0.sp,
+                //               ),
+                //             ),
+                //           ),
+                //         ),
+                //       ],
+                //     ),
+                //   ),
+                // ),
                 SizedBox(height: 12.0.h),
                 CustomTextFormField(
                   controller: _organizationController,

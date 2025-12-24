@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:medical_trade/diagnostic_module/screens/bank_transaction_report_screen.dart';
+import 'package:medical_trade/diagnostic_module/screens/cash_transaction_report_screen.dart';
 import 'package:medical_trade/diagnostic_module/screens/diagnostic_module_screen.dart';
 import 'package:medical_trade/view/auth/profile_screen.dart';
 import 'package:provider/provider.dart';
@@ -33,6 +35,7 @@ class CustomDrawer extends StatefulWidget {
 }
 
 class _CustomDrawerState extends State<CustomDrawer> {
+  String? role;
   String? userName;
   bool _isDiagnosticOpen = false;
 
@@ -43,10 +46,12 @@ class _CustomDrawerState extends State<CustomDrawer> {
     "Doctor List",
     "Patient List",
     "Appointment Entry",
-    "Cash Transaction",
-    "Bank Transaction",
+    "Cash Transaction Entry",
+    "Bank Transaction Entry",
     "Commission Payment",
     "Patient Payment",
+    "Cash Transaction Report",
+    "Bank Transaction Report",
   ];
 
   @override
@@ -54,6 +59,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
     super.initState();
     final box = GetStorage();
     userName = box.read('username');
+    role = box.read('role');
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<CategoryProvider>().getCategories();
@@ -71,139 +77,138 @@ class _CustomDrawerState extends State<CustomDrawer> {
       ),
       child: Container(
         color: Colors.white,
-        child: Column(
-          children: [
-
-            /// ================= HEADER =================
-            Container(
-              height: AppSize.s150.h,
-              width: double.infinity,
-              padding: EdgeInsets.only(left: AppPadding.p12.w),
-              child: Row(
-                children: [
-                  CircleAvatar(
-                    radius: 35.r,
-                    backgroundImage:
-                        const AssetImage("assets/icons/medical.png"),
-                  ),
-                  SizedBoxManager.width12(),
-                  Padding(
-                    padding: EdgeInsets.only(top: 55.h),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              /// ================= HEADER =================
+              Container(
+                height: AppSize.s150.h,
+                width: double.infinity,
+                padding: EdgeInsets.only(left: AppPadding.p12.w),
+                child: Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 35.r,
+                      backgroundImage:
+                          const AssetImage("assets/icons/medical.png"),
+                    ),
+                    SizedBoxManager.width12(),
+                    Padding(
+                      padding: EdgeInsets.only(top: 55.h),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Medical Trade",
+                            style: TextStyle(
+                                fontSize: 18.sp,
+                                fontWeight: FontWeight.bold),
+                          ),
+                          Text(
+                            userName ?? "Unknown User",
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(fontSize: 12.sp),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+          
+              Divider(height: 0.5.h),
+          
+              /// ================= MY PAGE =================
+              _drawerItem(
+                icon: Icons.home,
+                title: "My Page",
+                onTap: () =>
+                    Navigator.pushNamed(context, RoutesName.home),
+              ),
+          
+              Divider(height: 0.5.h),
+          
+              /// ================= ENGINEERING SUPPORT =================
+              _drawerItem(
+                icon: Icons.build,
+                title: "Engineering Support",
+                onTap: () async {
+                  final access =
+                      await PermissionHelper.engineerSupport();
+                  access == "true"
+                      ? Navigator.pushNamed(
+                          context, RoutesName.engineeringSupport)
+                      : showWarningDialog(context);
+                },
+              ),
+              Divider(height: 0.5.h),
+              /// ================= SALES OLD MACHINE =================
+              _drawerItem(
+                icon: Icons.monetization_on,
+                title: "Sales Old Machine",
+                onTap: () async {
+                  final access = await PermissionHelper.saleYourOldMachine();
+                  access == "true"
+                      ? Navigator.pushNamed(context, RoutesName.salesOldMachine)
+                      : showWarningDialog(context);
+                },
+              ),
+              Divider(height: 0.5.h),  
+              /// ================= DIAGNOSTIC MODULE =================
+              InkWell(
+                onTap: () {
+                  setState(() {
+                    _isDiagnosticOpen = !_isDiagnosticOpen;
+                  });
+                },
+                child: SizedBox(
+                  height: AppSize.s35.h,
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 24.w),
+                    child: Row(
                       children: [
-                        Text(
-                          "Medical Trade",
-                          style: TextStyle(
-                              fontSize: 18.sp,
-                              fontWeight: FontWeight.bold),
-                        ),
-                        Text(
-                          userName ?? "Unknown User",
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(fontSize: 12.sp),
+                        Icon(Icons.category, size: 16.sp),
+                        SizedBoxManager.width24(),
+                        Text("Diagnostic Module", style: TextStyle(fontSize: 14.sp)),
+                        const Spacer(),
+                        Icon(_isDiagnosticOpen? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
                         ),
                       ],
                     ),
                   ),
-                ],
-              ),
-            ),
-
-            Divider(height: 0.5.h),
-
-            /// ================= MY PAGE =================
-            _drawerItem(
-              icon: Icons.home,
-              title: "My Page",
-              onTap: () =>
-                  Navigator.pushNamed(context, RoutesName.home),
-            ),
-
-            Divider(height: 0.5.h),
-
-            /// ================= ENGINEERING SUPPORT =================
-            _drawerItem(
-              icon: Icons.build,
-              title: "Engineering Support",
-              onTap: () async {
-                final access =
-                    await PermissionHelper.engineerSupport();
-                access == "true"
-                    ? Navigator.pushNamed(
-                        context, RoutesName.engineeringSupport)
-                    : showWarningDialog(context);
-              },
-            ),
-            Divider(height: 0.5.h),
-            /// ================= SALES OLD MACHINE =================
-            _drawerItem(
-              icon: Icons.monetization_on,
-              title: "Sales Old Machine",
-              onTap: () async {
-                final access = await PermissionHelper.saleYourOldMachine();
-                access == "true"
-                    ? Navigator.pushNamed(context, RoutesName.salesOldMachine)
-                    : showWarningDialog(context);
-              },
-            ),
-
-            Divider(height: 0.5.h),
-
-            /// ================= DIAGNOSTIC MODULE =================
-            InkWell(
-              onTap: () {
-                setState(() {
-                  _isDiagnosticOpen = !_isDiagnosticOpen;
-                });
-              },
-              child: SizedBox(
-                height: AppSize.s35.h,
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 24.w),
-                  child: Row(
-                    children: [
-                      Icon(Icons.category, size: 16.sp),
-                      SizedBoxManager.width24(),
-                      Text("Diagnostic Module", style: TextStyle(fontSize: 14.sp)),
-                      const Spacer(),
-                      Icon(_isDiagnosticOpen? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
-                      ),
-                    ],
-                  ),
                 ),
               ),
-            ),
-
-            /// ================= DIAGNOSTIC CHILD =================
-            if (_isDiagnosticOpen)
-            Column(children: diagnosticTitles.map((title) => _diagnosticItem(title)).toList()),
-             Divider(height: 0.5.h),
-            /// ================= LOGOUT =================
-            _drawerItem(
-              icon: Icons.person,
-              title: "Profile",
-              showArrow: false,
-              onTap: () {
-                Navigator.push(context,MaterialPageRoute(builder: (_) => ProfileScreen()));
-              },
-            ),
-            Divider(height: 0.5.h),
-            /// ================= LOGOUT =================
-            _drawerItem(
-              icon: Icons.logout,
-              title: "Log Out",
-              showArrow: false,
-              onTap: () {
-                context.read<LoginAuthProvider>().logout();
-                Navigator.pushAndRemoveUntil(context,
-                  MaterialPageRoute(builder: (_) => const LoginView(isLogin: true)),(_) => false,
-                );
-              },
-            ),
-            Divider(height: 0.5.h),
-          ],
+              _isDiagnosticOpen? Divider(height: 0.5.h):SizedBox(),
+              /// ================= DIAGNOSTIC CHILD =================
+              if (_isDiagnosticOpen)
+              Column(children: diagnosticTitles.map((title) => _diagnosticItem(title)).toList()),
+               Divider(height: 0.5.h),
+              /// ================= LOGOUT =================
+              _drawerItem(
+                icon: Icons.person,
+                title: "Profile",
+                showArrow: false,
+                onTap: () {
+                  Navigator.push(context,MaterialPageRoute(builder: (_) => ProfileScreen()));
+                },
+              ),
+              Divider(height: 0.5.h),
+              /// ================= LOGOUT =================
+              _drawerItem(
+                icon: Icons.logout,
+                title: "Log Out",
+                showArrow: false,
+                onTap: () {
+                  context.read<LoginAuthProvider>().logout();
+                  Navigator.pushAndRemoveUntil(context,
+                    MaterialPageRoute(builder: (_) => const LoginView(isLogin: true)),(_) => false,
+                  );
+                },
+              ),
+              Divider(height: 0.5.h),
+            ],
+          ),
         ),
       ),
     );
@@ -240,12 +245,13 @@ class _CustomDrawerState extends State<CustomDrawer> {
     return InkWell(
       onTap: () async => _handleDiagnosticNavigation(title),
       child: Padding(
-        padding:EdgeInsets.only(left: 56.w, right: 24.w, top: 8.h, bottom: 8.h),
+        padding:EdgeInsets.only(left: 56.w, right: 24.w, top: 0.h, bottom:5.h),
         child: Row(
           children: [
             Icon(Icons.circle, size: 6.sp),
             SizedBox(width: 12.w),
             Text(title, style: TextStyle(fontSize: 13.sp)),
+            
           ],
         ),
       ),
@@ -255,66 +261,103 @@ class _CustomDrawerState extends State<CustomDrawer> {
   Future<void> _handleDiagnosticNavigation(String title) async {
     if (title == "Patient Entry") {
       final access = await PermissionHelper.patientEntry();
-      access == "true"
-          ? Navigator.push(context, MaterialPageRoute(builder: (_) => PatientEntryScreen()))
-          : showWarningDialog(context);
+       if (access == "true" || role == "Admin" || role == "Super Admin") {
+         Navigator.push(context,MaterialPageRoute(builder: (_) => PatientEntryScreen()));
+      } else {
+        showWarningDialog(context);
+      }
 
     } else if (title == "Doctor Entry") {
       final access = await PermissionHelper.doctorEntry();
-      access == "true"
-          ? Navigator.push(context, MaterialPageRoute(builder: (_) => DoctorEntryScreen()))
-          : showWarningDialog(context);
+      if (access == "true" || role == "Admin" || role == "Super Admin") {
+         Navigator.push(context,MaterialPageRoute(builder: (_) => DoctorEntryScreen()));
+      } else {
+        showWarningDialog(context);
+      }
 
     } else if (title == "Test Entry") {
       final access = await PermissionHelper.testEntry();
-      access == "true"
-          ? Navigator.push(context, MaterialPageRoute(builder: (_) => TestEntryScreen()))
-          : showWarningDialog(context);
+       if (access == "true" || role == "Admin" || role == "Super Admin") {
+         Navigator.push(context,MaterialPageRoute(builder: (_) => TestEntryScreen()));
+      } else {
+        showWarningDialog(context);
+      }
 
     } else if (title == "Doctor List") {
       final access = await PermissionHelper.doctorEntry();
-      access == "true"
-          ? Navigator.push(context, MaterialPageRoute(builder: (_) => DoctorListScreen()))
-          : showWarningDialog(context);
+       if (access == "true" || role == "Admin" || role == "Super Admin") {
+         Navigator.push(context,MaterialPageRoute(builder: (_) => DoctorListScreen()));
+      } else {
+        showWarningDialog(context);
+      }
 
     } else if (title == "Patient List") {
       final access = await PermissionHelper.patientList();
-      access == "true"
-          ? Navigator.push(context, MaterialPageRoute(builder: (_) => PatientListScreen()))
-          : showWarningDialog(context);
+      if (access == "true" || role == "Admin" || role == "Super Admin") {
+         Navigator.push(context,MaterialPageRoute(builder: (_) => PatientListScreen()));
+      } else {
+        showWarningDialog(context);
+      }
 
     } else if (title == "Appointment Entry") {
       final access = await PermissionHelper.appointmentEntry();
-      access == "true"
-          ? Navigator.push(context, MaterialPageRoute(builder: (_) => AppointmentEntryScreen()))
-          : showWarningDialog(context);
+      if (access == "true" || role == "Admin" || role == "Super Admin") {
+         Navigator.push(context,MaterialPageRoute(builder: (_) => AppointmentEntryScreen()));
+      } else {
+        showWarningDialog(context);
+      }
           
-    } else if (title == "Cash Transaction") {
+    } else if (title == "Cash Transaction Entry") {
       final access = await PermissionHelper.cashTrEntry();
-      access == "true"
-          ? Navigator.push(context, MaterialPageRoute(builder: (_) => CashTransactionEntryScreen()))
-          : showWarningDialog(context);
+       if (access == "true" || role == "Admin" || role == "Super Admin") {
+         Navigator.push(context,MaterialPageRoute(builder: (_) => CashTransactionEntryScreen()));
+      } else {
+        showWarningDialog(context);
+      }
 
-    } else if (title == "Bank Transaction") {
+    } else if (title == "Bank Transaction Entry") {
       final access = await PermissionHelper.bankTrEntry();
-      access == "true"
-          ? Navigator.push(context, MaterialPageRoute(builder: (_) => BankTransactionEntryScreen()))
-          : showWarningDialog(context);
+       if (access == "true" || role == "Admin" || role == "Super Admin") {
+         Navigator.push(context,MaterialPageRoute(builder: (_) => BankTransactionEntryScreen()));
+      } else {
+        showWarningDialog(context);
+      }
 
     } else if (title == "Commission Payment") {
       final access = await PermissionHelper.commissionPayment();
-      access == "true"
-          ? Navigator.push(context, MaterialPageRoute(builder: (_) =>CommissionPaymentEntryScreen()))
-          : showWarningDialog(context);
+       if (access == "true" || role == "Admin" || role == "Super Admin") {
+         Navigator.push(context,MaterialPageRoute(builder: (_) => CommissionPaymentEntryScreen()));
+      } else {
+        showWarningDialog(context);
+      }
 
     } else if (title == "Patient Payment") {
       final access = await PermissionHelper.patientPayment();
-      access == "true"
-          ? Navigator.push(context, MaterialPageRoute(builder: (_) => PatientPaymentEntryScreen()))
-          : showWarningDialog(context);
+       if (access == "true" || role == "Admin" || role == "Super Admin") {
+         Navigator.push(context,MaterialPageRoute(builder: (_) => PatientPaymentEntryScreen()));
+      } else {
+        showWarningDialog(context);
+      }
+
+    } else if (title == "Cash Transaction Report") {
+      final access = await PermissionHelper.cashTrReport();
+       if (access == "true" || role == "Admin" || role == "Super Admin") {
+         Navigator.push(context,MaterialPageRoute(builder: (_) => CashTransactionReportScreen()));
+      } else {
+        showWarningDialog(context);
+      }
+
+     } else if (title == "Bank Transaction Report") {
+      final access = await PermissionHelper.bankTrReport();
+      if (access == "true" || role == "Admin" || role == "Super Admin") {
+         Navigator.push(context,MaterialPageRoute(builder: (_) => BankTransactionReportScreen()));
+      } else {
+        showWarningDialog(context);
+      }
     }
   }
 }
+
 
 
 

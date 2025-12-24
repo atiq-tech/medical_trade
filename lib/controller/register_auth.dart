@@ -27,7 +27,9 @@ class RegisterAuthProvider extends ChangeNotifier {
       final responseData = jsonDecode(response.body);
 
       if (responseData['success'] == true && responseData['data'] != null) {
-        _customerCode = responseData['data']; // শুধু code অংশটা নিচ্ছে
+        
+        _customerCode = responseData['data'];
+        print("Branch Code fetched: $_customerCode");
         _errorMessage = null;
         print("Customer Code fetched: $_customerCode");
       } else {
@@ -143,7 +145,7 @@ class RegisterAuthProvider extends ChangeNotifier {
       print("RESPONSE BODY = $responseBody");
 
 
-      if (response.statusCode == 201) {
+      if (response.statusCode == 200) {
         final responseData = jsonDecode(responseBody);
         if (responseData['status'] == "success") {
           _isLoading = false;

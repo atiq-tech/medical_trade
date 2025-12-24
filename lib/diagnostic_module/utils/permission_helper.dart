@@ -17,4 +17,7 @@ class PermissionHelper {
   static Future<String> commissionPayment() => _get("commissionPayment");
   static Future<String> patientList() => _get("patientList");
   static Future<String> patientPayment() => _get("patientPayment");
+  static Future<String> cashTrReport() => _get("cashTrReport");
+  static Future<String> bankTrReport() => _get("bankTrReport");
+   
 }

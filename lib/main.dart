@@ -114,8 +114,6 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider<BankTransactionProvider>(create: (_) => BankTransactionProvider()),
         ChangeNotifierProvider<CommissionPaymentProvider>(create: (_) => CommissionPaymentProvider()),
         
-        
-        
       ],
       child: ScreenUtilInit(
         designSize: const Size(360, 690),

@@ -326,6 +326,7 @@ class _TestEntryScreenState extends State<TestEntryScreen> {
                       label: "Price",
                       controller: _priceController,
                       hintText: "0",
+                      keyboardType: TextInputType.number,
                     ),
                     SizedBox(height: 4.0.h),
                     Row(
@@ -338,6 +339,7 @@ class _TestEntryScreenState extends State<TestEntryScreen> {
                           height: 25.0.h,
                           child: TextField(
                             controller: _dayController,
+                            keyboardType: TextInputType.number,
                             style: AllTextStyle.dropDownlistStyle,
                             decoration: InputDecoration(
                               hintText: "Day",
@@ -359,6 +361,7 @@ class _TestEntryScreenState extends State<TestEntryScreen> {
                           height: 25.0.h,
                           child: TextField(
                             controller: _hourController,
+                            keyboardType: TextInputType.number,
                             style: AllTextStyle.dropDownlistStyle,
                             decoration: InputDecoration(
                               hintText: "Hour",
@@ -380,6 +383,7 @@ class _TestEntryScreenState extends State<TestEntryScreen> {
                           height: 25.0.h,
                           child: TextField(
                             controller: _minuteController,
+                            keyboardType: TextInputType.number,
                             style: AllTextStyle.dropDownlistStyle,
                             decoration: InputDecoration(
                               hintText: "Minute",

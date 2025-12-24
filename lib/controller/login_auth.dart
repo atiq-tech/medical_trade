@@ -76,6 +76,8 @@ class LoginAuthProvider extends ChangeNotifier {
           prefs.setString("appointmentEntry","${permissionList.contains("outdoor_patient")}");
           prefs.setString("bankTrEntry","${permissionList.contains("bank_transaction_entry")}");
           prefs.setString("cashTrEntry","${permissionList.contains("cash_transaction_entry")}");
+          prefs.setString("cashTrReport","${permissionList.contains("cash_transaction_report")}");
+          prefs.setString("bankTrReport","${permissionList.contains("bank_transaction_report")}");
           prefs.setString("patientPayment", "${permissionList.contains("patient_payment_medicine")}");
           prefs.setString("commissionPayment", "${permissionList.contains("commission_payment")}");
           prefs.setString("patientList","${permissionList.contains("patient_list",)}");

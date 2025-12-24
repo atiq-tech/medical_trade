@@ -509,6 +509,7 @@ getAppointSerialNumber() async {
                             label: "Mobile No",
                             controller: _mobileController,
                             hintText: "Enter Mobile",
+                            keyboardType: TextInputType.phone,
                           ),
                           SizedBox(height: 4.0.h),
                           Row(
@@ -594,6 +595,7 @@ getAppointSerialNumber() async {
                                   height: 25.0.h,
                                   child: TextField(
                                     controller: _yearController,
+                                    keyboardType: TextInputType.number,
                                     style: AllTextStyle.dropDownlistStyle,
                                     decoration: InputDecoration(
                                       hintText: "Year",
@@ -615,6 +617,7 @@ getAppointSerialNumber() async {
                                   height: 25.0.h,
                                   child: TextField(
                                     controller: _monthController,
+                                    keyboardType: TextInputType.number,
                                     style: AllTextStyle.dropDownlistStyle,
                                     decoration: InputDecoration(
                                       hintText: "Month",
@@ -636,6 +639,7 @@ getAppointSerialNumber() async {
                                   height: 25.0.h,
                                   child: TextField(
                                     controller: _dayAgeController,
+                                    keyboardType: TextInputType.number,
                                     style: AllTextStyle.dropDownlistStyle,
                                     decoration: InputDecoration(
                                       hintText: "Day",
@@ -1040,12 +1044,14 @@ getAppointSerialNumber() async {
                           label: "Con.Fees",
                           controller: _conFeesController,
                           hintText: "0",
+                          keyboardType: TextInputType.number,
                         ),
                         SizedBox(height: 4.0.h),
                         CommonTextFieldRow(
                           label: "Subtotal",
                           controller: _subTotalController,
                           hintText: "0",
+                          keyboardType: TextInputType.number,
                         ),
                         SizedBox(height: 4.0.h),
                         CommonTextFieldRow(
@@ -1184,7 +1190,7 @@ getAppointSerialNumber() async {
                                   style: AllTextStyle.textValueStyle,
                                   controller: _discountParcentController,
                                   onChanged: (value) => _calculateAll(),
-                                  keyboardType: TextInputType.phone,
+                                  keyboardType: TextInputType.number,
                                   decoration: InputDecoration(
                                     contentPadding: EdgeInsets.only(left: 3.w),
                                     hintText: "0",
@@ -1209,7 +1215,7 @@ getAppointSerialNumber() async {
                                   controller: _discountController,
                                   keyboardType: TextInputType.number,
                                   onChanged: (value) {
-                                    _discountParcentController.clear(); // percent reset
+                                    _discountParcentController.clear();
                                     _calculateAll();
                                   },
                                   decoration: InputDecoration(
@@ -1233,7 +1239,6 @@ getAppointSerialNumber() async {
                           children: [
                             Expanded(flex: 6, child: Text("Advance", style: AllTextStyle.textFieldHeadStyle)),
                             const Expanded(flex: 1, child: Text(":")),
-
                             Expanded(
                               flex: 7,
                               child: Container(
@@ -1242,7 +1247,7 @@ getAppointSerialNumber() async {
                                   style: AllTextStyle.textValueStyle,
                                   controller: _advanceController,
                                   onChanged: (value) => _calculateAll(),
-                                  keyboardType: TextInputType.phone,
+                                  keyboardType: TextInputType.number,
                                   decoration: InputDecoration(
                                     contentPadding: EdgeInsets.only(left: 3.w),
                                     hintText: "0",

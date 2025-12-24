@@ -443,6 +443,7 @@ getDoctorCode() async {
                       label: "Mobile",
                       controller: _mobileController,
                       hintText: "Enter Mobile Number",
+                      keyboardType: TextInputType.phone,
                     ),
                     SizedBox(height: 4.0.h),
                     CommonTextFieldRow(
@@ -561,6 +562,7 @@ getDoctorCode() async {
                     CommonTextFieldRow(
                       label: "Fees",
                       controller: _feesController,
+                      keyboardType: TextInputType.phone,
                       hintText: "0",
                       onChanged: (value) {
                         _calculateCommission();

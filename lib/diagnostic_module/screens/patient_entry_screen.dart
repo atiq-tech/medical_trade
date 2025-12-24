@@ -233,6 +233,7 @@ getPatientCode() async {
                       label: "Mobile",
                       controller: _mobileController,
                       hintText: "Enter Mobile Number",
+                      keyboardType: TextInputType.phone,
                     ),
                     SizedBox(height: 4.0.h),
                      Row(
@@ -324,6 +325,7 @@ getPatientCode() async {
                       label: "NID No",
                       controller: _nidNoController,
                       hintText: "Enter NID Number",
+                      keyboardType: TextInputType.number,
                     ),
                     SizedBox(height: 4.0.h),
                     CommonTextFieldRow(

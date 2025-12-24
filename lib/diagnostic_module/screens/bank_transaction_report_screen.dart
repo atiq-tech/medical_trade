@@ -1,9 +1,7 @@
-import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
-import 'package:http/http.dart' as http;
 import 'package:medical_trade/diagnostic_module/models/bank_account_model.dart';
 import 'package:medical_trade/diagnostic_module/providers/bank_account_provider.dart';
 import 'package:medical_trade/diagnostic_module/providers/bank_transaction_provider.dart';
@@ -212,15 +210,6 @@ class _BankTransactionReportScreenState extends State<BankTransactionReportScree
     dueStatus = "${sharedPreferences?.getString('due_status')}";
   }
 
-  Future<Uint8List> _fetchImage(String url) async {
-    final response = await http.get(Uri.parse(url));
-    if (response.statusCode == 200) {
-      return response.bodyBytes;
-    } else {
-      throw Exception('Failed to load image');
-    }
-  }
-
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback(_getDropdownSize);
@@ -243,8 +232,8 @@ class _BankTransactionReportScreenState extends State<BankTransactionReportScree
     double amount = allBankTransactionData
     .map((e) => double.parse("${e.amount}"))
     .fold(0.0, (p, element) => p + element);
-    double? depositValue = allBankTransactionData.where((element) => element.transactionType == 'deposit').map((e) => e.amount).fold(0.0, (p, element) => p! + double.parse("${element}"));
-    double? withdrawValue = allBankTransactionData.where((element) => element.transactionType == 'withdraw').map((e) => e.amount).fold(0.0, (p, element) => p! + double.parse("${element}"));
+    // double? depositValue = allBankTransactionData.where((element) => element.transactionType == 'deposit').map((e) => e.amount).fold(0.0, (p, element) => p! + double.parse("${element}"));
+    // double? withdrawValue = allBankTransactionData.where((element) => element.transactionType == 'withdraw').map((e) => e.amount).fold(0.0, (p, element) => p! + double.parse("${element}"));
 
     return Scaffold(
       appBar:AppBar(

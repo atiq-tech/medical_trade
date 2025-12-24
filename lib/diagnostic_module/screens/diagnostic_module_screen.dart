@@ -209,7 +209,7 @@ class _DiagnosticModuleScreenState extends State<DiagnosticModuleScreen> {
                 }
               }
               else if (index == 10) {
-                final access = await PermissionHelper.commissionPayment();
+                final access = await PermissionHelper.cashTrReport();
                 if (access == "true" || role == "Admin" || role == "Super Admin") {
                   Navigator.push(context,MaterialPageRoute(builder: (_) => CashTransactionReportScreen()));
                 } else {
@@ -217,7 +217,7 @@ class _DiagnosticModuleScreenState extends State<DiagnosticModuleScreen> {
                 }
 
               } else {
-                final access = await PermissionHelper.patientPayment();
+                final access = await PermissionHelper.bankTrReport();
                 if (access == "true" || role == "Admin" || role == "Super Admin") {
                   Navigator.push(context,MaterialPageRoute(builder: (_) => BankTransactionReportScreen()));
                 } else {

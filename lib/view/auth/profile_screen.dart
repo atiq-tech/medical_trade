@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:math';
 import 'package:get_storage/get_storage.dart';
 import 'package:medical_trade/config/app_url.dart';
 import 'package:medical_trade/diagnostic_module/utils/all_textstyle.dart';
@@ -12,7 +11,6 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
 
@@ -55,6 +53,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       setState(() {
         _image = File(pickedFile.path);
       });
+      print("picked image : ${_image}");
     }
   }
   @override
@@ -109,18 +108,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       child: CircleAvatar(
                       radius: 50.r,
                       backgroundColor: Colors.white,
-                      // backgroundImage: _image != null
-                      //     ? FileImage(_image!) as ImageProvider
-                      //     : (userImage != null && userImage!.isNotEmpty && userImage != 'null'
-                      //         ? NetworkImage("$imageBaseUrl${userImage!}") as ImageProvider
-                      //         : null),
-                      // child: (_image == null && (userImage == null || userImage!.isEmpty || userImage == 'null'))
-                      //     ? Icon(
-                      //         Icons.person,
-                      //         size: 60.sp,
-                      //         color: AppColors.appColor,
-                      //       )
-                      //     : null,
+                      backgroundImage: _image != null
+                          ? FileImage(_image!) as ImageProvider
+                          : (userImageName != null && userImageName!.isNotEmpty && userImageName != 'null'
+                              ? NetworkImage("https://app.medicaltradeltd.com/${userImageName!}") as ImageProvider
+                              : null),
+                      child: (_image == null && (userImageName == null || userImageName!.isEmpty || userImageName == 'null'))
+                          ? Icon(
+                              Icons.person,
+                              size: 60.sp,
+                              color: AppColors.appColor,
+                            )
+                          : null,
                      ),
                     ),
                     Positioned(
@@ -459,7 +458,7 @@ Future<bool> changeProfile({File? image}) async {
 
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text("Something went wrong. Please try again"),
+        content: Text("Something went wrong. Please Select Image and try again"),
       ),
     );
     return false;
