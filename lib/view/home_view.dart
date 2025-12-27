@@ -191,16 +191,10 @@ getDoctorCode() async {
                                     'https://app.madicaltrade.com/uploads/customers/$userImageName',
                                     fit: BoxFit.cover,
                                     errorBuilder: (context, error, stackTrace) {
-                                      return Image.asset(
-                                        ImageAssets.person,
-                                        fit: BoxFit.cover,
-                                      );
+                                      return Image.asset(ImageAssets.person,fit: BoxFit.cover);
                                     },
                                   )
-                                : Image.asset(
-                                    ImageAssets.person,
-                                    fit: BoxFit.cover,
-                                  ),
+                                : Image.asset(ImageAssets.person,fit: BoxFit.cover),
                           ),
                         ),
                         SizedBox(
@@ -227,10 +221,7 @@ getDoctorCode() async {
                         showLogoutButton = !showLogoutButton;
                       });
                     },
-                    child: Icon(
-                      Icons.arrow_drop_down,
-                      size: 28.sp,
-                    ),
+                    child: Icon(Icons.arrow_drop_down,size: 28.sp),
                   ),
                 ],
               ),

@@ -78,11 +78,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
         title: Text(
           "My Profile",
-          style: TextStyle(
-            color: Colors.black,
-            fontWeight: FontWeight.w500,
-            fontSize: 18.sp,
-          ),
+          style: TextStyle(color: Colors.black,fontWeight: FontWeight.w500,fontSize: 18.sp),
         ),
         centerTitle: true,
       ),
@@ -114,11 +110,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               ? NetworkImage("https://app.medicaltradeltd.com/${userImageName!}") as ImageProvider
                               : null),
                       child: (_image == null && (userImageName == null || userImageName!.isEmpty || userImageName == 'null'))
-                          ? Icon(
-                              Icons.person,
-                              size: 60.sp,
-                              color: AppColors.appColor,
-                            )
+                          ? Icon(Icons.person,size: 60.sp,color: AppColors.appColor)
                           : null,
                      ),
                     ),
@@ -130,11 +122,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         child: CircleAvatar(
                           radius: 14.r,
                           backgroundColor: AppColors.appColor,
-                          child: Icon(
-                            Icons.camera_alt,
-                            size: 14.sp,
-                            color: Colors.white,
-                          ),
+                          child: Icon(Icons.camera_alt,size: 14.sp,color: Colors.white),
                         ),
                       ),
                     ),
