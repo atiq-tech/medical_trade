@@ -53,7 +53,6 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
             child: DataTable(
               headingRowHeight: 22.h,
               dataRowMaxHeight:double.infinity,
-              //dataRowHeight: 22.h,
               headingRowColor: MaterialStateColor.resolveWith((states) => const Color.fromARGB(255, 2, 145, 9)),
               border: TableBorder.all(color: const Color.fromARGB(255, 110, 143, 145), width: 1),
               columns: const [

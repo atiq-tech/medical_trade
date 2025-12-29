@@ -413,7 +413,6 @@ class _TestEntryScreenState extends State<TestEntryScreen> {
                     onTap: () async {
                       Utils.closeKeyBoard(context);
                       print("Tapped Save");
-
                       if (_testNameController.text == '') {
                         Utils.showTopSnackBar(context, "Test name is required");
                         return;

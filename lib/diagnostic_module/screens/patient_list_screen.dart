@@ -45,13 +45,11 @@ class _PatientListScreenState extends State<PatientListScreen> {
         years -= 1;
         months += 12;
       }
-
       return "$years years $months months $days days";
     } catch (e) {
       return "";
     }
   }
-
   @override
   Widget build(BuildContext context) {
     final allPatientsData = Provider.of<PatientsProvider>(context).allPatientList;

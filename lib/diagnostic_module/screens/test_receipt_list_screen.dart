@@ -6,11 +6,9 @@ import 'package:medical_trade/utilities/color_manager.dart';
 
 class TestReceiptListScreen extends StatefulWidget {
   const TestReceiptListScreen({Key? key}) : super(key: key);
-
   @override
   State<TestReceiptListScreen> createState() => _TestReceiptListScreenState();
 }
-
 class _TestReceiptListScreenState extends State<TestReceiptListScreen> {
   Color getColor(Set<WidgetState> states) {
     return Colors.blue.shade100;

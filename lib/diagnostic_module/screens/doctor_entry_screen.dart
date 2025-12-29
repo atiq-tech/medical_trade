@@ -647,7 +647,6 @@ getDoctorCode() async {
                     onTap: () async {
                       Utils.closeKeyBoard(context);
                       print("Tapped Save");
-
                       if (_doctorNameController.text == '') {
                         Utils.showTopSnackBar(context, "Doctor name is required");
                         return;

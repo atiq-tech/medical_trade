@@ -277,7 +277,6 @@ class DiagnosticeApiservice {
     }
     return null;
   }
-  
   //==================get-bank-transactions List =======================
   static fetchBankTransaction(String? dateFrom,String? dateTo,String? transactionType,String? bankAccountId) async {
     String link = AppUrl.getBankTransactionEndPoint;
