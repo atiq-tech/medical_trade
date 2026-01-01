@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:medical_trade/utilities/color_manager.dart';
-import 'package:medical_trade/utilities/font_manager.dart'; // Adjust import based on your project structure
+import 'package:medical_trade/utilities/font_manager.dart'; 
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final VoidCallback? onTap;
@@ -21,6 +21,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
         title ?? "No Data Found",
         style:FontManager.subheading,
       ),
+      centerTitle: true,
     );
   }
 

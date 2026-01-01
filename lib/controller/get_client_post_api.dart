@@ -66,7 +66,6 @@ class GetClientPostProvider with ChangeNotifier {
     required List<String> selectedDivisions,
     required List<String> selectedDistricts,
     required String upazila,
-    required String validityDate,
     required String mobile,
     required String description,
     required List<File> images,
@@ -113,7 +112,7 @@ class GetClientPostProvider with ChangeNotifier {
       "mobile": mobile,
       "description": description,
       "upazilla": upazila,
-      "validity_date": validityDate,
+      "validity_date": "",
       "status": "p",
       "AddBy": userId.toString(), // ✅ FIXED
       "Client_branchid": "0",

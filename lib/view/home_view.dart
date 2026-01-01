@@ -7,17 +7,18 @@ import 'package:medical_trade/controller/contact_api.dart';
 import 'package:medical_trade/diagnostic_module/screens/diagnostic_module_screen.dart';
 import 'package:medical_trade/diagnostic_module/utils/permission_helper.dart';
 import 'package:medical_trade/diagnostic_module/utils/utils.dart';
+import 'package:medical_trade/diagnostic_module/utils/whats_up_fab.dart';
 import 'package:medical_trade/new_part/providers/category_provider.dart';
 import 'package:medical_trade/utilities/assets_manager.dart';
 import 'package:medical_trade/utilities/color_manager.dart';
+import 'package:medical_trade/utilities/custom_appbar.dart';
 import 'package:medical_trade/utilities/custom_container1.dart';
 import 'package:medical_trade/utilities/custom_container_homepage.dart';
 import 'package:medical_trade/utilities/font_manager.dart';
-import 'package:medical_trade/utilities/values_manager.dart';
 import 'package:medical_trade/view/auth/login_register_auth.dart';
 import 'package:medical_trade/view/details.dart';
-import 'package:medical_trade/view/drawer.dart';
 import 'package:medical_trade/view/engineering_support.dart';
+import 'package:medical_trade/view/my_wall_post_view.dart';
 import 'package:medical_trade/view/sales_your_old_machine_view.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -73,7 +74,7 @@ getDoctorCode() async {
   }
 }
   @override
-  void initState() {
+  void initState(){
     getDoctorCode();
     final box = GetStorage();
     userName = box.read('username');
@@ -83,6 +84,10 @@ getDoctorCode() async {
     CategoryProvider.isAllCategoriesLoading = true;
     Provider.of<CategoryProvider>(context, listen: false).getCategories();
     print("role ========== $role");
+    final access1 = PermissionHelper.engineerSupport();
+    final access2 = PermissionHelper.saleYourOldMachine();
+    print("Engineer Access ======= $access1");
+    print("Sales Old Machine Access ======= $access2");
   }
 
   @override
@@ -98,10 +103,10 @@ getDoctorCode() async {
 
     //final box = GetStorage();
 
-    // void onAppBarTitleTap() {
-    //   Navigator.pushAndRemoveUntil(context,
-    //     MaterialPageRoute(builder: (_) => const MyWallPostView()),(route) => false);
-    // }
+    void onAppBarTitleTap() {
+      Navigator.pushAndRemoveUntil(context,
+        MaterialPageRoute(builder: (_) => const MyWallPostView()),(route) => false);
+    }
 
     /// 🔹 Static Home Items (categories এর পরে আসবে)
     final List<Map<String, dynamic>> homeItems = [
@@ -116,7 +121,7 @@ getDoctorCode() async {
         'page': const DiagnosticModuleScreen(),
       },
       {
-        'title': 'Sales Your Old Machine',
+        'title': 'Sales Your Machine',
         'icon': ImageAssets.oldMachineTwo,
         'page': const SalesYourOldMachineView(),
         'requireLogin': true,
@@ -127,293 +132,20 @@ getDoctorCode() async {
 
     return Scaffold(
       backgroundColor: ColorManager.white,
-      // appBar: CustomAppBar(
-      //   onTap: onAppBarTitleTap,
-      //   title: "My Page",
-      // ),
-       appBar: AppBar(
-        backgroundColor: ColorManager.appbarColor,
-        leading: Builder(
-          builder: (context) => IconButton(
-            icon: Icon(
-              Icons.menu,
-              size: AppSize.s28.r,
-              color: ColorManager.black,
-            ),
-            onPressed: () {
-              Scaffold.of(context).openDrawer();
-            },
-          ),
-        ),
-        leadingWidth: 25.0.w,
-        title: Padding(
-          padding: EdgeInsets.only(
-            top: AppPadding.p4.h,
-            bottom: AppPadding.p4.h,
-          ),
-          child: Row(
-            children: [
-              Image.asset(
-                ImageAssets.appBarIcon,
-                height: AppSize.s40.h,
-                width: AppSize.s40.w,
-              ),
-              Text(
-                "Medical Trade",
-                style: FontManager.subheading,
-              ),
-            ],
-          ),
-        ),
-        actions: [
-          Padding(
-            padding: EdgeInsets.only(right: AppPadding.p12.w),
-            child: Stack(clipBehavior: Clip.none, children: [
-              Row(
-                children: [
-                  SingleChildScrollView(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Container(
-                          width: 32.w,
-                          height: 32.h,
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.black, width: 1.w),
-                            borderRadius: BorderRadius.circular(45.r),
-                          ),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(45.r),
-                            child: userImageName != null &&
-                                    userImageName.toString().isNotEmpty &&
-                                    userImageName != 'null'
-                                ? Image.network(
-                                    'https://app.madicaltrade.com/uploads/customers/$userImageName',
-                                    fit: BoxFit.cover,
-                                    errorBuilder: (context, error, stackTrace) {
-                                      return Image.asset(ImageAssets.person,fit: BoxFit.cover);
-                                    },
-                                  )
-                                : Image.asset(ImageAssets.person,fit: BoxFit.cover),
-                          ),
-                        ),
-                        SizedBox(
-                          width: 100.w,
-                          child: Center(
-                            child: Text(
-                              userName ?? "Unknown User",
-                              maxLines: 1,
-                              style: TextStyle(
-                                fontSize: 11.sp,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                              ),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  InkWell(
-                    onTap: () {
-                      setState(() {
-                        showLogoutButton = !showLogoutButton;
-                      });
-                    },
-                    child: Icon(Icons.arrow_drop_down,size: 28.sp),
-                  ),
-                ],
-              ),
-              if (showLogoutButton)
-                Positioned(
-                  top: 2.h,
-                  right: 0.w,
-                  child: Container(
-                    height: 40.h,
-                    width: 100.w,
-                    decoration: BoxDecoration(
-                      color: ColorManager.skyBlue,
-                      borderRadius: BorderRadius.circular(5.r),
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        InkWell(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const HomeView(),
-                              ),
-                            );
-                          },
-                          child: Padding(
-                            padding: EdgeInsets.only(
-                                left: 8.w, right: 8.w, top: 2.h),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.file_copy,
-                                  size: 16.sp,
-                                  color: Colors.white,
-                                ),
-                                SizedBox(width: 8.w),
-                                Text(
-                                  "My Page",
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 12.sp,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        Divider(
-                          color: Colors.white,
-                          height: 0.5.h,
-                        ),
-                        InkWell(
-                          onTap: () {
-                            // Show confirmation dialog before logging out
-                            showDialog(
-                              context: context,
-                              builder: (context) => AlertDialog(
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8.r),
-                                ),
-                                title: Text(
-                                  "Logout...!",
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black,
-                                    fontSize: 22.sp,
-                                  ),
-                                ),
-                                content: Text(
-                                  "Are you sure you want to log out?",
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 14.sp,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                                actions: [
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      TextButton(
-                                        onPressed: () {
-                                          setState(() {
-                                            showLogoutButton =
-                                                false; // Show logout button again
-                                          });
-                                          Navigator.pop(
-                                              context); // Close dialog
-                                        },
-                                        child: Container(
-                                          height: 40.h,
-                                          width: 50.w,
-                                          decoration: BoxDecoration(
-                                            color: Colors.blue,
-                                            borderRadius:
-                                                BorderRadius.circular(5.r),
-                                          ),
-                                          child: Center(
-                                            child: Text(
-                                              "No",
-                                              style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontSize: 18.sp),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      TextButton(
-                                        onPressed: () {
-                                          // Perform logout operation here
-                                          final storage = GetStorage();
-                                          storage.erase().then((_) {
-                                            Navigator.pop(
-                                                context); // Close dialog
-                                            Navigator.pushAndRemoveUntil(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) =>
-                                                    const LoginView(
-                                                        isLogin: true),
-                                              ),
-                                              (Route<dynamic> route) =>
-                                                  false, // Remove all previous routes
-                                            );
-                                          });
-                                        },
-                                        child: Container(
-                                          height: 40.h,
-                                          width: 50.w,
-                                          decoration: BoxDecoration(
-                                            color: Colors.red,
-                                            borderRadius:
-                                                BorderRadius.circular(5.r),
-                                          ),
-                                          child: Center(
-                                            child: Text(
-                                              "Yes",
-                                              style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontSize: 18.sp),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            );
-                          },
-                          child: Padding(
-                            padding: EdgeInsets.only(
-                                left: 8.w, right: 8.w, bottom: 2.h),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.logout,
-                                  size: 16.sp,
-                                  color: Colors.white,
-                                ),
-                                SizedBox(width: 8.w),
-                                Text(
-                                  "Logout",
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 12.sp,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-            ]),
-          ),
-        ],
+      appBar: CustomAppBar(
+        onTap: onAppBarTitleTap,
+        title: "My Page",
       ),
-      drawer: const CustomDrawer(),
+      
+      floatingActionButton: const WhatsAppFAB(),
       body: SingleChildScrollView(
         child: Padding(
-          padding: EdgeInsets.all(15.w),
+          padding: EdgeInsets.only(
+            left: 15.w,
+            right: 15.w,
+            top: 15.h,
+            bottom: 75.h,
+          ),
           child: GridView.builder(
             physics: const NeverScrollableScrollPhysics(),
             shrinkWrap: true,
@@ -457,29 +189,21 @@ getDoctorCode() async {
 
                   /// 🔹 Engineering Support (permission)
                   if (title == 'Engineering Support') {
-                    final access =
-                        await PermissionHelper.engineerSupport();
+                    final access = await PermissionHelper.engineerSupport();
                     if (access == "true" || role == "Admin" || role == "Super Admin") {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (_) =>
-                                const EngineeringSupport()),
+                      Navigator.push(context,
+                        MaterialPageRoute(builder: (_) =>const EngineeringSupport()),
                       );
                     } else {
                       showWarningDialog(context);
                     }
                   }
                   /// 🔹 Engineering Support (permission)
-                  else if (title == 'Sales Your Old Machine') {
-                     final access =
-                        await PermissionHelper.saleYourOldMachine();
+                  else if (title == 'Sales Your Machine') {
+                     final access = await PermissionHelper.saleYourOldMachine();
                     if (access == "true"|| role == "Admin" || role == "Super Admin") {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (_) =>
-                                const SalesYourOldMachineView()),
+                      Navigator.push(context,
+                        MaterialPageRoute(builder: (_) =>const SalesYourOldMachineView()),
                       );
                     } else {
                       showWarningDialog(context);
@@ -531,10 +255,7 @@ getDoctorCode() async {
 
                   /// 🔹 Diagnostic Module (no permission)
                   else {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (_) => item['page']),
+                    Navigator.push(context,MaterialPageRoute(builder: (_) => item['page']),
                     );
                   }
                 },

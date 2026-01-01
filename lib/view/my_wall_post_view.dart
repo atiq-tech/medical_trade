@@ -615,6 +615,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:medical_trade/controller/contact_api.dart';
 import 'package:medical_trade/controller/wall_post_api.dart';
+import 'package:medical_trade/diagnostic_module/utils/whats_up_fab.dart';
 import 'package:medical_trade/utilities/assets_manager.dart';
 import 'package:medical_trade/utilities/color_manager.dart';
 import 'package:medical_trade/utilities/font_manager.dart';
@@ -771,8 +772,8 @@ class _MyWallPostViewState extends State<MyWallPostView> {
                   top: 0.h,
                   right: 0.w,
                   child: Container(
-                    height: 50.h,
-                    width: 100.w,
+                    height: 40.h,
+                    width: 90.w,
                     decoration: BoxDecoration(
                       color: ColorManager.skyBlue,
                       borderRadius: BorderRadius.circular(5.r),
@@ -790,23 +791,21 @@ class _MyWallPostViewState extends State<MyWallPostView> {
                             );
                           },
                           child: Padding(
-                            padding: EdgeInsets.only(
-                                left: 8.w, right: 8.w, top: 2.h),
+                            padding: EdgeInsets.only(left: 4.w, right: 4.w, top: 2.h),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
                                 Icon(
-                                  Icons.file_copy,
-                                  size: 18.sp,
+                                  Icons.home,
+                                  size: 16.sp,
                                   color: Colors.white,
                                 ),
-                                SizedBox(width: 8.w),
+                                SizedBox(width: 5.w),
                                 Text(
                                   "My Page",
                                   style: TextStyle(
                                     color: Colors.white,
-                                    fontSize: 14.sp,
+                                    fontSize: 12.sp,
                                     fontWeight: FontWeight.w600,
                                   ),
                                 ),
@@ -845,71 +844,44 @@ class _MyWallPostViewState extends State<MyWallPostView> {
                                 ),
                                 actions: [
                                   Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment:MainAxisAlignment.spaceBetween,
                                     children: [
                                       TextButton(
                                         onPressed: () {
                                           setState(() {
-                                            showLogoutButton =
-                                                false; // Show logout button again
+                                            showLogoutButton = false;
                                           });
-                                          Navigator.pop(
-                                              context); // Close dialog
+                                          Navigator.pop(context);
                                         },
                                         child: Container(
-                                          height: 40.h,
+                                          height: 30.h,
                                           width: 50.w,
                                           decoration: BoxDecoration(
                                             color: Colors.blue,
-                                            borderRadius:
-                                                BorderRadius.circular(5.r),
+                                            borderRadius: BorderRadius.circular(5.r),
                                           ),
-                                          child: Center(
-                                            child: Text(
-                                              "No",
-                                              style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontSize: 18.sp),
-                                            ),
-                                          ),
+                                          child: Center(child: Text("No",style: TextStyle(color: Colors.white,fontSize: 14.sp))),
                                         ),
                                       ),
                                       TextButton(
                                         onPressed: () {
-                                          // Perform logout operation here
                                           final storage = GetStorage();
                                           storage.erase().then((_) {
-                                            Navigator.pop(
-                                                context); // Close dialog
-                                            Navigator.pushAndRemoveUntil(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) =>
-                                                    const LoginView(
-                                                        isLogin: true),
-                                              ),
-                                              (Route<dynamic> route) =>
-                                                  false, // Remove all previous routes
+                                            Navigator.pop(context); 
+                                            Navigator.pushAndRemoveUntil(context,
+                                              MaterialPageRoute(builder: (context) =>const LoginView(isLogin: true)),
+                                              (Route<dynamic> route) =>false, 
                                             );
                                           });
                                         },
                                         child: Container(
-                                          height: 40.h,
+                                          height: 30.h,
                                           width: 50.w,
                                           decoration: BoxDecoration(
                                             color: Colors.red,
-                                            borderRadius:
-                                                BorderRadius.circular(5.r),
+                                            borderRadius: BorderRadius.circular(5.r),
                                           ),
-                                          child: Center(
-                                            child: Text(
-                                              "Yes",
-                                              style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontSize: 18.sp),
-                                            ),
-                                          ),
+                                          child: Center(child: Text("Yes",style: TextStyle(color: Colors.white,fontSize: 14.sp))),
                                         ),
                                       ),
                                     ],
@@ -919,15 +891,13 @@ class _MyWallPostViewState extends State<MyWallPostView> {
                             );
                           },
                           child: Padding(
-                            padding: EdgeInsets.only(
-                                left: 8.w, right: 8.w, bottom: 4.h),
+                            padding: EdgeInsets.only(left: 4.w, right: 4.w, bottom: 2.h),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
                                 Icon(
                                   Icons.logout,
-                                  size: 18.sp,
+                                  size: 16.sp,
                                   color: Colors.white,
                                 ),
                                 SizedBox(width: 8.w),
@@ -935,7 +905,7 @@ class _MyWallPostViewState extends State<MyWallPostView> {
                                   "Logout",
                                   style: TextStyle(
                                     color: Colors.white,
-                                    fontSize: 14.sp,
+                                    fontSize: 12.sp,
                                     fontWeight: FontWeight.w600,
                                   ),
                                 ),
@@ -952,6 +922,7 @@ class _MyWallPostViewState extends State<MyWallPostView> {
         ],
       ),
       drawer: const CustomDrawer(),
+      floatingActionButton: const WhatsAppFAB(),
       body: Padding(
         padding: EdgeInsets.only(
           left: 8.w,

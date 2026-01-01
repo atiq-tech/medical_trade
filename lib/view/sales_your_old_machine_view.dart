@@ -10,6 +10,7 @@ import 'package:medical_trade/controller/get_district_api.dart';
 import 'package:medical_trade/controller/get_division_api.dart';
 import 'package:medical_trade/diagnostic_module/utils/all_textstyle.dart';
 import 'package:medical_trade/diagnostic_module/utils/utils.dart';
+import 'package:medical_trade/diagnostic_module/utils/whats_up_fab.dart';
 import 'package:medical_trade/model/district_model.dart';
 import 'package:medical_trade/model/division_model.dart';
 import 'package:medical_trade/utilities/custom_appbar.dart';
@@ -81,7 +82,7 @@ class _SalesYourOldMachineViewState extends State<SalesYourOldMachineView> {
 
                 if (photo != null) {
                   setState(() {
-                    // _imagesList.clear(); // চাইলে আগের সব মুছতে পারেন
+                    // _imagesList.clear(); 
                     _imagesList.add(photo);
                   });
                 }
@@ -155,37 +156,9 @@ class _SalesYourOldMachineViewState extends State<SalesYourOldMachineView> {
 //   );
 // }
 
-  String? firstPickedDate;
-  var backEndFirstDate;
-  var backEndSecondtDate;
-
-  var toDay = DateTime.now();
-  void _firstSelectedDate() async {
-    final selectedDate = await showDatePicker(
-        context: context,
-        initialDate: DateTime.now(),
-        firstDate: DateTime(1950),
-        lastDate: DateTime(2050));
-    if (selectedDate != null) {
-      setState(() {
-        firstPickedDate = Utils.formatFrontEndDate(selectedDate);
-        backEndFirstDate = Utils.formatBackEndDate(selectedDate);
-      });
-    }
-    else{
-      setState(() {
-        firstPickedDate = Utils.formatFrontEndDate(toDay);
-        backEndFirstDate = Utils.formatBackEndDate(toDay);
-      });
-    }
-  }
-
   @override
   void initState() {
     super.initState();
-    firstPickedDate = Utils.formatFrontEndDate(DateTime.now());
-    backEndFirstDate = Utils.formatBackEndDate(DateTime.now());
-
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final districtProvider = Provider.of<DistrictProvider>(context, listen: false);
       final divisionProvider = Provider.of<DivisionProvider>(context, listen: false);
@@ -232,10 +205,11 @@ class _SalesYourOldMachineViewState extends State<SalesYourOldMachineView> {
           onTap: () {
             Navigator.pop(context);
           },
-          title: "Sales Your Old Machine",
+          title: "Sales Your Machine",
         ),
+        floatingActionButton: const WhatsAppFAB(),
         body: SingleChildScrollView(
-            child: Column(children: [
+         child: Column(children: [
           Padding(
             padding: EdgeInsets.only(left: 8.w, right: 8.w, top: 12.h),
             child: FadeInUp(
@@ -1000,50 +974,6 @@ class _SalesYourOldMachineViewState extends State<SalesYourOldMachineView> {
                           keyboardType: TextInputType.text,
                         ),
                         SizedBox(height: 4.h),
-                        Row(children: [
-                          Expanded(flex:5, child: Text("Validity Date:",  style: TextStyle(
-                          fontSize: 14.0.sp,
-                          fontWeight: FontWeight.w600),)),
-                           SizedBox(width: 4.w),
-                          SizedBox(
-                            width: 4.w,
-                            child: Text(
-                              ":",
-                              style: TextStyle(color: Colors.black, fontSize: 16.sp),
-                            ),
-                          ),
-                          SizedBox(width: 10.w),
-                          Expanded(
-                            flex: 8,
-                            child: Container(
-                              height: 30.h,
-                              child: GestureDetector(
-                                onTap: (() {
-                                  _firstSelectedDate();
-                                }),
-                                child: TextFormField(
-                                  enabled: false,
-                                  decoration: InputDecoration(contentPadding: EdgeInsets.only(left: 5.w),
-                                    filled: true,
-                                    fillColor: Colors.white,
-                                    suffixIcon: Padding(padding: EdgeInsets.only(left: 20.w),
-                                    child: Icon(Icons.calendar_month, color: Colors.black87,size: 16.r)),
-                                    border: OutlineInputBorder(borderSide: BorderSide(color:  Colors.grey,width: 5.w)),
-                                    hintText: firstPickedDate,
-                                    hintStyle: AllTextStyle.dateFormatStyle
-                                  ),
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return null;
-                                    }
-                                    return null;
-                                  },
-                                ),
-                              ),
-                            ),
-                          ),
-                        ]),
-                        SizedBox(height: 4.h),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.start,
                           crossAxisAlignment: CrossAxisAlignment.center,
@@ -1150,7 +1080,6 @@ class _SalesYourOldMachineViewState extends State<SalesYourOldMachineView> {
                                     condition: _conditionController.text,
                                     origin: _originController.text,
                                     upazila: _upazilaController.text,
-                                    validityDate: backEndFirstDate.toString(),
                                     selectedDivisions: selectedDivisionIds,
                                     selectedDistricts: selectedDistrictIds,
                                     mobile: _contactNumberController.text,
@@ -1168,8 +1097,7 @@ class _SalesYourOldMachineViewState extends State<SalesYourOldMachineView> {
                                       _machineDetailsController.clear();
                                       _selectedDistricts.clear();
                                       _selectedDivisions.clear();
-                                      _imagesList.clear();
-                                      backEndFirstDate = "";  
+                                      _imagesList.clear(); 
                                       setState(() {});
                                     },
                                   );
@@ -1220,12 +1148,8 @@ class _SalesYourOldMachineViewState extends State<SalesYourOldMachineView> {
               ),
             ),
           ),
-
           //end
-          SizedBox(
-            height: 10.h,
-          ),
-
+          SizedBox(height: 100.h),
           const SalesOldMachieData()
         ])));
   }

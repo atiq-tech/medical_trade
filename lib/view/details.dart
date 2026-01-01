@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
+import 'package:medical_trade/diagnostic_module/utils/whats_up_fab.dart';
 import 'package:medical_trade/model/get_category_product_model.dart';
 import 'package:medical_trade/new_part/model/new_category_model.dart';
 import 'package:medical_trade/new_part/providers/all_products_provider.dart';
@@ -8,7 +9,7 @@ import 'package:medical_trade/utilities/color_manager.dart';
 import 'package:medical_trade/utilities/font_manager.dart';
 import 'package:medical_trade/utilities/values_manager.dart';
 import 'package:medical_trade/utilities/zoom_screen.dart';
-import 'package:medical_trade/view/detaisl_all_items.dart';
+import 'package:medical_trade/view/details_all_items.dart';
 import 'package:provider/provider.dart';
 
 class Details extends StatefulWidget {
@@ -43,7 +44,7 @@ class _DetailsState extends State<Details> {
         leading: IconButton(
           icon: Icon(
             Icons.arrow_back,
-            size: 24.sp,
+            size: 22.sp,
           ),
           onPressed: () {
             Navigator.pop(context);
@@ -122,7 +123,7 @@ class _DetailsState extends State<Details> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => DetaislAllItems(item: suggestion),
+                      builder: (context) => DetailsAllItems(item: suggestion),
                     ),
                   );
                   _productController.clear();
@@ -148,12 +149,12 @@ class _DetailsState extends State<Details> {
               ),
             )
            
-            : Text(widget.item.name),
+            : Text(widget.item.name,style: TextStyle(fontSize: 18,fontWeight: FontWeight.w600),),
         actions: [
           IconButton(
             icon: Icon(
               _isSearching ? Icons.close : Icons.search,
-              size: 26.sp,
+              size: 24.sp,
               color: Colors.green,
             ),
             onPressed: () {
@@ -168,6 +169,7 @@ class _DetailsState extends State<Details> {
           SizedBox(width: 8.w),
         ],
       ),
+      floatingActionButton: const WhatsAppFAB(),
       body: Padding(
         padding: EdgeInsets.only(left: 8.w, right: 8.w, top: 8.h, bottom: 20.h),
         child: Padding(
@@ -321,7 +323,7 @@ class _DetailsState extends State<Details> {
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) =>
-                                          DetaislAllItems(item: product),
+                                          DetailsAllItems(item: product),
                                     ),
                                   );
                                 },

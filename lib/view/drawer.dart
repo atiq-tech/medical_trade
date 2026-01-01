@@ -4,6 +4,8 @@ import 'package:medical_trade/diagnostic_module/screens/bank_transaction_report_
 import 'package:medical_trade/diagnostic_module/screens/cash_transaction_report_screen.dart';
 import 'package:medical_trade/diagnostic_module/screens/diagnostic_module_screen.dart';
 import 'package:medical_trade/view/auth/profile_screen.dart';
+import 'package:medical_trade/view/engineering_support.dart';
+import 'package:medical_trade/view/sales_your_old_machine_view.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -134,24 +136,39 @@ class _CustomDrawerState extends State<CustomDrawer> {
                 icon: Icons.build,
                 title: "Engineering Support",
                 onTap: () async {
-                  final access =
-                      await PermissionHelper.engineerSupport();
-                  access == "true"
-                      ? Navigator.pushNamed(
-                          context, RoutesName.engineeringSupport)
-                      : showWarningDialog(context);
+                  final access = await PermissionHelper.engineerSupport();
+                  if (access == "true" || role == "Admin" || role == "Super Admin") {
+                      Navigator.push(context,
+                        MaterialPageRoute(builder: (_) =>const EngineeringSupport()),
+                      );
+                    } else {
+                      showWarningDialog(context);
+                    }
+
+                  // final access = await PermissionHelper.engineerSupport();
+                  // access == "true"
+                  //     ? Navigator.pushNamed(
+                  //         context, RoutesName.engineeringSupport)
+                  //     : showWarningDialog(context);
                 },
               ),
               Divider(height: 0.5.h),
               /// ================= SALES OLD MACHINE =================
               _drawerItem(
                 icon: Icons.monetization_on,
-                title: "Sales Old Machine",
+                title: "Sales Your Machine",
                 onTap: () async {
                   final access = await PermissionHelper.saleYourOldMachine();
-                  access == "true"
-                      ? Navigator.pushNamed(context, RoutesName.salesOldMachine)
-                      : showWarningDialog(context);
+                  if (access == "true" || role == "Admin" || role == "Super Admin") {
+                      Navigator.push(context,
+                        MaterialPageRoute(builder: (_) =>const SalesYourOldMachineView()),
+                      );
+                    } else {
+                      showWarningDialog(context);
+                    }
+                  // access == "true"
+                  //     ? Navigator.pushNamed(context, RoutesName.salesOldMachine)
+                  //     : showWarningDialog(context);
                 },
               ),
               Divider(height: 0.5.h),  

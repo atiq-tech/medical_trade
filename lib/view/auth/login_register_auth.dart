@@ -15,7 +15,7 @@ import 'package:medical_trade/utilities/custom_textfromfield_register.dart';
 import 'package:medical_trade/utilities/font_manager.dart';
 import 'package:medical_trade/utilities/sizebox_manager.dart';
 import 'package:medical_trade/utilities/values_manager.dart';
-import 'package:medical_trade/view/home_view.dart';
+import 'package:medical_trade/view/my_wall_post_view.dart';
 import 'package:provider/provider.dart';
 
 class LoginView extends StatefulWidget {
@@ -248,12 +248,13 @@ Widget _buildCustomButton({
 
 class _RegisterWidgets extends StatefulWidget {
   const _RegisterWidgets();
-
+                                                                                         
   @override
   State<_RegisterWidgets> createState() => _RegisterWidgetsState();
 }
 
 class _RegisterWidgetsState extends State<_RegisterWidgets> {
+
   final TextEditingController _organizationController = TextEditingController();
   final TextEditingController _customerNameController = TextEditingController();
   final TextEditingController _titleController = TextEditingController();
@@ -1367,9 +1368,8 @@ class _LoginWidgetsState extends State<_LoginWidgets> {
                           text: "Login successful!",
                           isSuccess: true,
                         );
-
                         Navigator.pushAndRemoveUntil(context,
-                          MaterialPageRoute(builder: (context) => const HomeView()),
+                          MaterialPageRoute(builder: (context) => const MyWallPostView()),
                           (Route<dynamic> route) => false,
                         );
                       }

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:medical_trade/controller/engineering_support_post_api.dart';
+import 'package:medical_trade/diagnostic_module/utils/whats_up_fab.dart';
 import 'package:medical_trade/utilities/custom_appbar.dart';
 import 'package:medical_trade/utilities/custom_message.dart';
 import 'package:medical_trade/utilities/custom_textfrom_field_two.dart';
@@ -103,6 +104,7 @@ void _pickImage() async {
         },
         title: "Engineering Support",
       ),
+      floatingActionButton: const WhatsAppFAB(),
       body: SingleChildScrollView(
         child: Column(
           children: [

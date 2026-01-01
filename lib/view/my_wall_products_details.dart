@@ -5,6 +5,7 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:medical_trade/controller/client_wall_product_buy_api.dart';
 import 'package:medical_trade/controller/contact_api.dart';
 import 'package:medical_trade/controller/slider_controller.dart';
+import 'package:medical_trade/diagnostic_module/utils/whats_up_fab.dart';
 import 'package:medical_trade/model/wall_post_model.dart';
 import 'package:medical_trade/utilities/color_manager.dart';
 import 'package:medical_trade/utilities/custom_appbar.dart';
@@ -44,6 +45,7 @@ class _MyWallProductsDetailsState extends State<MyWallProductsDetails> {
         onTap: _onAppBarTitleTap,
         title: "Products Details",
       ),
+      floatingActionButton: const WhatsAppFAB(),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -643,7 +645,7 @@ class _MyWallProductsDetailsState extends State<MyWallProductsDetails> {
                 ],
               ),
             ),
-            SizedBox(height: 30.h),
+            SizedBox(height: 116.h),
           ],
         ),
       ),
