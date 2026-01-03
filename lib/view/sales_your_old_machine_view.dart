@@ -8,8 +8,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:medical_trade/controller/get_client_post_api.dart';
 import 'package:medical_trade/controller/get_district_api.dart';
 import 'package:medical_trade/controller/get_division_api.dart';
-import 'package:medical_trade/diagnostic_module/utils/all_textstyle.dart';
-import 'package:medical_trade/diagnostic_module/utils/utils.dart';
 import 'package:medical_trade/diagnostic_module/utils/whats_up_fab.dart';
 import 'package:medical_trade/model/district_model.dart';
 import 'package:medical_trade/model/division_model.dart';
@@ -163,32 +161,18 @@ class _SalesYourOldMachineViewState extends State<SalesYourOldMachineView> {
       final districtProvider = Provider.of<DistrictProvider>(context, listen: false);
       final divisionProvider = Provider.of<DivisionProvider>(context, listen: false);
 
-      // Fetch data
       await Future.wait([
         districtProvider.fetchDistricts(),
         divisionProvider.fetchDivisions(),
       ]);
-      // print("fgsdfg v1 1 1 1: ${divisionProvider.divisions}");
-      // print("Districts v1 1 1 1: ${districtProvider.districts}");
-      // Update divisionsNameMap after fetching divisons
        setState(() {
         divisionNameMap = Map.fromEntries(divisionProvider.divisions.map(
             (division) =>MapEntry(division.id.toString(), division.name)));
       });
-      ///===old===
-      // setState(() {
-      //   divisionNameMap = Map.fromEntries(divisionProvider.divisions.map(
-      //       (division) =>MapEntry(division.divisionSlNo, division.divisionName)));
-      // });
-      // Update districtsNameMap after fetching districts
       setState(() {
         districtsNameMap = Map.fromEntries(districtProvider.districts.map(
             (district) => MapEntry(district.id.toString(), district.areaName)));
       });
-      // setState(() {
-      //   districtsNameMap = Map.fromEntries(districtProvider.districts.map(
-      //       (district) => MapEntry(district.districtSlNo, district.districtName)));
-      // });
     });
   }
 
@@ -196,9 +180,6 @@ class _SalesYourOldMachineViewState extends State<SalesYourOldMachineView> {
   Widget build(BuildContext context) {
     final districtProvider = Provider.of<DistrictProvider>(context);
     final divisionProvider = Provider.of<DivisionProvider>(context);
-    //final registerProvider = Provider.of<GetClientPostProvider>(context);
-    // print('Districts: ${districtProvider.districts}');
-    // print('District Name Map: $districtsNameMap');
     print("Image _imagesList: ${_imagesList}");
     return Scaffold(
         appBar: CustomAppBar(
@@ -311,7 +292,7 @@ class _SalesYourOldMachineViewState extends State<SalesYourOldMachineView> {
                                           borderRadius:
                                               BorderRadius.circular(5.r),
                                           child: Image.file(
-                                            file, // Use the images from the list
+                                            file, 
                                             height: 80.h,
                                             width: 80.w,
                                             fit: BoxFit.cover,
@@ -994,10 +975,8 @@ class _SalesYourOldMachineViewState extends State<SalesYourOldMachineView> {
                             ),
                             SizedBox(
                               width: 4.w,
-                              child: Text(
-                                ":",
-                                style: TextStyle(
-                                    color: Colors.black, fontSize: 16.sp),
+                              child: Text(":",
+                                style: TextStyle(color: Colors.black, fontSize: 16.sp),
                               ),
                             ),
                             SizedBox(
@@ -1012,7 +991,7 @@ class _SalesYourOldMachineViewState extends State<SalesYourOldMachineView> {
                                   borderRadius: BorderRadius.circular(5.0.r),
                                   border: Border.all(
                                     color: Colors.black,
-                                    width: 0.5.w, // Set border width here
+                                    width: 0.5.w, 
                                   ),
                                 ),
                                 child: TextFormField(
@@ -1055,13 +1034,11 @@ class _SalesYourOldMachineViewState extends State<SalesYourOldMachineView> {
                                   _machineDetailsController.text.isEmpty) {
                                 CustomToast.show(
                                   context: context,
-                                  text:
-                                      "Please fill in all the required fields.",
+                                  text:"Please fill in all the required fields.",
                                   isSuccess: false,
                                 );
                                 return;
                               }
-
                               //List<String> selectedDivisionIds = _selectedDivisions.map((division) => division.id).toList();
                               List<String> selectedDivisionIds = _selectedDivisions.map((division) => division.id.toString()).toList();
 

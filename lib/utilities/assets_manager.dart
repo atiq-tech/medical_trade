@@ -50,4 +50,6 @@ class DiagnosticModule {
   static const String bankTransaction = "$imagePath/btrans.png";
   static const String supplierPay = "$imagePath/spply.png";
   static const String patientPay = "$imagePath/pppay.png";
+  static const String cashTrReport = "$imagePath/ctr.png";
+  static const String bankTrReport = "$imagePath/btr.png";
 }

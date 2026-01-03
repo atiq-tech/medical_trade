@@ -210,7 +210,7 @@ class _DetailsAllItemsState extends State<DetailsAllItems> {
                                       textAlign: TextAlign.start,
                                       style: FontManager.headline.copyWith(color: Colors.green,fontSize: 14.sp,fontWeight: FontWeight.w600),
                                       overflow: TextOverflow.ellipsis,
-                                      maxLines: 2,
+                                      maxLines: 4,
                                     ),
                                   ),
                                 ],

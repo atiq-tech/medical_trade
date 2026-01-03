@@ -51,7 +51,6 @@ class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
   @override
-  // ignore: library_private_types_in_public_api
   _MyAppState createState() => _MyAppState();
 }
 
@@ -64,9 +63,7 @@ class _MyAppState extends State<MyApp> {
 
   Future<void> _checkInternetConnectivity() async {
     var connectivityResult = await Connectivity().checkConnectivity();
-    // ignore: unrelated_type_equality_checks
     if (connectivityResult == ConnectivityResult.none) {
-      // No internet connection
       CustomErrorToast.show(
         text: "No internet connection",
       );

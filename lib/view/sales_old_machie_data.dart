@@ -19,8 +19,7 @@ class _SalesOldMachieDataState extends State<SalesOldMachieData> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<GetSalesOldMachineProvider>(context, listen: false)
-          .fetchData();
+      Provider.of<GetSalesOldMachineProvider>(context, listen: false).fetchData();
     });
   }
 
@@ -29,13 +28,10 @@ class _SalesOldMachieDataState extends State<SalesOldMachieData> {
     final getOldMachineProvider = Provider.of<GetSalesOldMachineProvider>(context);
     print(getOldMachineProvider.categories.length);
     final machines = getOldMachineProvider.categories;
-
     return Padding(
       padding: EdgeInsets.only(left: 8.w, right: 8.w, bottom: 20.h),
       child: getOldMachineProvider.isLoading
-          ? const Center(
-              child: CircularProgressIndicator(),
-            )
+          ? const Center(child: CircularProgressIndicator())
           : GridView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
@@ -51,9 +47,7 @@ class _SalesOldMachieDataState extends State<SalesOldMachieData> {
                 return Card(
                   elevation: 6,
                   color: Colors.grey.shade200,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.r),
-                  ),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.r)),
                   child: Column(
                     children: [
                       Expanded(
@@ -98,13 +92,8 @@ class _SalesOldMachieDataState extends State<SalesOldMachieData> {
                               alignment: Alignment.center,
                               child: InkWell(
                                 onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (_) =>
-                                          SalesOldMachineDetailsView(
-                                              item: machine),
-                                    ),
+                                  Navigator.push(context,
+                                    MaterialPageRoute(builder: (_) =>SalesOldMachineDetailsView(item: machine)),
                                   );
                                 },
                                 child: Card(
@@ -114,16 +103,11 @@ class _SalesOldMachieDataState extends State<SalesOldMachieData> {
                                     width: 70.w,
                                     decoration: BoxDecoration(
                                       color: ColorManager.black,
-                                      borderRadius:
-                                          BorderRadius.circular(AppSize.s5.r),
+                                      borderRadius:BorderRadius.circular(AppSize.s5.r),
                                     ),
                                     child: Center(
-                                      child: Text(
-                                        "Read More",
-                                        style: FontManager.bodyText.copyWith(
-                                          color: ColorManager.white,
-                                          fontSize: 11.sp,
-                                        ),
+                                      child: Text("Read More",
+                                        style: FontManager.bodyText.copyWith(color: ColorManager.white,fontSize: 11.sp),
                                       ),
                                     ),
                                   ),

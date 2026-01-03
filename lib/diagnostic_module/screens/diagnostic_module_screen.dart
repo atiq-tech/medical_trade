@@ -89,12 +89,12 @@ class _DiagnosticModuleScreenState extends State<DiagnosticModuleScreen> {
       },
        {
         'title': 'Cash Transaction Report',
-        'icon': DiagnosticModule.supplierPay,
+        'icon': DiagnosticModule.cashTrReport,
         'color': Color.fromARGB(255, 98, 44, 148),
       },
        {
         'title': 'Bank Transaction Report',
-        'icon': DiagnosticModule.patientPay,
+        'icon': DiagnosticModule.bankTrReport,
         'color': const Color.fromARGB(255, 1, 160, 192),
       },
     ];

@@ -59,17 +59,14 @@ class _SalesOldMachineDetailsViewState
                             }
                             return Center(
                               child: CircularProgressIndicator(
-                                value: loadingProgress.expectedTotalBytes !=
-                                        null
-                                    ? loadingProgress.cumulativeBytesLoaded /
-                                        loadingProgress.expectedTotalBytes!
+                                value: loadingProgress.expectedTotalBytes != null
+                                    ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
                                     : null,
                                 strokeWidth: 2.0,
                               ),
                             );
                           },
-                          errorBuilder: (context, error, stackTrace) =>
-                              const Icon(Icons.error),
+                          errorBuilder: (context, error, stackTrace) => const Icon(Icons.error),
                         );
                       },
                     );
@@ -77,11 +74,9 @@ class _SalesOldMachineDetailsViewState
                   options: CarouselOptions(
                     autoPlay: false,
                     enlargeCenterPage: true,
-                    // aspectRatio: 2.0,
                     viewportFraction: 1.0,
                     onPageChanged: (index, reason) {
-                      Provider.of<AppProvider>(context, listen: false)
-                          .setCarouselIndex(index);
+                      Provider.of<AppProvider>(context, listen: false).setCarouselIndex(index);
                     },
                   ),
                 ),
@@ -94,8 +89,7 @@ class _SalesOldMachineDetailsViewState
                     return Container(
                       width: 8,
                       height: 8,
-                      margin:
-                          EdgeInsets.symmetric(vertical: 10.h, horizontal: 3.w),
+                      margin: EdgeInsets.symmetric(vertical: 10.h, horizontal: 3.w),
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         color: provider.carouselIndex == index
@@ -118,8 +112,7 @@ class _SalesOldMachineDetailsViewState
                           context,
                           MaterialPageRoute(
                             builder: (context) => ImageZoomScreen(
-                                imageUrl:
-                                    'https://soft.madicaltrade.com/uploads/client_gallery/${widget.item.images?[0].clientpostImage}'),
+                                imageUrl:'https://soft.madicaltrade.com/uploads/client_gallery/${widget.item.images?[0].clientpostImage}'),
                           ),
                         );
                       },
@@ -154,9 +147,7 @@ class _SalesOldMachineDetailsViewState
                             overflow: TextOverflow.ellipsis,
                             maxLines: 3,
                           ),
-                          SizedBox(
-                            height: 8.h,
-                          ),
+                          SizedBox(height: 8.h),
                           Text(
                             "BDT ${widget.item.machinePrice}",
                             textAlign: TextAlign.start,
@@ -166,9 +157,7 @@ class _SalesOldMachineDetailsViewState
                               fontWeight: FontWeight.w600,
                             ),
                           ),
-                          SizedBox(
-                            height: 4.h,
-                          ),
+                          SizedBox(height: 4.h),
                           Row(
                             children: [
                               Text(
@@ -180,9 +169,7 @@ class _SalesOldMachineDetailsViewState
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
-                              SizedBox(
-                                width: 4.w,
-                              ),
+                              SizedBox(width: 4.w),
                               Text(
                                 widget.item.machineCondition.toString(),
                                 textAlign: TextAlign.start,
@@ -194,9 +181,7 @@ class _SalesOldMachineDetailsViewState
                               ),
                             ],
                           ),
-                          SizedBox(
-                            height: 4.h,
-                          ),
+                          SizedBox(height: 4.h),
                           Row(
                             children: [
                               Text(
@@ -208,9 +193,7 @@ class _SalesOldMachineDetailsViewState
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
-                              SizedBox(
-                                width: 4.w,
-                              ),
+                              SizedBox(width: 4.w),
                               Text(
                                 widget.item.machineModel.toString(),
                                 textAlign: TextAlign.start,
@@ -223,9 +206,7 @@ class _SalesOldMachineDetailsViewState
                               ),
                             ],
                           ),
-                          SizedBox(
-                            height: 4.h,
-                          ),
+                          SizedBox(height: 4.h),
                           Row(
                             children: [
                               Text(
@@ -237,9 +218,7 @@ class _SalesOldMachineDetailsViewState
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
-                              SizedBox(
-                                width: 4.w,
-                              ),
+                              SizedBox(width: 4.w),
                               Text(
                                 widget.item.origin.toString(),
                                 textAlign: TextAlign.start,
@@ -251,9 +230,7 @@ class _SalesOldMachineDetailsViewState
                               ),
                             ],
                           ),
-                          SizedBox(
-                            height: 4.h,
-                          ),
+                          SizedBox(height: 4.h),
                           Row(
                             children: [
                               Text(
@@ -266,9 +243,7 @@ class _SalesOldMachineDetailsViewState
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
-                              SizedBox(
-                                width: 4.w,
-                              ),
+                              SizedBox(width: 4.w),
                               Expanded(
                                 child: AutoSizeText(
                                   widget.item.mobile.toString(),
@@ -285,8 +260,7 @@ class _SalesOldMachineDetailsViewState
                             ],
                           ),
                           Padding(
-                            padding: EdgeInsets.only(
-                                left: 12.w, right: 12.w, top: 12.h),
+                            padding: EdgeInsets.only(left: 12.w, right: 12.w, top: 12.h),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
@@ -301,16 +275,14 @@ class _SalesOldMachineDetailsViewState
                                       width: 36.w,
                                       decoration: BoxDecoration(
                                         color: const Color(0xFF46AB67),
-                                        borderRadius:
-                                            BorderRadius.circular(2.r),
+                                        borderRadius: BorderRadius.circular(2.r),
                                       ),
                                       child: Padding(
                                         padding: EdgeInsets.all(4.0.r),
                                         child: Icon(
                                           Icons.call,
                                           size: 20.sp,
-                                          color: const Color.fromARGB(
-                                              255, 246, 250, 248),
+                                          color: const Color.fromARGB(255, 246, 250, 248),
                                         ),
                                       ),
                                     ),
@@ -318,8 +290,7 @@ class _SalesOldMachineDetailsViewState
                                 ),
                                 // Message Button
                                 GestureDetector(
-                                  onTap: () => _launchMessage(
-                                      widget.item.mobile.toString()),
+                                  onTap: () => _launchMessage(widget.item.mobile.toString()),
                                   child: Padding(
                                     padding: EdgeInsets.only(left: 12.w),
                                     child: Container(
@@ -327,16 +298,14 @@ class _SalesOldMachineDetailsViewState
                                       width: 36.w,
                                       decoration: BoxDecoration(
                                         color: const Color(0xFF46AB67),
-                                        borderRadius:
-                                            BorderRadius.circular(2.r),
+                                        borderRadius:BorderRadius.circular(2.r),
                                       ),
                                       child: Padding(
                                         padding: EdgeInsets.all(4.r),
                                         child: Icon(
                                           Icons.message,
                                           size: 20.sp,
-                                          color: const Color.fromARGB(
-                                              255, 246, 250, 248),
+                                          color: const Color.fromARGB(255, 246, 250, 248),
                                         ),
                                       ),
                                     ),
@@ -360,19 +329,14 @@ class _SalesOldMachineDetailsViewState
                 ),
               ),
               SizedBox(height: 4.h),
-              Divider(
-                color: Colors.black,
-                height: 0.5.h,
-              ),
+              Divider(color: Colors.black,height: 0.5.h),
               SizedBox(height: 16.h),
               Padding(
                 padding: EdgeInsets.only(left: 4.w, right: 4.w),
                 child: Text(
                   widget.item.description.toString(),
                   textAlign: TextAlign.justify,
-                  style: FontManager.bodyText.copyWith(
-                    fontSize: 16.sp,
-                  ),
+                  style: FontManager.bodyText.copyWith(fontSize: 16.sp),
                 ),
               ),
               SizedBox(height: 16.h),
@@ -407,11 +371,7 @@ class _SalesOldMachineDetailsViewState
               Padding(
                 padding: EdgeInsets.only(top: 10.h),
                 child: IconButton(
-                  icon: Icon(
-                    Icons.close,
-                    color: Colors.white,
-                    size: 30.sp,
-                  ),
+                  icon: Icon(Icons.close,color: Colors.white,size: 30.sp),
                   onPressed: () => Navigator.of(context).pop(),
                 ),
               ),
@@ -433,10 +393,8 @@ class _SalesOldMachineDetailsViewState
             },
             loadingBuilder: (context, event) => Center(
               child: CircularProgressIndicator(
-                value: event == null
-                    ? null
-                    : event.cumulativeBytesLoaded /
-                        (event.expectedTotalBytes ?? 1),
+                value: event == null ? null
+                    : event.cumulativeBytesLoaded / (event.expectedTotalBytes ?? 1),
               ),
             ),
           ),

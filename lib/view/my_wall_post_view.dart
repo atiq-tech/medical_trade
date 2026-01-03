@@ -1097,7 +1097,7 @@ class _MyWallPostViewState extends State<MyWallPostView> {
                               overflow: TextOverflow.ellipsis,
                             ),
                             Text(
-                              "\$ ${product.wallPostId}",
+                              "BDT ${product.price}",
                               style: TextStyle(
                                 fontSize: 14.sp,
                                 fontWeight: FontWeight.w500,
