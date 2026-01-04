@@ -1,7 +1,3 @@
-// To parse this JSON data, do
-//
-//     final getClientpostModel = getClientpostModelFromJson(jsonString);
-
 import 'dart:convert';
 
 List<GetClientpostModel> getClientpostModelFromJson(String str) => List<GetClientpostModel>.from(json.decode(str).map((x) => GetClientpostModel.fromJson(x)));

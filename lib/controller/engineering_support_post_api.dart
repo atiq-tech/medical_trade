@@ -39,26 +39,22 @@ class EngineeringSupportProvider with ChangeNotifier {
     final url = AppUrl.addEngineerSuportEndPoint;
     final box = GetStorage();
 
-    /// ✅ Correct keys
     final userId = box.read('userId');
     final token = box.read('loginToken');
 
     print("User ID = $userId");
     print("Token = $token");
 
-    /// Multipart Request
     var request = http.MultipartRequest(
       'POST',
       Uri.parse(url),
     );
 
-    /// ✅ Headers with TOKEN
     request.headers.addAll({
       'Authorization': 'Bearer $token',
       'Accept': 'application/json',
     });
 
-    /// Fields
     request.fields.addAll({
       'machine_name': machineName,
       'model': model,
@@ -73,7 +69,6 @@ class EngineeringSupportProvider with ChangeNotifier {
       'Engineer_branchid': '0',
     });
 
-    /// Images
     for (var image in images) {
       request.files.add(
         await http.MultipartFile.fromPath(

@@ -113,8 +113,6 @@ class RegisterAuthProvider extends ChangeNotifier {
         ..fields['password'] = password
         ..fields['password_confirmation'] = confirmPassword;
         
-
-      // Only add the image file if it's not null
       if (image != null) {
         String contentType;
         final fileExtension = image.path.split('.').last.toLowerCase();

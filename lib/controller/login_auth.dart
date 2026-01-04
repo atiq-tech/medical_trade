@@ -63,8 +63,6 @@ class LoginAuthProvider extends ChangeNotifier {
           final image = userData['image'] ?? '';
           final role = userData['role'] ?? '';
           final branchId = userData['branch_id']?.toString() ?? '';
-
-          /// ✅ PERMISSIONS
           List permissionList = userData['permissions'] ?? [];
 
           prefs.setString("saleYourOldMachine","${permissionList.contains("client_post")}");

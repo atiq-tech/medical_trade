@@ -11,23 +11,17 @@ class GetEngineerSupportProductProvider extends ChangeNotifier {
 
   bool _isLoading = false;
   bool get isLoading => _isLoading;
+  final ApiService _apiService = ApiService(); 
 
-  final ApiService _apiService = ApiService(); // Instantiate ApiService
-
-  // Fetch data from the API
   Future<void> fetchDataProduct() async {
     _isLoading = true;
     notifyListeners();
-
     final url = AppUrl.getProductEngineeringEndPoint;
-
     try {
       final response = await _apiService.getRequest(url);
       if (response != null && response.statusCode == 200) {
         final List<dynamic> data = jsonDecode(response.body);
-        _categories = data
-            .map((item) => ProductModelEngineersuport.fromJson(item))
-            .toList();
+        _categories = data.map((item) => ProductModelEngineersuport.fromJson(item)).toList();
       } else {
         // Handle API error
         // ErrorHandling.handleError(ApiException(

@@ -14,8 +14,6 @@ class GetCategoriesProvider extends ChangeNotifier {
   bool get isLoading => _isLoading;
 
   final ApiService _apiService = ApiService();
-
-  // Fetch categories from API
   Future<void> fetchData() async {
     _isLoading = true;
     notifyListeners();
@@ -26,8 +24,6 @@ class GetCategoriesProvider extends ChangeNotifier {
       if (response != null && response.statusCode == 200) {
         final List<dynamic> data = jsonDecode(response.body);
         _categories = data.map((item) => GetCategoryModel.fromJson(item)).toList();
-
-        // Print all categories after fetching
         printAllCategories();
 
       } else {
@@ -41,8 +37,6 @@ class GetCategoriesProvider extends ChangeNotifier {
       notifyListeners();
     }
   }
-
-  // Print all category data
   void printAllCategories() {
     print("===== All Categories =====");
     for (var category in _categories) {
@@ -60,13 +54,11 @@ class GetCategoriesProvider extends ChangeNotifier {
     }
   }
 
-  // Filter categories by id list
   List<GetCategoryModel> getFilteredCategories(List<String> ids) {
-    return _categories
-        .where((category) => ids.contains(category.id.toString()))
-        .toList();
+    return _categories.where((category) => ids.contains(category.id.toString())).toList();
   }
 }
+
 
 
 // class GetCategoriesProvider extends ChangeNotifier {

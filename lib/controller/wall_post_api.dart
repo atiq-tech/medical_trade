@@ -27,8 +27,7 @@ class WallPostApiProvider extends ChangeNotifier {
         final List<dynamic> data = jsonDecode(response.body);
         print(data);
 
-        _wallpostdata =
-            data.map((item) => WallPostModel.fromJson(item)).toList();
+        _wallpostdata = data.map((item) => WallPostModel.fromJson(item)).toList();
 
         notifyListeners();
       } else {

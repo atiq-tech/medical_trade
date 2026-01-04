@@ -129,9 +129,7 @@ class ProductModel {
 
 class ProductGallery {
   String? productImage;
-
   ProductGallery({this.productImage});
-
   ProductGallery.fromJson(Map<String, dynamic> json) {
     productImage = json['Product_Image'];
   }

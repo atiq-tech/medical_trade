@@ -13,9 +13,7 @@ class ProductDetailsProvider extends ChangeNotifier {
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 
-  final ApiService _apiService = ApiService(); // Instantiate ApiService
-
-  // Method to fetch products by category based on productCategoryID
+  final ApiService _apiService = ApiService(); 
   Future<List<ProductModel>> fetchProduct({
     required String categoryId,
     required String categoryType,
@@ -27,19 +25,16 @@ class ProductDetailsProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final response = await _apiService.postRequest(
-          url, body); // Use ApiService for POST request
-
+      final response = await _apiService.postRequest(url, body); 
       if (response != null && response.statusCode == 200) {
         final List<dynamic> data = jsonDecode(response.body);
         _categories = data.map((item) => ProductModel.fromJson(item)).toList();
         notifyListeners();
-        return _categories; // Return the list of products
+        return _categories; 
       } else {
-        final errorMessage =
-            'Failed to fetch products: ${response?.reasonPhrase}';
+        final errorMessage = 'Failed to fetch products: ${response?.reasonPhrase}';
         ErrorHandling.handleError(ApiException(errorMessage));
-        return []; // Return an empty list on error
+        return []; 
       }
     } catch (e) {
       if (e is SocketException) {
@@ -47,7 +42,7 @@ class ProductDetailsProvider extends ChangeNotifier {
       } else {
         ErrorHandling.handleError(e is Exception ? e : Exception(e.toString()));
       }
-      return []; // Return an empty list on exception
+      return []; 
     } finally {
       _isLoading = false;
       notifyListeners();

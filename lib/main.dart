@@ -123,8 +123,6 @@ class _MyAppState extends State<MyApp> {
             useMaterial3: true,
           ),
           onGenerateRoute: Routes.generateRoute,
-          //initialRoute: RoutesName.categorylist,
-          // initialRoute: RoutesName.myWallPost,
           initialRoute: GetStorage().read('loginToken') != null
               ? RoutesName.myWallPost
               : RoutesName.splash,

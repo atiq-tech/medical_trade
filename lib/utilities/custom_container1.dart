@@ -41,8 +41,6 @@ class CustomContainerOne extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-
-                  /// 🔹 IMAGE
                   if (networkImageUrl != null &&
                       networkImageUrl!.isNotEmpty)
                     Image.network(
@@ -62,10 +60,7 @@ class CustomContainerOne extends StatelessWidget {
                       size: 36.sp,
                       color: textColor,
                     ),
-
                   SizedBox(height: 8.h),
-
-                  /// 🔹 TITLE
                   Padding(
                     padding: const EdgeInsets.all(5),
                     child: Text(

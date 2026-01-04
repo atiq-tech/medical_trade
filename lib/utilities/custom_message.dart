@@ -6,16 +6,13 @@ class CustomToast {
   final String text;
   final bool isSuccess;
 
-  CustomToast._(
-      {required this.context, required this.text, required this.isSuccess});
+  CustomToast._({required this.context, required this.text, required this.isSuccess});
 
-  // Named constructor for creating and showing the custom toast
   factory CustomToast.show(
       {required BuildContext context,
       required String text,
       required bool isSuccess}) {
-    final customToast =
-        CustomToast._(context: context, text: text, isSuccess: isSuccess);
+    final customToast = CustomToast._(context: context, text: text, isSuccess: isSuccess);
     customToast._show();
     return customToast;
   }
@@ -29,8 +26,7 @@ class CustomToast {
           child: Material(
             color: Colors.transparent,
             child: Container(
-              padding:
-                  EdgeInsets.symmetric(horizontal: 5.0.w, vertical: 12.0.h),
+              padding: EdgeInsets.symmetric(horizontal: 5.0.w, vertical: 12.0.h),
               decoration: BoxDecoration(
                 color: isSuccess
                     ? const Color.fromARGB(255, 71, 184, 129)
@@ -53,10 +49,7 @@ class CustomToast {
                     size: 16.sp,
                   ),
                   SizedBox(width: 6.0.w),
-                  Text(
-                    text,
-                    style: TextStyle(color: Colors.white, fontSize: 12.0.sp),
-                  ),
+                  Text(text,style: TextStyle(color: Colors.white, fontSize: 12.0.sp)),
                 ],
               ),
             ),
@@ -64,9 +57,7 @@ class CustomToast {
         ),
       ),
     );
-
     Overlay.of(context).insert(overlayEntry);
-
     Future.delayed(const Duration(seconds: 3), () {
       overlayEntry.remove();
     });

@@ -56,13 +56,10 @@ class CustomErrorToast {
         ),
       ),
     );
-
     overlay.insert(overlayEntry);
-
     Future.delayed(const Duration(seconds: 3), () {
       overlayEntry.remove();
     });
   }
-
   static GlobalKey<NavigatorState> get navigatorKey => _navigatorKey;
 }

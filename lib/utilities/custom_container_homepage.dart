@@ -5,16 +5,9 @@ class CustomContainer extends StatelessWidget {
   final Color? backgroundColor;
   final String text;
   final Color textColor;
-
-  /// 🔹 Asset icon (optional)
   final String? iconPath;
-
-  /// 🔹 Flutter icon (optional)
   final IconData? iconData;
-
-  /// 🔹 API / Network image (optional)
   final String? networkImageUrl;
-
   final VoidCallback? onTap;
 
   const CustomContainer({
@@ -54,8 +47,6 @@ class CustomContainer extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-
-                  /// 🔹 ICON / IMAGE SECTION
                   if (networkImageUrl != null && networkImageUrl!.isNotEmpty)
                     Image.network(
                       networkImageUrl!,
@@ -77,10 +68,7 @@ class CustomContainer extends StatelessWidget {
                       size: 35.sp,
                       color: textColor,
                     ),
-
                   SizedBox(height: 6.h),
-
-                  /// 🔹 TITLE
                   Padding(
                     padding: const EdgeInsets.all(5.0),
                     child: Text(

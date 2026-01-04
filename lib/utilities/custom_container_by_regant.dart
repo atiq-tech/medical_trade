@@ -6,9 +6,7 @@ import 'package:medical_trade/utilities/values_manager.dart';
 
 class CustomConatinerByReagent extends StatelessWidget {
   final String text;
-
   final VoidCallback? onTap;
-
   const CustomConatinerByReagent({
     super.key,
     required this.text,
@@ -44,7 +42,6 @@ class CustomConatinerByReagent extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                // Use the provided iconPath here
                 Expanded(
                   child: Image.asset(
                     ImageAssets.byReagent,
@@ -58,8 +55,7 @@ class CustomConatinerByReagent extends StatelessWidget {
                     text,
                     maxLines: 2,
                     textAlign: TextAlign.center,
-                    style:
-                        FontManager.subheadingTwo.copyWith(color: Colors.black),
+                    style: FontManager.subheadingTwo.copyWith(color: Colors.black),
                   ),
                 ),
               ],

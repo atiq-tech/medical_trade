@@ -4,14 +4,13 @@ const String jsonPath = "assets/json";
 class ImageAssets {
   // New image paths
   static const String appBarIcon = "$imagePath/medical.png";
-    static const String person = "$imagePath/person.jpg";
+  static const String person = "$imagePath/person.jpg";
   static const String loginBackgroundImage = "$imagePath/background_login.jpg";
   static const String salesOldMachineBackgroundImage = "$imagePath/from2.jpg";
   static const String medicalIcon = "$imagePath/medical.png";
   //home_view All Container Image Icons 
   static const String allAccessories = "$imagePath/all accessories.png";
-  static const String engineeringSupport =
-      "$imagePath/engineering support.png";
+  static const String engineeringSupport ="$imagePath/engineering support.png";
   static const String newMachine = "$imagePath/new machine.png";
   static const String oldMachine = "$imagePath/old machine.png";
   static const String others = "$imagePath/others.png";
@@ -21,11 +20,11 @@ class ImageAssets {
   static const String pathology = "$imagePath/pathology.png";
   static const String oldMachineTwo = "$imagePath/old machine two.png";
   //By Reagent Items 
-    static const String biochemistry = "$imagePath/biochemistry.png";
-    static const String hormone = "$imagePath/hormone.png";
-    static const String serology = "$imagePath/serology.png";
-    static const String stripAndDevice = "$imagePath/strip_and_device.png";
-    static const String byReagent = "$imagePath/by_reagent.png";
+  static const String biochemistry = "$imagePath/biochemistry.png";
+  static const String hormone = "$imagePath/hormone.png";
+  static const String serology = "$imagePath/serology.png";
+  static const String stripAndDevice = "$imagePath/strip_and_device.png";
+  static const String byReagent = "$imagePath/by_reagent.png";
 }
 
 class JsonAssets {
@@ -44,7 +43,6 @@ class DiagnosticModule {
   static const String testReceipt = "$imagePath/treceipt.png";
   static const String appointment = "$imagePath/appoint.png";
   static const String appointmentList = "$imagePath/appointlist.png";
-
   static const String testReceiptList = "$imagePath/trlist.png";
   static const String cashTransaction = "$imagePath/ctrans.png";
   static const String bankTransaction = "$imagePath/btrans.png";

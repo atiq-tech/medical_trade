@@ -60,10 +60,9 @@ void _pickImage() async {
                 final XFile? photo = await ImagePicker().pickImage(
                   source: ImageSource.camera,
                 );
-
                 if (photo != null) {
                   setState(() {
-                    // _imagesList.clear(); // চাইলে আগের সব মুছতে পারেন
+                    // _imagesList.clear(); 
                     _imagesList.add(photo);
                   });
                 }
@@ -75,7 +74,6 @@ void _pickImage() async {
               onTap: () async {
                 Navigator.pop(context);
                 final pickedFiles = await ImagePicker().pickMultiImage();
-
                 if (pickedFiles.isNotEmpty) {
                   setState(() {
                     _imagesList.clear();
@@ -91,12 +89,9 @@ void _pickImage() async {
   );
 }
 
-
-
   @override
   Widget build(BuildContext context) {
     final supportProvider = Provider.of<EngineeringSupportProvider>(context);
-
     return Scaffold(
       appBar: CustomAppBar(
         onTap: () {
@@ -124,8 +119,7 @@ void _pickImage() async {
                           BorderRadius.all(Radius.circular(AppSize.s12.r)),
                     ),
                     child: Padding(
-                      padding:
-                          EdgeInsets.only(right: 8.w, top: 4.h, bottom: 4.h),
+                      padding: EdgeInsets.only(right: 8.w, top: 4.h, bottom: 4.h),
                       child: Column(
                         children: [
                           Padding(
@@ -202,18 +196,13 @@ void _pickImage() async {
                                     child: Stack(
                                       children: [
                                         ClipRRect(
-                                          borderRadius:
-                                              BorderRadius.circular(5.r),
+                                          borderRadius: BorderRadius.circular(5.r),
                                           child: Image.file(
-                                            file, // Use the images from the list
+                                            file,
                                             height: 80.h,
                                             width: 80.w,
                                             fit: BoxFit.cover,
-                                            errorBuilder:
-                                                (context, error, stackTrace) =>
-                                                    const Icon(
-                                              Icons.error,
-                                            ),
+                                            errorBuilder:(context, error, stackTrace) => const Icon(Icons.error),
                                           ),
                                         ),
                                         Positioned(
@@ -246,7 +235,6 @@ void _pickImage() async {
                               ),
                             ),
                           ),
-                         
                           SizedBox(height: 16.h),
                           CustomTextFromfieldTwo(
                             controller: _machineNameController,
@@ -277,8 +265,7 @@ void _pickImage() async {
                           ),
                           SizedBox(height: 4.0.h),
                           Padding(
-                            padding: EdgeInsets.only(
-                                left: 10.w, bottom: 3.h, top: 4.h),
+                            padding: EdgeInsets.only(left: 10.w, bottom: 3.h, top: 4.h),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.start,
                               crossAxisAlignment: CrossAxisAlignment.center,
@@ -298,15 +285,11 @@ void _pickImage() async {
                                     ),
                                   ),
                                 ),
-                                SizedBox(
-                                  width: 8.w,
-                                ),
+                                SizedBox(width: 8.w),
                                 SizedBox(
                                   width: 4.w,
-                                  child: Text(
-                                    ":",
-                                    style: TextStyle(
-                                        color: Colors.black, fontSize: 16.sp),
+                                  child: Text(":",
+                                    style: TextStyle(color: Colors.black, fontSize: 16.sp),
                                   ),
                                 ),
                                 SizedBox(width: 12.w),
@@ -316,11 +299,10 @@ void _pickImage() async {
                                     height: 50.0.h,
                                     decoration: BoxDecoration(
                                       color: Colors.white,
-                                      borderRadius:
-                                          BorderRadius.circular(5.0.r),
+                                      borderRadius: BorderRadius.circular(5.0.r),
                                       border: Border.all(
                                         color: Colors.grey,
-                                        width: 0.5.w, // Set border width here
+                                        width: 0.5.w,
                                       ),
                                     ),
                                     child: TextFormField(
@@ -328,7 +310,7 @@ void _pickImage() async {
                                       controller: _machineDetailsController,
                                       maxLines: 3,
                                       decoration: InputDecoration(
-                                        hintText:"Enter Machine Problem Details",
+                                        hintText: "Enter Machine Problem Details",
                                         hintStyle: TextStyle(
                                           fontSize: 12.sp,
                                           color: Colors.grey[500],
@@ -353,7 +335,6 @@ void _pickImage() async {
                             alignment: AlignmentDirectional.centerEnd,
                             child: InkWell(
                               onTap: () async {
-                                // Validate required fields
                                 if (_machineNameController.text.isEmpty ||
                                     _modelController.text.isEmpty ||
                                     _mobileController.text.isEmpty ||
@@ -366,9 +347,7 @@ void _pickImage() async {
                                       isSuccess: false);
                                   return;
                                 }
-                                // Convert _imagesList (XFile) to a list of File
                                 List<File> images = _imagesList.map((e) => File(e.path)).toList();
-                                // Call the saveSupportData function
                                 await supportProvider.saveSupportData(
                                   images: images,
                                   model: _modelController.text,
@@ -406,22 +385,22 @@ void _pickImage() async {
                                 padding: EdgeInsets.symmetric(vertical: 6.h),
                                 child: Center(
                                   child: supportProvider.isLoading
-                                      ? SizedBox(
-                                          width: 15.w,
-                                          height: 15.h,
-                                          child: CircularProgressIndicator(
-                                            color: Colors.white,
-                                            strokeWidth: 2.0.w,
-                                          ),
-                                        )
-                                      : Text(
-                                          "POST",
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 12.sp,
-                                            fontWeight: FontWeight.bold,
-                                          ),
+                                    ? SizedBox(
+                                        width: 15.w,
+                                        height: 15.h,
+                                        child: CircularProgressIndicator(
+                                          color: Colors.white,
+                                          strokeWidth: 2.0.w,
                                         ),
+                                      )
+                                    : Text(
+                                        "POST",
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 12.sp,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
                                 ),
                               ),
                             ),

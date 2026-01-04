@@ -1,21 +1,15 @@
-// sized_box_manager.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:medical_trade/utilities/values_manager.dart';
 
 class SizedBoxManager {
-  // Method to create a SizedBox with predefined height
   static Widget height(double margin) {
-    return SizedBox(height: margin.h); // Convert margin to responsive height
+    return SizedBox(height: margin.h); 
   }
-
-  // Method to create a SizedBox with predefined width
   static Widget width(double margin) {
-    return SizedBox(width: margin.w); // Convert margin to responsive width
+    return SizedBox(width: margin.w);
   }
-
-  // Method to create a SizedBox with predefined height and width
   static Widget size({double? height, double? width}) {
     return SizedBox(
       height: height?.h,

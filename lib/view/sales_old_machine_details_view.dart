@@ -18,14 +18,10 @@ class SalesOldMachineDetailsView extends StatefulWidget {
   const SalesOldMachineDetailsView({super.key, required this.item});
 
   @override
-  State<SalesOldMachineDetailsView> createState() =>
-      _SalesOldMachineDetailsViewState();
+  State<SalesOldMachineDetailsView> createState() =>_SalesOldMachineDetailsViewState();
 }
-
 int _currentIndex = 0;
-
-class _SalesOldMachineDetailsViewState
-    extends State<SalesOldMachineDetailsView> {
+class _SalesOldMachineDetailsViewState extends State<SalesOldMachineDetailsView> {
   void _onAppBarTitleTap() {
     Navigator.pop(context);
   }
@@ -264,7 +260,6 @@ class _SalesOldMachineDetailsViewState
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                // Call Button
                                 GestureDetector(
                                   onTap: () => _launchPhone(
                                       widget.item.mobile.toString()),
@@ -288,7 +283,6 @@ class _SalesOldMachineDetailsViewState
                                     ),
                                   ),
                                 ),
-                                // Message Button
                                 GestureDetector(
                                   onTap: () => _launchMessage(widget.item.mobile.toString()),
                                   child: Padding(

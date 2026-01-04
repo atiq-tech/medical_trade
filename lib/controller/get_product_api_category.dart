@@ -23,24 +23,19 @@ class GetCategoryProductProvider extends ChangeNotifier {
 
     try {
       final response = await _apiService.postRequest(url, body);
-
       if (response != null && response.statusCode == 200) {
         final List<dynamic> data = jsonDecode(response.body);
-        _categories =
-            data.map((item) => GetCategoryProductModel.fromJson(item)).toList();
-        // print("Fetched category products successfully.");
-        _errorMessage = null; // Clear previous error message
+        _categories = data.map((item) => GetCategoryProductModel.fromJson(item)).toList();
+        _errorMessage = null; 
       } else {
         _categories = [];
         _errorMessage = 'Failed to load products';
-        ErrorHandling.handleError(ApiException(
-            'API responded with status code ${response?.statusCode}'));
+        ErrorHandling.handleError(ApiException('API responded with status code ${response?.statusCode}'));
       }
     } catch (e) {
       _categories = [];
       _errorMessage = 'Error: $e';
       ErrorHandling.handleError(e is Exception ? e : Exception(e.toString()));
-      //  print("Error: $e");
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -48,5 +43,5 @@ class GetCategoryProductProvider extends ChangeNotifier {
   }
 
   String? _errorMessage;
-  String? get errorMessage => _errorMessage; // Add a getter for errorMessage
+  String? get errorMessage => _errorMessage; 
 }

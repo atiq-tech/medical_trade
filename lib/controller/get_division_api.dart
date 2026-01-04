@@ -18,7 +18,6 @@ class DivisionProvider extends ChangeNotifier {
   List<String> get selectedDivisions => _selectedDivisions;
 
   Future<void> fetchDivisions() async {
-    // Check internet connection
     var connectivityResult = await Connectivity().checkConnectivity();
     // ignore: unrelated_type_equality_checks
     if (connectivityResult == ConnectivityResult.none) {

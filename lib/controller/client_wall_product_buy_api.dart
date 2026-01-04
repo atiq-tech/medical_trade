@@ -17,10 +17,6 @@ class ClientWallProductBuyProvider with ChangeNotifier {
     _isLoading = value;
     notifyListeners();
   }
-
-  /// =========================
-  /// FETCH ORDER CODE + SEND
-  /// =========================
   Future<void> fetchClientCodeAndSendOrder({
     required String wallpostId,
   }) async {
@@ -45,7 +41,7 @@ class ClientWallProductBuyProvider with ChangeNotifier {
       if (response.statusCode == 200) {
         final decoded = jsonDecode(response.body);
 
-        _clientCode = decoded["data"]; // OW0001
+        _clientCode = decoded["data"];
         _errorMessage = null;
 
         await sendOrderCode(
@@ -66,9 +62,6 @@ class ClientWallProductBuyProvider with ChangeNotifier {
     }
   }
 
-  /// =========================
-  /// SEND ORDER CODE
-  /// =========================
   Future<void> sendOrderCode({
     required String wallpostId,
     required String? orderCode,

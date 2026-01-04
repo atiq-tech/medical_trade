@@ -1,15 +1,9 @@
-// To parse this JSON data, do
-//
-//     final getProductModel = getProductModelFromJson(jsonString);
-
 import 'dart:convert';
 
 List<GetProductModel> getProductModelFromJson(String str) =>
-    List<GetProductModel>.from(
-        json.decode(str).map((x) => GetProductModel.fromJson(x)));
+    List<GetProductModel>.from(json.decode(str).map((x) => GetProductModel.fromJson(x)));
 
-String getProductModelToJson(List<GetProductModel> data) =>
-    json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
+String getProductModelToJson(List<GetProductModel> data) =>json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
 
 class GetProductModel {
   String productSlNo;

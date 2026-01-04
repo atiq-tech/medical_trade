@@ -7,20 +7,15 @@ class EngineeringCustomDataTable extends StatefulWidget {
   const EngineeringCustomDataTable({super.key});
 
   @override
-  State<EngineeringCustomDataTable> createState() =>
-      _EngineeringCustomDataTableState();
+  State<EngineeringCustomDataTable> createState() => _EngineeringCustomDataTableState();
 }
 
-class _EngineeringCustomDataTableState
-    extends State<EngineeringCustomDataTable> {
+class _EngineeringCustomDataTableState extends State<EngineeringCustomDataTable> {
   @override
   void initState() {
     super.initState();
-
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      // Fetch data when the widget is initialized
-      Provider.of<GetEngineerSupportProductProvider>(context, listen: false)
-          .fetchDataProduct();
+      Provider.of<GetEngineerSupportProductProvider>(context, listen: false).fetchDataProduct();
     });
   }
 
@@ -31,13 +26,10 @@ class _EngineeringCustomDataTableState
         if (provider.isLoading) {
           return const Center(child: CircularProgressIndicator());
         }
-
         if (provider.categories.isEmpty) {
           return const Center(child: Text('No data available'));
         }
-
         final products = provider.categories.reversed.toList();
-
         return SingleChildScrollView(
           scrollDirection: Axis.vertical,
           child: SingleChildScrollView(
@@ -45,11 +37,9 @@ class _EngineeringCustomDataTableState
             child: Padding(
               padding: EdgeInsets.only(left: 6.w),
               child: DataTable(
-                // ignore: deprecated_member_use
                 dataRowHeight: 25.0.h,
                 headingRowHeight: 25.0.h,
-                headingRowColor: WidgetStateProperty.all(
-                    const Color.fromARGB(255, 83, 177, 87)),
+                headingRowColor: WidgetStateProperty.all(const Color.fromARGB(255, 83, 177, 87)),
                 border: TableBorder.all(color: Colors.black, width: 0.5.w),
                 columns: [
                   DataColumn(
@@ -122,24 +112,11 @@ class _EngineeringCustomDataTableState
                   var product = entry.value;
                   return DataRow(
                     cells: <DataCell>[
-                      DataCell(
-                        Center(
-                          child: SizedBox(
-                            width: 35.w,
-                            child: Text(
-                              (index + 1).toString(),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                        ),
-                      ),
+                      DataCell(Center(child: SizedBox(width: 35.w,child: Text((index + 1).toString(),textAlign: TextAlign.center)))),
                       DataCell(Text(product.title, textAlign: TextAlign.start)),
-                      DataCell(
-                          Text(product.personName, textAlign: TextAlign.start)),
-                      DataCell(Text(product.designation,
-                          textAlign: TextAlign.start)),
-                      DataCell(
-                          Text(product.mobile, textAlign: TextAlign.start)),
+                      DataCell(Text(product.personName, textAlign: TextAlign.start)),
+                      DataCell(Text(product.designation,textAlign: TextAlign.start)),
+                      DataCell(Text(product.mobile, textAlign: TextAlign.start)),
                     ],
                   );
                 }).toList(),

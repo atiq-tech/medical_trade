@@ -17,7 +17,6 @@ import 'package:medical_trade/utilities/custom_textfromfield_sales_old_machine.d
 import 'package:medical_trade/utilities/values_manager.dart';
 import 'package:medical_trade/view/sales_old_machie_data.dart';
 import 'package:provider/provider.dart';
-// import 'package:flutter_typeahead/flutter_typeahead.dart';
 
 class SalesYourOldMachineView extends StatefulWidget {
   const SalesYourOldMachineView({super.key});
@@ -42,20 +41,6 @@ class _SalesYourOldMachineViewState extends State<SalesYourOldMachineView> {
   Map<String, String> divisionsNameMap = {};
   final List<DistrictModel> _selectedDistricts = [];
   final List<DivisionModel> _selectedDivisions = [];
-
-  // final List<XFile> _imagesList = [];
-  // void _pickImage() async {
-  //   final pickedFiles = await ImagePicker().pickMultiImage();
-
-  //   if (pickedFiles.isNotEmpty) {
-  //     setState(() {
-  //       _imagesList.clear(); // Clear previous images
-  //       for (var pickedFile in pickedFiles) {
-  //         _imagesList.add(XFile(pickedFile.path));
-  //       }
-  //     });
-  //   }
-  // }
   final List<XFile> _imagesList = [];
   void _pickImage() async {
   showDialog(
@@ -77,10 +62,8 @@ class _SalesYourOldMachineViewState extends State<SalesYourOldMachineView> {
                 final XFile? photo = await ImagePicker().pickImage(
                   source: ImageSource.camera,
                 );
-
                 if (photo != null) {
                   setState(() {
-                    // _imagesList.clear(); 
                     _imagesList.add(photo);
                   });
                 }
@@ -92,7 +75,6 @@ class _SalesYourOldMachineViewState extends State<SalesYourOldMachineView> {
               onTap: () async {
                 Navigator.pop(context);
                 final pickedFiles = await ImagePicker().pickMultiImage();
-
                 if (pickedFiles.isNotEmpty) {
                   setState(() {
                     _imagesList.clear();
@@ -108,59 +90,12 @@ class _SalesYourOldMachineViewState extends State<SalesYourOldMachineView> {
   );
 }
 
-// void _pickImage() async {
-//   showModalBottomSheet(
-//     context: context,
-//     builder: (context) {
-//       return SafeArea(
-//         child: Wrap(
-//           children: [
-//             ListTile(
-//               leading: Icon(Icons.camera_alt),
-//               title: Text("Camera"),
-//               onTap: () async {
-//                 Navigator.pop(context);
-//                 final XFile? photo = await ImagePicker().pickImage(
-//                   source: ImageSource.camera,
-//                 );
-
-//                 if (photo != null) {
-//                   setState(() {
-//                     //_imagesList.clear(); // আগের সব ছবি রিমুভ
-//                     _imagesList.add(photo);
-//                   });
-//                 }
-//               },
-//             ),
-//             ListTile(
-//               leading: Icon(Icons.photo_library),
-//               title: Text("Gallery (Multi Image)"),
-//               onTap: () async {
-//                 Navigator.pop(context);
-//                 final pickedFiles = await ImagePicker().pickMultiImage();
-
-//                 if (pickedFiles.isNotEmpty) {
-//                   setState(() {
-//                     _imagesList.clear();
-//                     _imagesList.addAll(pickedFiles);
-//                   });
-//                 }
-//               },
-//             ),
-//           ],
-//         ),
-//       );
-//     },
-//   );
-// }
-
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final districtProvider = Provider.of<DistrictProvider>(context, listen: false);
       final divisionProvider = Provider.of<DivisionProvider>(context, listen: false);
-
       await Future.wait([
         districtProvider.fetchDistricts(),
         divisionProvider.fetchDivisions(),
@@ -333,127 +268,6 @@ class _SalesYourOldMachineViewState extends State<SalesYourOldMachineView> {
                               ),
                             ),
                           ),
-                         
-                      //   Padding(
-                      //     padding: EdgeInsets.only(top: 12.h, bottom: 10.h),
-                      //     child: Center(
-                      //       child: GestureDetector(
-                      //         onTap: _pickImage,
-                      //         child: Stack(
-                      //           clipBehavior: Clip.none,
-                      //           children: [
-                      //             Container(
-                      //               width: 85.0.w,
-                      //               height: 85.0.h,
-                      //               decoration: BoxDecoration(
-                      //                 shape: BoxShape.circle,
-                      //                 border: Border.all(
-                      //                   color: Colors.grey,
-                      //                   width: 2.0.w,
-                      //                 ),
-                      //               ),
-                      //               child: CircleAvatar(
-                      //                 radius: 30.0.r,
-                      //                 backgroundColor: Colors.white,
-                      //                 child: Padding(
-                      //                   padding: EdgeInsets.all(12.0.r),
-                      //                   child: Image.asset(
-                      //                     "assets/icons/machine.png",
-                      //                     fit: BoxFit.cover,
-                      //                   ),
-                      //                 ),
-                      //               ),
-                      //             ),
-                      //             Positioned(
-                      //               bottom: 0,
-                      //               right: 0,
-                      //               child: Container(
-                      //                 width: 30.0.w,
-                      //                 height: 30.0.h,
-                      //                 decoration: BoxDecoration(
-                      //                   shape: BoxShape.circle,
-                      //                   color: Colors.white,
-                      //                   border: Border.all(
-                      //                     color: Colors.grey,
-                      //                     width: 1.0.w,
-                      //                   ),
-                      //                 ),
-                      //                 child: InkWell(
-                      //                   onTap: _pickImage,
-                      //                   child: Icon(
-                      //                     Icons.camera_alt,
-                      //                     color: Colors.black,
-                      //                     size: 16.0.sp,
-                      //                   ),
-                      //                 ),
-                      //               ),
-                      //             ),
-                      //           ],
-                      //         ),
-                      //       ),
-                      //     ),
-                      //   ),
-                      //   ///====my contribute
-                      //  _imagesList.isEmpty ? SizedBox() : Padding(
-                      //     padding: EdgeInsets.symmetric(horizontal: 12.w),
-                      //     child: SizedBox(
-                      //       height: 80.h,
-                      //       child: ListView.builder(
-                      //         scrollDirection: Axis.horizontal,
-                      //         itemCount: _imagesList.length,
-                      //         itemBuilder: (context, index) {
-                      //           final XFile imageFile = _imagesList[index];
-                      //           final File file = File(imageFile.path);
-                      //           return Padding(
-                      //             padding: EdgeInsets.only(right: 10.w),
-                      //             child: Stack(
-                      //               children: [
-                      //                 ClipRRect(
-                      //                   borderRadius: BorderRadius.circular(5.r),
-                      //                   child: Image.file(
-                      //                     file, // Use the images from the list
-                      //                     height: 80.h,
-                      //                     width: 80.w,
-                      //                     fit: BoxFit.cover,
-                      //                     errorBuilder:
-                      //                         (context, error, stackTrace) =>
-                      //                             const Icon(
-                      //                       Icons.error,
-                      //                     ),
-                      //                   ),
-                      //                 ),
-                      //                 Positioned(
-                      //                   top: 4.0,
-                      //                   right: 4.0,
-                      //                   child: GestureDetector(
-                      //                     onTap: () {
-                      //                       setState(() {
-                      //                         _imagesList.removeAt(index);
-                      //                       });
-                      //                     },
-                      //                     child: Container(
-                      //                       padding: EdgeInsets.all(4.0.r),
-                      //                       decoration: BoxDecoration(
-                      //                         color: Colors.grey.shade100,
-                      //                         shape: BoxShape.circle,
-                      //                       ),
-                      //                       child: Icon(
-                      //                         Icons.close,
-                      //                         color: Colors.red,
-                      //                         size: 12.0.sp,
-                      //                       ),
-                      //                     ),
-                      //                   ),
-                      //                 ),
-                      //               ],
-                      //             ),
-                      //           );
-                      //         },
-                      //       ),
-                      //     ),
-                      //   ),
-                      //   //end image path
-
                         SizedBox(height: 10.h),
                         CustomTextfromfieldSalesOldMachine(
                           controller: _machineNameController,
@@ -468,9 +282,7 @@ class _SalesYourOldMachineViewState extends State<SalesYourOldMachineView> {
                           title: "Contact Number",
                           keyboardType: TextInputType.number,
                         ),
-                        SizedBox(
-                          height: 4.h,
-                        ),
+                        SizedBox(height: 4.h),
                         Row(
                           children: [
                             Expanded(
@@ -501,7 +313,6 @@ class _SalesYourOldMachineViewState extends State<SalesYourOldMachineView> {
                               ),
                             ),
                             SizedBox(width: 10.w),
-                            // Start of the widget
                             Expanded(
                               flex: 8,
                               child: Column(
@@ -517,7 +328,6 @@ class _SalesYourOldMachineViewState extends State<SalesYourOldMachineView> {
                                       child: Column(
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
-                                          // Display selected districts as text with a clear icon
                                           if (_selectedDivisions.isNotEmpty)
                                             Padding(
                                               padding: EdgeInsets.symmetric(horizontal: 8.0.w),
@@ -529,16 +339,12 @@ class _SalesYourOldMachineViewState extends State<SalesYourOldMachineView> {
                                                       fontWeight: FontWeight.w600,
                                                       fontSize: 14.sp,
                                                       color: Colors.black),
-                                                  overflow: TextOverflow.ellipsis, // Handle overflow if text is too long
+                                                  overflow: TextOverflow.ellipsis, 
                                                 ),
                                               ),
                                             ),
-
-                                          // TextField with TypeAhead suggestions
-                                          ///=====new myTask TypeAheadField new 
                                           TypeAheadField<DivisionModel>(
                                             controller: _divisionController,
-                                            /// TextField builder
                                             builder: (context, controller, focusNode) {
                                               return TextField(
                                                 controller: controller,
@@ -557,13 +363,9 @@ class _SalesYourOldMachineViewState extends State<SalesYourOldMachineView> {
                                                 ),
                                               );
                                             },
-
-                                            /// Suggestions callback
                                             suggestionsCallback: (pattern) {
                                               return divisionProvider.searchDivisions(pattern);
                                             },
-
-                                            /// Suggestion list UI
                                             itemBuilder: (context, DivisionModel suggestion) {
                                               return Padding(
                                                 padding: EdgeInsets.symmetric(vertical: 5.h, horizontal: 10.w),
@@ -575,22 +377,16 @@ class _SalesYourOldMachineViewState extends State<SalesYourOldMachineView> {
                                                 ),
                                               );
                                             },
-
-                                            /// When a suggestion is selected
                                             onSelected: (DivisionModel suggestion) {
                                               setState(() {
-                                                // Toggle selection
                                                 if (_selectedDivisions.contains(suggestion)) {
                                                   _selectedDivisions.remove(suggestion);
                                                 } else {
                                                   _selectedDivisions.add(suggestion);
                                                 }
-                                                // Clear the text field
                                                 _divisionController.clear();
                                               });
                                             },
-
-                                            /// Suggestion box decoration (optional)
                                             decorationBuilder: (context, child) => Material(
                                               elevation: 4,
                                               color: Colors.white,
@@ -598,68 +394,6 @@ class _SalesYourOldMachineViewState extends State<SalesYourOldMachineView> {
                                               child: child,
                                             ),
                                           )
-
-                                          //   ///=====old TypeAheadFormField code
-                                          // TypeAheadFormField<DivisionModel>(
-                                          //   textFieldConfiguration:
-                                          //       TextFieldConfiguration(
-                                          //     controller: _divisionController,
-                                          //     decoration: InputDecoration(
-                                          //       contentPadding: EdgeInsets.only(
-                                          //           top: 2.h,
-                                          //           bottom: 4.h,
-                                          //           left: 8.0.w),
-                                          //       hintText: 'Select Divisions',
-                                          //       isDense: true,
-                                          //       hintStyle: TextStyle(
-                                          //         fontSize: 12.0.sp,
-                                          //         color: Colors.grey[500],
-                                          //       ),
-                                          //       filled: true,
-                                          //       fillColor: Colors.white,
-                                          //       border: InputBorder.none,
-                                          //     ),
-                                          //   ),
-                                          //   suggestionsCallback: (pattern) {
-                                          //     return divisionProvider
-                                          //         .searchDivisions(pattern);
-                                          //   },
-                                          //   itemBuilder: (context, suggestion) {
-                                          //     return Padding(
-                                          //       padding: EdgeInsets.symmetric(
-                                          //           vertical: 5.h,
-                                          //           horizontal: 10.w),
-                                          //       child: Text(
-                                          //         suggestion.divisionName,
-                                          //         style: TextStyle(
-                                          //             fontSize: 14.sp),
-                                          //         maxLines: 1,
-                                          //         overflow:
-                                          //             TextOverflow.ellipsis,
-                                          //       ),
-                                          //     );
-                                          //   },
-                                          //   transitionBuilder: (context,
-                                          //       suggestionsBox, controller) {
-                                          //     return suggestionsBox;
-                                          //   },
-                                          //   onSuggestionSelected:
-                                          //       (DivisionModel suggestion) {
-                                          //     setState(() {
-                                          //       // Toggle selection
-                                          //       if (_selectedDivisions
-                                          //           .contains(suggestion)) {
-                                          //         _selectedDivisions
-                                          //             .remove(suggestion);
-                                          //       } else {
-                                          //         _selectedDivisions
-                                          //             .add(suggestion);
-                                          //       }
-                                          //       // Clear the text field and update it with selected districts
-                                          //       _divisionController.clear();
-                                          //     });
-                                          //   },
-                                          // )
                                         ],
                                       ),
                                     ),
@@ -670,8 +404,6 @@ class _SalesYourOldMachineViewState extends State<SalesYourOldMachineView> {
                           ],
                         ),
                         SizedBox(height: 4.h),
-
-                        // District Multi-Select
                         Row(
                           children: [
                             Expanded(
@@ -702,8 +434,6 @@ class _SalesYourOldMachineViewState extends State<SalesYourOldMachineView> {
                               ),
                             ),
                             SizedBox(width: 10.w),
-
-                            // Start of the widget
                             Expanded(
                               flex: 8,
                               child: Column(
@@ -716,41 +446,30 @@ class _SalesYourOldMachineViewState extends State<SalesYourOldMachineView> {
                                         color: Colors.white,
                                         border: Border.all(
                                           color: Colors.black,
-                                          width: 0.5.w, // Set border width here
+                                          width: 0.5.w, 
                                         ),
                                       ),
                                       child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
+                                        crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
-                                          // Display selected districts as text with a clear icon
                                           if (_selectedDistricts.isNotEmpty)
                                             Padding(
-                                              padding: EdgeInsets.symmetric(
-                                                  horizontal: 8.0.w),
+                                              padding: EdgeInsets.symmetric(horizontal: 8.0.w),
                                               child: SingleChildScrollView(
-                                                scrollDirection:
-                                                    Axis.horizontal,
+                                                scrollDirection: Axis.horizontal,
                                                 child: Text(
-                                                  _selectedDistricts
-                                                      .map((district) =>
-                                                          district.areaName)
-                                                      .join(', '),
+                                                  _selectedDistricts.map((district) =>district.areaName).join(', '),
                                                   style: TextStyle(
                                                     fontWeight: FontWeight.w600,
                                                     fontSize: 14.sp,
                                                     color: Colors.black,
                                                   ),
-                                                  overflow: TextOverflow
-                                                      .ellipsis, // Handle overflow if text is too long
+                                                  overflow: TextOverflow.ellipsis,
                                                 ),
                                               ),
                                             ),
-                                          // TextField with TypeAhead suggestions
-                                          ///=====new myTask TypeAheadField new
                                           TypeAheadField<DistrictModel>(
                                             controller: _districtController,
-                                            /// TextField builder
                                             builder: (context, controller, focusNode) {
                                               return TextField(
                                                 controller: controller,
@@ -769,13 +488,9 @@ class _SalesYourOldMachineViewState extends State<SalesYourOldMachineView> {
                                                 ),
                                               );
                                             },
-
-                                            /// Suggestions callback
                                             suggestionsCallback: (pattern) {
                                               return districtProvider.searchDistricts(pattern);
                                             },
-
-                                            /// Suggestion list UI
                                             itemBuilder: (context, DistrictModel suggestion) {
                                               return Padding(
                                                 padding: EdgeInsets.symmetric(vertical: 5.h, horizontal: 10.w),
@@ -787,22 +502,16 @@ class _SalesYourOldMachineViewState extends State<SalesYourOldMachineView> {
                                                 ),
                                               );
                                             },
-
-                                            /// When a suggestion is selected
                                             onSelected: (DistrictModel suggestion) {
                                               setState(() {
-                                                // Toggle selection
                                                 if (_selectedDistricts.contains(suggestion)) {
                                                   _selectedDistricts.remove(suggestion);
                                                 } else {
                                                   _selectedDistricts.add(suggestion);
                                                 }
-                                                // Clear the text field
                                                 _districtController.clear();
                                               });
                                             },
-
-                                            /// Suggestion box decoration (optional)
                                             decorationBuilder: (context, child) => Material(
                                               elevation: 4,
                                               color: Colors.white,
@@ -810,69 +519,6 @@ class _SalesYourOldMachineViewState extends State<SalesYourOldMachineView> {
                                               child: child,
                                             ),
                                           )
-
-                                          //   ///=====old TypeAheadFormField code
-                                          // TypeAheadFormField<DistrictModel>(
-                                          //   textFieldConfiguration:
-                                          //       TextFieldConfiguration(
-                                          //     controller: _districtController,
-                                          //     decoration: InputDecoration(
-                                          //       contentPadding: EdgeInsets.only(
-                                          //           top: 2.h,
-                                          //           bottom: 4.h,
-                                          //           left: 8.0.w),
-                                          //       hintText: 'Select District',
-                                          //       isDense: true,
-                                          //       hintStyle: TextStyle(
-                                          //         fontSize: 12.0.sp,
-                                          //         color: Colors.grey[500],
-                                          //       ),
-                                          //       filled: true,
-                                          //       fillColor: Colors.white,
-                                          //       border: InputBorder.none,
-                                          //     ),
-                                          //   ),
-                                          //   suggestionsCallback: (pattern) {
-                                          //     return districtProvider
-                                          //         .searchDistricts(pattern);
-                                          //   },
-                                          //   itemBuilder: (context, suggestion) {
-                                          //     return Padding(
-                                          //       padding: EdgeInsets.symmetric(
-                                          //           vertical: 5.h,
-                                          //           horizontal: 10.w),
-                                          //       child: Text(
-                                          //         suggestion.districtName,
-                                          //         style: TextStyle(
-                                          //             fontSize: 14.sp),
-                                          //         maxLines: 1,
-                                          //         overflow:
-                                          //             TextOverflow.ellipsis,
-                                          //       ),
-                                          //     );
-                                          //   },
-                                          //   transitionBuilder: (context,
-                                          //       suggestionsBox, controller) {
-                                          //     return suggestionsBox;
-                                          //   },
-                                          //   onSuggestionSelected:
-                                          //       (DistrictModel suggestion) {
-                                          //     setState(() {
-                                          //       // Toggle selection
-                                          //       if (_selectedDistricts
-                                          //           .contains(suggestion)) {
-                                          //         _selectedDistricts
-                                          //             .remove(suggestion);
-                                          //       } else {
-                                          //         _selectedDistricts
-                                          //             .add(suggestion);
-                                          //       }
-                                          //       // Clear the text field and update it with selected districts
-                                          //       _districtController.clear();
-                                          //     });
-                                          //   },
-                                          // ),
-                                        
                                         ],
                                       ),
                                     ),
@@ -880,37 +526,9 @@ class _SalesYourOldMachineViewState extends State<SalesYourOldMachineView> {
                                 ],
                               ),
                             )
-
-                            // data remove
-                            // GestureDetector(
-                            //   onTap: () {
-                            //     setState(() {
-                            //       if (_selectedDistricts
-                            //           .isNotEmpty) {
-                            //         _selectedDistricts
-                            //             .removeLast(); // Remove the last selected district
-                            //         if (_selectedDistricts
-                            //             .isEmpty) {
-                            //           _districtController
-                            //               .clear(); // Clear text field if no districts are left
-                            //         }
-                            //       }
-                            //     });
-                            //   },
-                            //   child: Padding(
-                            //     padding:
-                            //         EdgeInsets.all(5.r),
-                            //     child: Icon(Icons.close,
-                            //         size: 16.sp),
-                            //   ),
-                            // ),
-                            //end
-                            // End of the widget
                           ],
                         ),
-                        SizedBox(
-                          height: 4.h,
-                        ),
+                        SizedBox(height: 4.h),
                         CustomTextfromfieldSalesOldMachine(
                           controller: _upazilaController,
                           hintText: "Enter Upazila",
@@ -1039,14 +657,9 @@ class _SalesYourOldMachineViewState extends State<SalesYourOldMachineView> {
                                 );
                                 return;
                               }
-                              //List<String> selectedDivisionIds = _selectedDivisions.map((division) => division.id).toList();
                               List<String> selectedDivisionIds = _selectedDivisions.map((division) => division.id.toString()).toList();
-
-                              //List<String> selectedDistrictIds = _selectedDistricts.map((district) => district.districtSlNo).toList();
                               List<String> selectedDistrictIds = _selectedDistricts.map((district) => district.id.toString()).toList();
-                              // Convert _imagesList (XFile) to a list of File
                               List<File> images = _imagesList.map((e) => File(e.path)).toList();
-
                               await context
                                   .read<GetClientPostProvider>()
                                   .clientPostData(
@@ -1125,7 +738,6 @@ class _SalesYourOldMachineViewState extends State<SalesYourOldMachineView> {
               ),
             ),
           ),
-          //end
           SizedBox(height: 100.h),
           const SalesOldMachieData()
         ])));

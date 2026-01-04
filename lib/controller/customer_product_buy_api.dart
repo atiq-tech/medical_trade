@@ -164,11 +164,11 @@ import 'package:medical_trade/config/app_url.dart';
 class CustomerProductBuyApi with ChangeNotifier {
   String? _clientCode;
   String? _errorMessage;
-  bool _isLoading = false; // Loading state variable
+  bool _isLoading = false; 
 
   String? get clientCode => _clientCode;
   String? get errorMessage => _errorMessage;
-  bool get isLoading => _isLoading; // Getter for loading state
+  bool get isLoading => _isLoading; 
 
   Future<void> fetchCustomerCodeAndSendOrder({
   required String wallpostId,
@@ -195,8 +195,6 @@ class CustomerProductBuyApi with ChangeNotifier {
 
     if (response.statusCode == 200) {
       final decoded = jsonDecode(response.body);
-
-      // এখানে data → OR0002 পাওয়া যাবে
       _clientCode = decoded["data"]?.toString();
 
       print("Fetched Order Code: $_clientCode");
@@ -234,15 +232,12 @@ class CustomerProductBuyApi with ChangeNotifier {
   print("Customer ID     : $customerId");
   print("====================================");
 
-    // Prepare data for sending
     final body = {
       'product_id': wallpostId,
       'order_id': orderCode ?? '',
       'user_id': customerId ?? '',
     };
-
     try {
-      // Sending data to the second API
       final response = await http.post(
         Uri.parse(AppUrl.customerOrderEndPint),
         headers: {

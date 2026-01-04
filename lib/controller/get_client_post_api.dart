@@ -19,9 +19,6 @@ class GetClientPostProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  /// =========================
-  /// FETCH CLIENT POST CODE
-  /// =========================
   Future<void> fetchClientCode() async {
     setLoading(true);
 
@@ -39,7 +36,7 @@ class GetClientPostProvider with ChangeNotifier {
 
       if (response.statusCode == 200) {
         final decoded = jsonDecode(response.body);
-        _clientCode = decoded["data"]; // CP0002
+        _clientCode = decoded["data"]; 
         _errorMessage = null;
       } else {
         _clientCode = null;
@@ -53,9 +50,6 @@ class GetClientPostProvider with ChangeNotifier {
     }
   }
 
-  /// =========================
-  /// POST CLIENT DATA
-  /// =========================
   Future<bool> clientPostData({
     required BuildContext context,
     required String machineName,
@@ -94,14 +88,10 @@ class GetClientPostProvider with ChangeNotifier {
       'POST',
       Uri.parse(AppUrl.addClientpostEndPoint),
     );
-
-    /// ✅ Headers with TOKEN
     request.headers.addAll({
       'Authorization': 'Bearer $token',
       'Accept': 'application/json',
     });
-
-    /// ✅ BASIC TEXT FIELDS
     request.fields.addAll({
       "customer_post_id": _clientCode!,
       "machine_name": machineName,
@@ -114,21 +104,18 @@ class GetClientPostProvider with ChangeNotifier {
       "upazilla": upazila,
       "validity_date": "",
       "status": "p",
-      "AddBy": userId.toString(), // ✅ FIXED
+      "AddBy": userId.toString(), 
       "Client_branchid": "0",
     });
 
-    /// ✅ MULTIPLE division_id[]
     for (var id in selectedDivisions) {
       request.fields.putIfAbsent("division_id[]", () => id);
     }
 
-    /// ✅ MULTIPLE area_id[]
     for (var id in selectedDistricts) {
       request.fields.putIfAbsent("area_id[]", () => id);
     }
 
-    /// ✅ IMAGES
     for (var image in images) {
       request.files.add(
         await http.MultipartFile.fromPath(

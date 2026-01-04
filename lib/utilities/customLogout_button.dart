@@ -110,10 +110,8 @@ class CustomLogoutButton extends StatelessWidget {
 
   void _logout(BuildContext context) {
     final storage = GetStorage();
-
     storage.erase().then((_) {
       Navigator.pop(context);
-
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
@@ -157,13 +155,8 @@ class CustomLogoutButton extends StatelessWidget {
             children: [
               TextButton(
                 onPressed: () {
-                  Navigator.pop(context); // Close dialog
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const MyWallPostView(),
-                    ),
-                  );
+                  Navigator.pop(context);
+                  Navigator.pushReplacement(context,MaterialPageRoute(builder: (context) => const MyWallPostView()));
                 },
                 child: Container(
                   height: 40.h,
