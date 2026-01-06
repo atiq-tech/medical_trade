@@ -39,7 +39,7 @@ class _DetailsAllItemsState extends State<DetailsAllItems> {
     }
     return Scaffold(
       appBar: CustomAppBar(onTap: _onAppBarTitleTap,title: "Products Details"),
-      floatingActionButton: const WhatsAppFAB(),
+      floatingActionButton: const WhatsAppFAB(phone:  "8801711781111"),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

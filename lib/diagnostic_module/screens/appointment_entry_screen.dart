@@ -1320,7 +1320,7 @@ getAppointSerialNumber() async {
                                 },
                                 child: Row(
                                   children: [
-                                    const Text("No"),
+                                    const Text("No:"),
                                     Transform.scale(
                                       scale: 0.8,
                                       child: Radio(
@@ -1348,14 +1348,14 @@ getAppointSerialNumber() async {
                         onTap: () async {
                           Utils.closeKeyBoard(context);
                           print("Tapped Save");
-                          // if (_customerNameController.text == '') {
-                          //   Utils.showTopSnackBar(context, "Customer name is required");
-                          //   return;
-                          // }
-                          // if (_regionController.text == '') {
-                          //   Utils.showTopSnackBar(context, "Please Select Region");
-                          //   return;
-                          // }
+                          if (_nameController.text == '') {
+                            Utils.showTopSnackBar(context, "Patient name is required");
+                            return;
+                          }
+                          if (_mobileController.text == '') {
+                            Utils.showTopSnackBar(context, "Patient mobile is required");
+                            return;
+                          }
                           // if (_territoryController.text == '') {
                           //   Utils.showTopSnackBar(context, "Please Select Territory");
                           //   return;
@@ -1380,6 +1380,10 @@ getAppointSerialNumber() async {
                           //   Utils.showTopSnackBar(context, "Account No. field is required");
                           //   return;
                           // }
+                           _patientController.text = "";
+    _doctorNameController.text = "";
+    _mobileController.text = "";
+    _nameController.text = "";
                           setState(() {
                             addAppointmentBtnClk = true;
                           });

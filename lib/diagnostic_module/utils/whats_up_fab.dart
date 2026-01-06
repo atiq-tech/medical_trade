@@ -3,7 +3,10 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class WhatsAppFAB extends StatelessWidget {
-  const WhatsAppFAB({super.key});
+  const WhatsAppFAB({super.key, this.phone});
+
+  /// country code সহ number দিন (8801xxxxxxx)
+  final String? phone;
 
   @override
   Widget build(BuildContext context) {
@@ -11,7 +14,7 @@ class WhatsAppFAB extends StatelessWidget {
       elevation: 9,
       backgroundColor: Colors.transparent,
       onPressed: () {
-        WhatsAppHelper.launchWhatsApp();
+        WhatsAppHelper.launchWhatsApp(phone: phone);
       },
       child: ClipOval(
         child: Image.asset(
@@ -25,18 +28,23 @@ class WhatsAppFAB extends StatelessWidget {
   }
 }
 
+
 class WhatsAppHelper {
-  static Future<void> launchWhatsApp() async {
-    const String url = "https://web.whatsapp.com/";
-    //const String url = "https://wa.me/";
-    final uri = Uri.parse(url);
-    if (await canLaunchUrl(uri)) {
+  static Future<void> launchWhatsApp({String? phone}) async {
+    final String url = phone == null || phone.isEmpty
+        ? "https://wa.me/"
+        : "https://wa.me/$phone";
+
+    final Uri uri = Uri.parse(url);
+
+    try {
       await launchUrl(
         uri,
         mode: LaunchMode.externalApplication,
       );
-    } else {
-      throw 'Could not launch WhatsApp';
+    } catch (e) {
+      debugPrint("WhatsApp launch failed: $e");
     }
   }
 }
+

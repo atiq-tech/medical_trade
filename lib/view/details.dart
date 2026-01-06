@@ -169,7 +169,7 @@ class _DetailsState extends State<Details> {
           SizedBox(width: 8.w),
         ],
       ),
-      floatingActionButton: const WhatsAppFAB(),
+      floatingActionButton: const WhatsAppFAB(phone:  "8801711781111"),
       body: Padding(
         padding: EdgeInsets.only(left: 8.w, right: 8.w, top: 8.h, bottom: 20.h),
         child: Padding(

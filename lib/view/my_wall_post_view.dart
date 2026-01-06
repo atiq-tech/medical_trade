@@ -26,6 +26,7 @@ class MyWallPostView extends StatefulWidget {
 class _MyWallPostViewState extends State<MyWallPostView> {
   bool showLogoutButton = false;
   String? userName;
+  String? name;
   String? userImageName;
 
   @override
@@ -33,11 +34,13 @@ class _MyWallPostViewState extends State<MyWallPostView> {
     super.initState();
     final box = GetStorage();
     userName = box.read('username');
+    name = box.read('name');
     userImageName = box.read('image');
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<WallPostApiProvider>(context, listen: false).fetchWallData();
       Provider.of<ContactProvider>(context, listen: false).fetchContact();
     });
+    print("User Image Name: $userImageName");
   }
 
   @override
@@ -102,29 +105,26 @@ class _MyWallPostViewState extends State<MyWallPostView> {
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(45.r),
                             child: userImageName != null &&
-                                    userImageName.toString().isNotEmpty &&
-                                    userImageName != 'null'
-                                ? Image.network(
-                                    'https://app.madicaltrade.com/uploads/customers/$userImageName',
-                                    fit: BoxFit.cover,
-                                    errorBuilder: (context, error, stackTrace) {
-                                      return Image.asset(
-                                        ImageAssets.person,
-                                        fit: BoxFit.cover,
-                                      );
-                                    },
-                                  )
-                                : Image.asset(
+                                userImageName.toString().isNotEmpty &&
+                                userImageName != 'null'
+                            ? Image.network(
+                                'https://app.medicaltradeltd.com/$userImageName',
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Image.asset(
                                     ImageAssets.person,
                                     fit: BoxFit.cover,
-                                  ),
+                                  );
+                                },
+                              )
+                            : Image.asset(ImageAssets.person,fit: BoxFit.cover),
                           ),
                         ),
                         SizedBox(
                           width: 100.w,
                           child: Center(
                             child: Text(
-                              userName ?? "Unknown User",
+                              name ?? "Unknown User",
                               maxLines: 1,
                               style: TextStyle(
                                 fontSize: 11.sp,
@@ -306,7 +306,7 @@ class _MyWallPostViewState extends State<MyWallPostView> {
         ],
       ),
       drawer: const CustomDrawer(),
-      floatingActionButton: const WhatsAppFAB(),
+      floatingActionButton: const WhatsAppFAB(phone:  "8801711781111"),
       body: Padding(
         padding: EdgeInsets.only(left: 8.w,right: 12.w,top: 8.h),
         child: Padding(

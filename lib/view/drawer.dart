@@ -3,6 +3,7 @@ import 'package:get_storage/get_storage.dart';
 import 'package:medical_trade/diagnostic_module/screens/bank_transaction_report_screen.dart';
 import 'package:medical_trade/diagnostic_module/screens/cash_transaction_report_screen.dart';
 import 'package:medical_trade/diagnostic_module/screens/diagnostic_module_screen.dart';
+import 'package:medical_trade/utilities/color_manager.dart';
 import 'package:medical_trade/view/auth/profile_screen.dart';
 import 'package:medical_trade/view/engineering_support.dart';
 import 'package:medical_trade/view/sales_your_old_machine_view.dart';
@@ -39,6 +40,7 @@ class CustomDrawer extends StatefulWidget {
 class _CustomDrawerState extends State<CustomDrawer> {
   String? role;
   String? userName;
+  String? name;
   bool _isDiagnosticOpen = false;
 
   final List<String> diagnosticTitles = [
@@ -61,6 +63,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
     super.initState();
     final box = GetStorage();
     userName = box.read('username');
+    name = box.read('name');
     role = box.read('role');
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -87,6 +90,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
                 height: AppSize.s150.h,
                 width: double.infinity,
                 padding: EdgeInsets.only(left: AppPadding.p12.w),
+                color: ColorManager.appbarColor,
                 child: Row(
                   children: [
                     CircleAvatar(
@@ -107,7 +111,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
                                 fontWeight: FontWeight.bold),
                           ),
                           Text(
-                            userName ?? "Unknown User",
+                            name ?? "Unknown User",
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(fontSize: 12.sp),
