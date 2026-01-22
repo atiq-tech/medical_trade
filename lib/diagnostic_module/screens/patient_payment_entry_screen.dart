@@ -448,9 +448,9 @@ getMadicinePatientDue(String? patientId) async {
                     width: double.infinity,
                     margin: EdgeInsets.only(bottom: 10.h),
                     decoration: BoxDecoration(
-                      color: Colors.blue.shade200,
+                      color: const Color.fromARGB(255, 211, 214, 163),
                       borderRadius: BorderRadius.circular(10.r),
-                      border: Border.all(color: const Color.fromARGB(255,7,125,180),width: 1.w),
+                      border: Border.all(color: const Color.fromARGB(255, 151, 156, 102),width: 1.w),
                       boxShadow: [
                         // ignore: deprecated_member_use
                         BoxShadow(color: Colors.grey.withOpacity(0.6),spreadRadius: 2.r,blurRadius: 5.r,offset: Offset(0, 3)),
@@ -467,7 +467,7 @@ getMadicinePatientDue(String? patientId) async {
                             child: Container(
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.only(topLeft: Radius.circular(6.r),topRight: Radius.circular(6.r)),
-                                color: Color.fromARGB(255, 0, 64, 160),
+                                color: const Color.fromARGB(255, 87, 92, 1),
                               ),
                               child: Center(child: Text('Patient Payment Information',style:TextStyle(fontWeight:FontWeight.bold, fontSize: 16.sp, color: Colors.white))),
                             ),
@@ -943,7 +943,7 @@ getMadicinePatientDue(String? patientId) async {
                         child: DataTable(
                           headingRowHeight: 20.0,
                           dataRowHeight: 20.0,
-                          headingRowColor: WidgetStateColor.resolveWith((states) => Color.fromARGB(255, 0, 64, 160),),
+                          headingRowColor: WidgetStateColor.resolveWith((states) => const Color.fromARGB(255, 87, 92, 1),),
                           showCheckboxColumn: true,
                           border: TableBorder.all(color: Colors.grey.shade400, width: 1),
                           columns: [

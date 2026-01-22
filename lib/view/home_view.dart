@@ -73,6 +73,7 @@ getDoctorCode() async {
     print("doctorId ERROR =======> $e");
   }
 }
+
   @override
   void initState(){
     getDoctorCode();
@@ -84,10 +85,6 @@ getDoctorCode() async {
     CategoryProvider.isAllCategoriesLoading = true;
     Provider.of<CategoryProvider>(context, listen: false).getCategories();
     print("role ========== $role");
-    final access1 = PermissionHelper.engineerSupport();
-    final access2 = PermissionHelper.saleYourOldMachine();
-    print("Engineer Access ======= $access1");
-    print("Sales Old Machine Access ======= $access2");
   }
 
   @override

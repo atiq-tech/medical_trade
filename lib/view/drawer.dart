@@ -124,17 +124,20 @@ class _CustomDrawerState extends State<CustomDrawer> {
               ),
           
               Divider(height: 0.5.h),
-          
               /// ================= MY PAGE =================
               _drawerItem(
                 icon: Icons.home,
                 title: "My Page",
-                onTap: () =>
-                    Navigator.pushNamed(context, RoutesName.home),
+                onTap: () => Navigator.pushNamed(context, RoutesName.home),
               ),
-          
               Divider(height: 0.5.h),
-          
+              /// ================= Wall Post PAGE =================
+              _drawerItem(
+                icon: Icons.wallpaper,
+                title: "Wall Post Page",
+                onTap: () => Navigator.pushNamed(context, RoutesName.myWallPost),
+              ),
+              Divider(height: 0.5.h),
               /// ================= ENGINEERING SUPPORT =================
               _drawerItem(
                 icon: Icons.build,
@@ -148,12 +151,6 @@ class _CustomDrawerState extends State<CustomDrawer> {
                     } else {
                       showWarningDialog(context);
                     }
-
-                  // final access = await PermissionHelper.engineerSupport();
-                  // access == "true"
-                  //     ? Navigator.pushNamed(
-                  //         context, RoutesName.engineeringSupport)
-                  //     : showWarningDialog(context);
                 },
               ),
               Divider(height: 0.5.h),
@@ -170,9 +167,6 @@ class _CustomDrawerState extends State<CustomDrawer> {
                     } else {
                       showWarningDialog(context);
                     }
-                  // access == "true"
-                  //     ? Navigator.pushNamed(context, RoutesName.salesOldMachine)
-                  //     : showWarningDialog(context);
                 },
               ),
               Divider(height: 0.5.h),  

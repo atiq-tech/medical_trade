@@ -49,12 +49,12 @@ class _DiagnosticModuleScreenState extends State<DiagnosticModuleScreen> {
       {
         'title': 'Test Entry',
         'icon': DiagnosticModule.testEntry,
-        'color': Colors.orange,
+        'color': Colors.orange.shade300,
       },
       {
         'title': 'Doctor List',
         'icon': DiagnosticModule.doctorList,
-        'color': Colors.blue,
+        'color': Colors.green,
       },
       {
         'title': 'Patient List',
@@ -84,7 +84,7 @@ class _DiagnosticModuleScreenState extends State<DiagnosticModuleScreen> {
        {
         'title': 'Patient Payment',
         'icon': DiagnosticModule.patientPay,
-        'color': const Color.fromARGB(255, 1, 160, 192),
+        'color': const Color.fromARGB(255, 122, 129, 17),
       },
        {
         'title': 'Cash Transaction Report',
