@@ -28,15 +28,12 @@ class WhatsAppFAB extends StatelessWidget {
   }
 }
 
-
 class WhatsAppHelper {
   static Future<void> launchWhatsApp({String? phone}) async {
     final String url = phone == null || phone.isEmpty
         ? "https://wa.me/"
         : "https://wa.me/$phone";
-
     final Uri uri = Uri.parse(url);
-
     try {
       await launchUrl(
         uri,

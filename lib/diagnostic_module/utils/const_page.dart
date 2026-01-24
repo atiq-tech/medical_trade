@@ -8,7 +8,6 @@
     {"name": "Order Record", "image": "assets/corecord.png"},
     {"name": "Pending Order", "image": "assets/porder.png"},
     {"name": "Delivery Order", "image": "assets/dorder.png"},
-    //{"name": "Order Invoice", "image": "assets/coinv.png"},
     {"name": "Customer Payment ", "image": "assets/ccpay.png"},
     {"name": "Supplier Payment ", "image": "assets/cspay.png"},
     {"name": "Customer Ledger", "image": "assets/ccled.png"},

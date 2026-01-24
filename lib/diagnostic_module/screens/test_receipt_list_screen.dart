@@ -171,19 +171,12 @@ class _TestReceiptListScreenState extends State<TestReceiptListScreen> {
    emtyMethod() {
     setState(() {
       customerController.text= "";
-      //_selectedCustomer="";
       customerId="";
     });
   }
 
-  //String? _selectedCustomer;
   var data;
-  // int? decimal = 0;
-  // SharedPreferences? sharedPreferences;
-  // Future<void> _initializeData() async {
-  //   sharedPreferences = await SharedPreferences.getInstance();
-  //   decimal = int.parse("${sharedPreferences?.getString('decimal')}");
-  // }
+
 
   @override
   void initState() {
@@ -192,11 +185,6 @@ class _TestReceiptListScreenState extends State<TestReceiptListScreen> {
     backEndFirstDate = Utils.formatBackEndDate(DateTime.now());
     secondPickedDate = Utils.formatFrontEndDate(DateTime.now());
     backEndSecondtDate = Utils.formatBackEndDate(DateTime.now());
-    //_initializeData();
-    ///Get customers due
-    // Provider.of<CustomerDueProvider>(context, listen: false).customerDueList = [];
-    // ///Get customers
-    // Provider.of<AllCustomerProvider>(context, listen: false).getCustomerList(context, customerType: "");
     super.initState();
   }
 
@@ -206,11 +194,6 @@ class _TestReceiptListScreenState extends State<TestReceiptListScreen> {
   double? totalCustomerDue;
   @override
   Widget build(BuildContext context) {
-    ///Get customers
-  //   final allCustomerData = Provider.of<AllCustomerProvider>(context).customerList.where((element) => element.code != "").toList();
-  //   ///Get customers due
-  //  final allCustomerDueData = Provider.of<CustomerDueProvider>(context).customerDueList.where((element) => double.parse(element.dueAmount) != 0).toList();
-  //   totalCustomerDue = allCustomerDueData.map((e) => e.dueAmount).fold(0.0, (p, element) => p!+double.parse(element));
     return Scaffold(
       appBar:AppBar(
       backgroundColor: ColorManager.appbarColor,
