@@ -22,12 +22,10 @@
 //   @override
 //   State<TestReceiptScreen> createState() => _TestReceiptScreenState();
 // }
-
 // class _TestReceiptScreenState extends State<TestReceiptScreen> {
 //   Color getColors(Set<WidgetState> states) {
 //     return Colors.deepPurple.shade100;
 //   }
-
 //   Color getColor(Set<WidgetState> states) {
 //     return Colors.white;
 //   }

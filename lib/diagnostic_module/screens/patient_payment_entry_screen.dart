@@ -1139,15 +1139,6 @@ getMadicinePatientDue(String? patientId) async {
 bool patientPayBtnClk = false;
 Future<String> patientPayEntry(BuildContext context) async {
   String link = AppUrl.addPatientPayEndPoint;
-  print("patientPayCode=>> $patientPayCode");
-  print("_selectedPatientId=>> $_selectedPatientId");
-  print("getPaymentType=>> $getPaymentType");
-  print("_selectedBankAccount=>> $_selectedBankAccount");
-  print("paymentType=>> $paymentType");
-  print("dueAmmount=>> $dueAmmount");
-  print("backEndFirstDate=>> $backEndFirstDate");
-  print("_descriptionController.text.trim()=>> ${_descriptionController.text.trim()}");
-  print("_amountController.text.trim()=>> ${_amountController.text.trim()}");
   try {
     final token = getToken();
     var response = await Dio().post(link,

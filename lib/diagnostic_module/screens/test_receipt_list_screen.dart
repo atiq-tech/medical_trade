@@ -339,7 +339,6 @@ class _TestReceiptListScreenState extends State<TestReceiptListScreen> {
                             //       });
                             //    },
                             //  ),
-
                                 ),
                               ),
                             ],
@@ -436,7 +435,6 @@ class _TestReceiptListScreenState extends State<TestReceiptListScreen> {
                               : _searchType == "All"
                               ? data = 'all' : '';
                           });
-
                       // CustomerDueProvider().on();
                       // Provider.of<CustomerDueProvider>(context, listen: false).getCustomerDue(
                       //   customerId: _selectedCustomer ?? '',
@@ -537,7 +535,6 @@ class _TestReceiptListScreenState extends State<TestReceiptListScreen> {
         //      ),
         //    ),
         //  ):const Align(alignment: Alignment.center,child: Center(child: Text("No Data Found",style:AllTextStyle.nofoundTextStyle))),
-       
         ],
       ),
     );

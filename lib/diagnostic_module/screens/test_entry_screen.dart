@@ -451,11 +451,7 @@ class _TestEntryScreenState extends State<TestEntryScreen> {
                       ),
                       child: Center(
                         child: testEntryBtnClk
-                            ? SizedBox(
-                                height: 20.0.h,
-                                width: 20.0.w,
-                                child: CircularProgressIndicator(color: Colors.white),
-                              )
+                            ? SizedBox(height: 20.0.h,width: 20.0.w,child: CircularProgressIndicator(color: Colors.white))
                             : Text("SAVE", style: AllTextStyle.saveButtonTextStyle),
                       ),
                     ),
