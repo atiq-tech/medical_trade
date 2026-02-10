@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:medical_trade/controller/add_requirement_post_api.dart';
 import 'package:medical_trade/controller/client_wall_product_buy_api.dart';
 import 'package:medical_trade/controller/contact_api.dart';
 import 'package:medical_trade/controller/customer_product_buy_api.dart';
@@ -107,6 +108,7 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider<NewClientPostProvider>(create: (_) => NewClientPostProvider()),
         ChangeNotifierProvider<AvailableSlotsProvider>(create: (_) => AvailableSlotsProvider()),
         ChangeNotifierProvider<PatientPaymentProvider>(create: (_) => PatientPaymentProvider()),
+        ChangeNotifierProvider<AddRequirementProvider>(create: (_) => AddRequirementProvider()),
         ChangeNotifierProvider<CashTransactionProvider>(create: (_) => CashTransactionProvider()),
         ChangeNotifierProvider<BankTransactionProvider>(create: (_) => BankTransactionProvider()),
         ChangeNotifierProvider<CommissionPaymentProvider>(create: (_) => CommissionPaymentProvider()),

@@ -98,6 +98,7 @@ class AppUrl {
   static var getAppointmentTrIDEndPoint = '$baseUrl/get-appointment-tr-id';
   static var getAppointSerialNumberEndPoint = '$baseUrl/get-appointment-serial-number';
   static var addAppointmentEndPoint = '$baseUrl/add-appointment';
+  static var addRequirementEndPoint = '$baseUrl/add-requirement';
 
   //end
 }

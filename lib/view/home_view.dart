@@ -18,6 +18,7 @@ import 'package:medical_trade/utilities/font_manager.dart';
 import 'package:medical_trade/view/auth/login_register_auth.dart';
 import 'package:medical_trade/view/details.dart';
 import 'package:medical_trade/view/engineering_support.dart';
+import 'package:medical_trade/view/my_requirement_view.dart';
 import 'package:medical_trade/view/my_wall_post_view.dart';
 import 'package:medical_trade/view/sales_your_old_machine_view.dart';
 import 'package:provider/provider.dart';
@@ -121,6 +122,12 @@ getDoctorCode() async {
         'title': 'Sales Your Machine',
         'icon': ImageAssets.oldMachineTwo,
         'page': const SalesYourOldMachineView(),
+        'requireLogin': true,
+      },
+      {
+        'title': 'My Requirement',
+        'icon': ImageAssets.regalSupport,
+        'page': const MyRequirementView(),
         'requireLogin': true,
       },
     ];
