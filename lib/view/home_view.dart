@@ -5,7 +5,6 @@ import 'package:get_storage/get_storage.dart';
 import 'package:medical_trade/config/app_url.dart';
 import 'package:medical_trade/controller/contact_api.dart';
 import 'package:medical_trade/diagnostic_module/screens/diagnostic_module_screen.dart';
-import 'package:medical_trade/diagnostic_module/utils/permission_helper.dart';
 import 'package:medical_trade/diagnostic_module/utils/utils.dart';
 import 'package:medical_trade/diagnostic_module/utils/whats_up_fab.dart';
 import 'package:medical_trade/new_part/providers/category_provider.dart';
@@ -144,12 +143,7 @@ getDoctorCode() async {
       floatingActionButton: const WhatsAppFAB(phone:  "8801711781111"),
       body: SingleChildScrollView(
         child: Padding(
-          padding: EdgeInsets.only(
-            left: 15.w,
-            right: 15.w,
-            top: 15.h,
-            bottom: 75.h,
-          ),
+          padding: EdgeInsets.only(left: 15.w,right: 15.w,top: 15.h,bottom: 75.h),
           child: GridView.builder(
             physics: const NeverScrollableScrollPhysics(),
             shrinkWrap: true,
@@ -161,15 +155,12 @@ getDoctorCode() async {
               childAspectRatio: 1.2,
             ),
             itemBuilder: (context, index) {
-
               /// ================= CATEGORY SECTION =================
               if (index < allCategoriesData.length) {
                 final category = allCategoriesData[index];
-
                 return InkWell(
                   onTap: () {
-                    Navigator.push(context,
-                     MaterialPageRoute(builder: (context) => Details(item: category)),
+                    Navigator.push(context,MaterialPageRoute(builder: (context) => Details(item: category)),
                   );
                   },
                   child: CustomContainerOne(
@@ -193,71 +184,12 @@ getDoctorCode() async {
 
                   /// 🔹 Engineering Support (permission)
                   if (title == 'Engineering Support') {
-                    final access = await PermissionHelper.engineerSupport();
-                    if (access == "true" || role == "Admin" || role == "Super Admin") {
-                      Navigator.push(context,
-                        MaterialPageRoute(builder: (_) =>const EngineeringSupport()),
-                      );
-                    } else {
-                      showWarningDialog(context);
-                    }
+                    Navigator.push(context,MaterialPageRoute(builder: (_) =>const EngineeringSupport()));
                   }
                   /// 🔹 Engineering Support (permission)
                   else if (title == 'Sales Your Machine') {
-                     final access = await PermissionHelper.saleYourOldMachine();
-                    if (access == "true"|| role == "Admin" || role == "Super Admin") {
-                      Navigator.push(context,
-                        MaterialPageRoute(builder: (_) =>const SalesYourOldMachineView()),
-                      );
-                    } else {
-                      showWarningDialog(context);
-                    }
+                    Navigator.push(context,MaterialPageRoute(builder: (_) =>const SalesYourOldMachineView()));
                   }
-
-                  /// 🔹 Sales Your Old Machine (login + permission)
-                 // else if (title == 'Sales Your Old Machine') {
-                    // if (token == null) {
-                    //   showDialog(
-                    //     context: context,
-                    //     builder: (_) => AlertDialog(
-                    //       title: const Text('Please Register'),
-                    //       content: const Text(
-                    //           'You need to register or log in to access this feature.'),
-                    //       actions: [
-                    //         TextButton(
-                    //           onPressed: () {
-                    //             Navigator.pushNamed(
-                    //                 context, RoutesName.login);
-                    //           },
-                    //           child:
-                    //               const Text('Register / Log In'),
-                    //         ),
-                    //         TextButton(
-                    //           onPressed: () =>
-                    //               Navigator.pop(context),
-                    //           child: const Text('Cancel'),
-                    //         ),
-                    //       ],
-                    //     ),
-                    //   );
-                    //   return;
-                    // }
-
-                  //   final access =
-                  //       await PermissionHelper.saleYourOldMachine();
-                  //   if (access == "true"|| role == "Admin" || role == "Super Admin") {
-                  //     Navigator.push(
-                  //       context,
-                  //       MaterialPageRoute(
-                  //           builder: (_) =>
-                  //               const SalesYourOldMachineView()),
-                  //     );
-                  //   } else {
-                  //     showWarningDialog(context);
-                  //   }
-                  // }
-
-                  /// 🔹 Diagnostic Module (no permission)
                   else {
                     Navigator.push(context,MaterialPageRoute(builder: (_) => item['page']),
                     );

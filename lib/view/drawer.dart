@@ -6,6 +6,7 @@ import 'package:medical_trade/diagnostic_module/screens/diagnostic_module_screen
 import 'package:medical_trade/utilities/color_manager.dart';
 import 'package:medical_trade/view/auth/profile_screen.dart';
 import 'package:medical_trade/view/engineering_support.dart';
+import 'package:medical_trade/view/my_requirement_view.dart';
 import 'package:medical_trade/view/sales_your_old_machine_view.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -142,15 +143,8 @@ class _CustomDrawerState extends State<CustomDrawer> {
               _drawerItem(
                 icon: Icons.build,
                 title: "Engineering Support",
-                onTap: () async {
-                  final access = await PermissionHelper.engineerSupport();
-                  if (access == "true" || role == "Admin" || role == "Super Admin") {
-                      Navigator.push(context,
-                        MaterialPageRoute(builder: (_) =>const EngineeringSupport()),
-                      );
-                    } else {
-                      showWarningDialog(context);
-                    }
+                onTap: () {
+                  Navigator.push(context,MaterialPageRoute(builder: (_) =>const EngineeringSupport()));
                 },
               ),
               Divider(height: 0.5.h),
@@ -159,14 +153,16 @@ class _CustomDrawerState extends State<CustomDrawer> {
                 icon: Icons.monetization_on,
                 title: "Sales Your Machine",
                 onTap: () async {
-                  final access = await PermissionHelper.saleYourOldMachine();
-                  if (access == "true" || role == "Admin" || role == "Super Admin") {
-                      Navigator.push(context,
-                        MaterialPageRoute(builder: (_) =>const SalesYourOldMachineView()),
-                      );
-                    } else {
-                      showWarningDialog(context);
-                    }
+                   Navigator.push(context,MaterialPageRoute(builder: (_) =>const SalesYourOldMachineView()));
+                },
+              ),
+                Divider(height: 0.5.h),
+              /// ================= SALES OLD MACHINE =================
+              _drawerItem(
+                icon: Icons.work_history,
+                title: "My Requirement",
+                onTap: () async {
+                   Navigator.push(context,MaterialPageRoute(builder: (_) =>const MyRequirementView()));
                 },
               ),
               Divider(height: 0.5.h),  

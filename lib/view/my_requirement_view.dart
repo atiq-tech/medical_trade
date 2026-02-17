@@ -1,9 +1,10 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:medical_trade/controller/engineering_support_post_api.dart';
+import 'package:medical_trade/controller/add_requirement_post_api.dart';
 import 'package:medical_trade/diagnostic_module/utils/whats_up_fab.dart';
 import 'package:medical_trade/utilities/custom_appbar.dart';
+import 'package:medical_trade/utilities/custom_message.dart';
 import 'package:medical_trade/utilities/custom_textfrom_field_two.dart';
 import 'package:medical_trade/utilities/values_manager.dart';
 import 'package:provider/provider.dart';
@@ -73,7 +74,7 @@ class _MyRequirementViewState extends State<MyRequirementView> {
 
   @override
   Widget build(BuildContext context) {
-    final supportProvider = Provider.of<EngineeringSupportProvider>(context);
+    final requirementProvider = Provider.of<AddRequirementProvider>(context);
     return Scaffold(
       appBar: CustomAppBar(
         onTap: () {
@@ -206,37 +207,29 @@ class _MyRequirementViewState extends State<MyRequirementView> {
                             alignment: AlignmentDirectional.centerEnd,
                             child: InkWell(
                               onTap: () async {
-                                // if (_machineNameController.text.isEmpty ||
-                                //     _modelController.text.isEmpty ||
-                                //     _mobileController.text.isEmpty ||
-                                //     _machineDetailsController.text.isEmpty ||
-                                //     _originController.text.isEmpty ||
-                                //     _imagesList.isEmpty) {
-                                //   CustomToast.show(
-                                //       context: context,
-                                //       text: "Please fill all fields and select images.",
-                                //       isSuccess: false);
-                                //   return;
-                                // }
-                                // List<File> images = _imagesList.map((e) => File(e.path)).toList();
-                                // await supportProvider.saveSupportData(
-                                //   images: images,
-                                //   model: _modelController.text,
-                                //   origin: _originController.text,
-                                //   context: context,
-                                //   machineName: _machineNameController.text,
-                                //   mobile: _mobileController.text,
-                                //   machineDetails:_machineDetailsController.text,
-                                //   onSuccess: () {
-                                //     _machineNameController.clear();
-                                //     _modelController.clear();
-                                //     _originController.clear();
-                                //     _mobileController.clear();
-                                //     _machineDetailsController.clear();
-                                //     _imagesList.clear();
-                                //     debugPrint("Image list length: ${_imagesList.length}");
-                                //   },
-                                // );
+                                if (_nameController.text.isEmpty ||
+                                    _phoneNoController.text.isEmpty ||
+                                    _descriptionController.text.isEmpty ||
+                                    _addressController.text.isEmpty) {
+                                  CustomToast.show(
+                                      context: context,
+                                      text: "Please fill all fields and select images.",
+                                      isSuccess: false);
+                                  return;
+                                }
+                                await requirementProvider.addRequirement(
+                                  name: _nameController.text,
+                                  mobile: _phoneNoController.text,
+                                  address: _addressController.text,
+                                  context: context,
+                                  description: _descriptionController.text,
+                                  onSuccess: () {
+                                    _nameController.clear();
+                                    _phoneNoController.clear();
+                                    _addressController.clear();
+                                    _descriptionController.clear();
+                                  },
+                                );
                               },
                               child: Container(
                                 height: 30.h,
@@ -255,7 +248,7 @@ class _MyRequirementViewState extends State<MyRequirementView> {
                                 ),
                                 padding: EdgeInsets.symmetric(vertical: 6.h),
                                 child: Center(
-                                  child: supportProvider.isLoading
+                                  child: requirementProvider.isLoading
                                     ? SizedBox(
                                         width: 15.w,
                                         height: 15.h,
