@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:medical_trade/controller/add_others_post_api.dart';
 import 'package:medical_trade/controller/add_requirement_post_api.dart';
 import 'package:medical_trade/controller/client_wall_product_buy_api.dart';
 import 'package:medical_trade/controller/contact_api.dart';
@@ -99,6 +100,7 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider<CategoryProvider>(create: (_) => CategoryProvider()),
         ChangeNotifierProvider<PatientsProvider>(create: (_) => PatientsProvider()),
         ChangeNotifierProvider<AccountsProvider>(create: (_) => AccountsProvider()),
+        ChangeNotifierProvider<AddOthersPostApi>(create: (_) => AddOthersPostApi()),
         ChangeNotifierProvider<TestEntryProvider>(create: (_) => TestEntryProvider()),
         ChangeNotifierProvider<SpecimensProvider>(create: (_) => SpecimensProvider()),
         ChangeNotifierProvider<DepartmentProvider>(create: (_) => DepartmentProvider()),

@@ -22,56 +22,6 @@ class _MyRequirementViewState extends State<MyRequirementView> {
   final TextEditingController _addressController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
 
-// final List<XFile> _imagesList = [];
-// void _pickImage() async {
-//   showDialog(
-//     context: context,
-//     builder: (context) {
-//       return AlertDialog(
-//         shape: RoundedRectangleBorder(
-//           borderRadius: BorderRadius.circular(15),
-//         ),
-//         title: Text("Select Image Option"),
-//         content: Column(
-//           mainAxisSize: MainAxisSize.min,
-//           children: [
-//             ListTile(
-//               leading: Icon(Icons.camera_alt),
-//               title: Text("Camera"),
-//               onTap: () async {
-//                 Navigator.pop(context);
-//                 final XFile? photo = await ImagePicker().pickImage(
-//                   source: ImageSource.camera,
-//                 );
-//                 if (photo != null) {
-//                   setState(() {
-//                     // _imagesList.clear(); 
-//                     _imagesList.add(photo);
-//                   });
-//                 }
-//               },
-//             ),
-//             ListTile(
-//               leading: Icon(Icons.photo_library),
-//               title: Text("Gallery"),
-//               onTap: () async {
-//                 Navigator.pop(context);
-//                 final pickedFiles = await ImagePicker().pickMultiImage();
-//                 if (pickedFiles.isNotEmpty) {
-//                   setState(() {
-//                     _imagesList.clear();
-//                     _imagesList.addAll(pickedFiles);
-//                   });
-//                 }
-//               },
-//             ),
-//           ],
-//         ),
-//       );
-//     },
-//   );
-// }
-
   @override
   Widget build(BuildContext context) {
     final requirementProvider = Provider.of<AddRequirementProvider>(context);
@@ -184,7 +134,7 @@ class _MyRequirementViewState extends State<MyRequirementView> {
                                 child: TextFormField(
                                   controller: _descriptionController,
                                   keyboardType: TextInputType.multiline,
-                                  maxLines: 4,
+                                  maxLines: 8,
                                   style: TextStyle(fontSize: 12.sp),
                                   decoration: InputDecoration(
                                     hintText: "Enter Description",
@@ -213,7 +163,7 @@ class _MyRequirementViewState extends State<MyRequirementView> {
                                     _addressController.text.isEmpty) {
                                   CustomToast.show(
                                       context: context,
-                                      text: "Please fill all fields and select images.",
+                                      text: "Please fill all fields",
                                       isSuccess: false);
                                   return;
                                 }
@@ -232,7 +182,7 @@ class _MyRequirementViewState extends State<MyRequirementView> {
                                 );
                               },
                               child: Container(
-                                height: 30.h,
+                                height: 25.h,
                                 width: 60.w,
                                 decoration: BoxDecoration(
                                   color: const Color.fromARGB(255, 34, 139, 34), 

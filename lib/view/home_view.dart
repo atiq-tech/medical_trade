@@ -19,6 +19,7 @@ import 'package:medical_trade/view/details.dart';
 import 'package:medical_trade/view/engineering_support.dart';
 import 'package:medical_trade/view/my_requirement_view.dart';
 import 'package:medical_trade/view/my_wall_post_view.dart';
+import 'package:medical_trade/view/others_view.dart';
 import 'package:medical_trade/view/sales_your_old_machine_view.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -128,6 +129,12 @@ getDoctorCode() async {
         'icon': ImageAssets.regalSupport,
         'page': const MyRequirementView(),
         'requireLogin': true,
+      },
+      {
+        'title': 'Others',
+        'icon': ImageAssets.others,
+        'page': const OthersView(),
+        'requireLogin': false,
       },
     ];
 

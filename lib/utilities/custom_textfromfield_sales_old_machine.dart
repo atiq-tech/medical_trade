@@ -48,7 +48,7 @@ class CustomTextfromfieldSalesOldMachine extends StatelessWidget {
         Expanded(
           flex: 8,
           child: Container(
-            height: 30.h,
+            height: 25.h,
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(AppSize.s5.r),
