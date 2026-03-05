@@ -305,7 +305,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:medical_trade/controller/add_others_post_api.dart';
-import 'package:medical_trade/controller/get_client_post_api.dart';
 import 'package:medical_trade/controller/get_district_api.dart';
 import 'package:medical_trade/controller/get_division_api.dart';
 import 'package:medical_trade/diagnostic_module/utils/whats_up_fab.dart';
@@ -860,7 +859,7 @@ class _OthersViewState extends State<OthersView> {
                                   );
                             },
                             child: Container(
-                              height: 25.h,
+                              height: 28.h,
                               width: 60.w,
                               decoration: BoxDecoration(
                                 color: Colors.blue.shade900,
@@ -878,7 +877,7 @@ class _OthersViewState extends State<OthersView> {
                               padding: EdgeInsets.symmetric(vertical: 6.h),
                               child: Center(
                                 child: context
-                                        .watch<GetClientPostProvider>()
+                                        .watch<AddOthersPostApi>()
                                         .isLoading
                                     ? SizedBox(
                                         width: 15.w,

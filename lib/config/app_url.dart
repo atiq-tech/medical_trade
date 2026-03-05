@@ -1,8 +1,8 @@
 class AppUrl {
   //static var baseUrl = 'https://soft.madicaltrade.com';//sub
-  static var baseUrl = 'https://app.medicaltradeltd.com/api/v1';//sub
+  //static var baseUrl = 'https://app.medicaltradeltd.com/api/v1';//sub
   static var newImageUrl = 'https://app.medicaltradeltd.com/';//sub
-  //static var baseUrl = 'https://medicaltradeltd.com'; //main
+  static var baseUrl = 'https://medicaltradeltd.com/api/v1'; //main
   static var baseImageUrl = 'https://soft.madicaltrade.com/uploads/products/';
   static var baseImageUrlTwo = 'https://madicaltrade.com/uploads/clientposts/';
   // Login Api
@@ -100,6 +100,8 @@ class AppUrl {
   static var addAppointmentEndPoint = '$baseUrl/add-appointment';
   static var addRequirementEndPoint = '$baseUrl/add-requirement';
   static var addOthersEndPoint = '$baseUrl/add-other-entry';
+  static var userRecordEndPoint = '$baseUrl/get-user-record';
+  
 
   //end
 }

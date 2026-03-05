@@ -7,7 +7,9 @@ import 'package:medical_trade/utilities/color_manager.dart';
 import 'package:medical_trade/view/auth/profile_screen.dart';
 import 'package:medical_trade/view/engineering_support.dart';
 import 'package:medical_trade/view/my_requirement_view.dart';
+import 'package:medical_trade/view/others_view.dart';
 import 'package:medical_trade/view/sales_your_old_machine_view.dart';
+import 'package:medical_trade/view/user_record_view.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -75,6 +77,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
   @override
   Widget build(BuildContext context) {
     return Drawer(
+      width: MediaQuery.of(context).size.width * 0.8,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.only(
           topRight: Radius.circular(AppSize.s50.r),
@@ -163,6 +166,24 @@ class _CustomDrawerState extends State<CustomDrawer> {
                 title: "My Requirement",
                 onTap: () async {
                    Navigator.push(context,MaterialPageRoute(builder: (_) =>const MyRequirementView()));
+                },
+              ),
+              Divider(height: 0.5.h),
+              /// ================= Others =================
+              _drawerItem(
+                icon: Icons.other_houses_sharp,
+                title: "Others",
+                onTap: () async {
+                   Navigator.push(context,MaterialPageRoute(builder: (_) =>const OthersView()));
+                },
+              ),
+              Divider(height: 0.5.h),
+              /// ================= User Record =================
+              _drawerItem(
+                icon: Icons.receipt,
+                title: "User Record",
+                onTap: () async {
+                   Navigator.push(context,MaterialPageRoute(builder: (_) =>const UserRecordView()));
                 },
               ),
               Divider(height: 0.5.h),  
@@ -256,7 +277,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
     return InkWell(
       onTap: () async => _handleDiagnosticNavigation(title),
       child: Padding(
-        padding:EdgeInsets.only(left: 56.w, right: 24.w, top: 0.h, bottom:5.h),
+        padding:EdgeInsets.only(left: 30.w, right: 10.w, top: 0.h, bottom: 5.h),
         child: Row(
           children: [
             Icon(Icons.circle, size: 6.sp),

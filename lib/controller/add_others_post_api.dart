@@ -99,7 +99,7 @@ class AddOthersPostApi with ChangeNotifier {
         }
         CustomToast.show(
           context: context,
-          text: "Data posted successfully",
+          text: "${jsonResp["message"]}",
           isSuccess: true,
         );
         onSuccess();
