@@ -1,9 +1,10 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:medical_trade/config/api_error_service.dart';
-import 'package:medical_trade/config/api_service.dart';
 import 'package:medical_trade/config/app_url.dart';
 import 'package:medical_trade/model/user_record_model.dart';
+
+import 'package:http/http.dart' as http;
+import 'package:get_storage/get_storage.dart';
 
 class UserRecordProvider extends ChangeNotifier {
 
@@ -16,17 +17,21 @@ class UserRecordProvider extends ChangeNotifier {
   String? _errorMessage;
   String? get errorMessage => _errorMessage;
 
-  final ApiService _apiService = ApiService();
-
   Future<void> fetchUserRecord({
     required String dateFrom,
     required String dateTo,
   }) async {
 
     _isLoading = true;
+    _errorMessage = null;
     notifyListeners();
 
-    final url = AppUrl.userRecordEndPoint; 
+    final box = GetStorage();
+    final token = box.read('loginToken');
+
+    print("TOKEN: $token");
+
+    final url = Uri.parse(AppUrl.userRecordEndPoint);
 
     final body = {
       "dateFrom": dateFrom,
@@ -37,33 +42,36 @@ class UserRecordProvider extends ChangeNotifier {
 
     try {
 
-      final response = await _apiService.postFormData(url, body);
+      final response = await http.post(
+        url,
+        headers: {
+          "Authorization": "Bearer $token",
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+        },
+        body: jsonEncode(body),
+      );
 
-      if (response != null && response.statusCode == 200) {
+      print("Status Code: ${response.statusCode}");
+      print("Response Body: ${response.body}");
+
+      if (response.statusCode == 200) {
 
         final Map<String, dynamic> data =
             jsonDecode(response.body);
 
         _userRecord = UserRecordModel.fromJson(data);
 
-        _errorMessage = null;
-
       } else {
 
         _userRecord = null;
-        _errorMessage = "Failed to load data";
-
+        _errorMessage = "Server Error: ${response.statusCode}";
       }
 
     } catch (e) {
 
       _userRecord = null;
       _errorMessage = "Error: $e";
-
-      ErrorHandling.handleError(
-        e is Exception ? e : Exception(e.toString()),
-      );
-
       print("Error: $e");
 
     } finally {

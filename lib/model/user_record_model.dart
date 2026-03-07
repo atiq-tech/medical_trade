@@ -4,7 +4,7 @@ class UserRecordModel {
   List<ClientPost>? clientPosts;
   List<EngineerSupport>? engineerSupports;
   List<MyRequirement>? myRequirements;
-  List<ClientPost>? others;
+  List<OtherPost>? others;
   List<Order>? orders;
 
   UserRecordModel({
@@ -43,9 +43,9 @@ class UserRecordModel {
     }
 
     if (json['others'] != null) {
-      others = <ClientPost>[];
+      others = <OtherPost>[];
       json['others'].forEach((v) {
-        others!.add(ClientPost.fromJson(v));
+        others!.add(OtherPost.fromJson(v));
       });
     }
 
@@ -335,6 +335,7 @@ class Order {
   dynamic deletedAt;
   DateTime? createdAt;
   DateTime? updatedAt;
+  Product? product;   // ✅ NEW
 
   Order();
 
@@ -357,6 +358,11 @@ class Order {
     updatedAt = json['updated_at'] != null
         ? DateTime.tryParse(json['updated_at'])
         : null;
+
+    // ✅ Product parse
+    product = json['product'] != null
+        ? Product.fromJson(json['product'])
+        : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -373,6 +379,188 @@ class Order {
     data['deleted_at'] = deletedAt;
     data['created_at'] = createdAt?.toIso8601String();
     data['updated_at'] = updatedAt?.toIso8601String();
+
+    // ✅ Product toJson
+    if (product != null) {
+      data['product'] = product!.toJson();
+    }
+
+    return data;
+  }
+}
+
+class Product {
+  int? id;
+  String? productId;
+  int? productCategoryId;
+  String? productName;
+  String? price;
+  String? image;
+  List<String>? images;
+  String? type;
+  String? description;
+  int? createdBy;
+  dynamic updatedBy;
+  String? ipAddress;
+  int? branchId;
+  dynamic deletedAt;
+  DateTime? createdAt;
+  DateTime? updatedAt;
+
+  Product();
+
+  Product.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    productId = json['product_id'];
+    productCategoryId = json['product_category_id'];
+    productName = json['product_name'];
+    price = json['price'];
+    image = json['image'];
+    images = json['images'] != null
+        ? List<String>.from(json['images'])
+        : [];
+    type = json['type'];
+    description = json['description'];
+    createdBy = json['created_by'];
+    updatedBy = json['updated_by'];
+    ipAddress = json['ip_address'];
+    branchId = json['branch_id'];
+    deletedAt = json['deleted_at'];
+
+    createdAt = json['created_at'] != null
+        ? DateTime.tryParse(json['created_at'])
+        : null;
+
+    updatedAt = json['updated_at'] != null
+        ? DateTime.tryParse(json['updated_at'])
+        : null;
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = {};
+    data['id'] = id;
+    data['product_id'] = productId;
+    data['product_category_id'] = productCategoryId;
+    data['product_name'] = productName;
+    data['price'] = price;
+    data['image'] = image;
+    data['images'] = images;
+    data['type'] = type;
+    data['description'] = description;
+    data['created_by'] = createdBy;
+    data['updated_by'] = updatedBy;
+    data['ip_address'] = ipAddress;
+    data['branch_id'] = branchId;
+    data['deleted_at'] = deletedAt;
+    data['created_at'] = createdAt?.toIso8601String();
+    data['updated_at'] = updatedAt?.toIso8601String();
+    return data;
+  }
+}
+
+class OtherPost {
+  int? id;
+  String? customerPostId;
+  String? machineName;
+  String? price;
+  String? model;
+  String? condition;
+  String? origin;
+  List<int>? divisionId;
+  List<int>? areaId;
+  String? upazilla;
+  String? mobile;
+  DateTime? validityDate;
+  String? description;
+  String? image;
+  List<String>? images;
+  int? createdBy;
+  dynamic updatedBy;
+  String? ipAddress;
+  int? branchId;
+  dynamic deletedAt;
+  DateTime? createdAt;
+  DateTime? updatedAt;
+  String? name;
+  dynamic address;
+
+  OtherPost();
+
+  OtherPost.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    customerPostId = json['customer_post_id'];
+    machineName = json['machine_name'];
+    price = json['price'];
+    model = json['model'];
+    condition = json['condition'];
+    origin = json['origin'];
+
+    if (json['division_id'] != null) {
+      divisionId = List<int>.from(json['division_id']);
+    }
+
+    if (json['area_id'] != null) {
+      areaId = List<int>.from(json['area_id']);
+    }
+
+    upazilla = json['upazilla'];
+    mobile = json['mobile'];
+
+    validityDate = json['validity_date'] != null
+        ? DateTime.tryParse(json['validity_date'])
+        : null;
+
+    description = json['description'];
+    image = json['image'];
+
+    if (json['images'] != null) {
+      images = List<String>.from(json['images']);
+    }
+
+    createdBy = json['created_by'];
+    updatedBy = json['updated_by'];
+    ipAddress = json['ip_address'];
+    branchId = json['branch_id'];
+    deletedAt = json['deleted_at'];
+
+    createdAt = json['created_at'] != null
+        ? DateTime.tryParse(json['created_at'])
+        : null;
+
+    updatedAt = json['updated_at'] != null
+        ? DateTime.tryParse(json['updated_at'])
+        : null;
+
+    name = json['name'];
+    address = json['address'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = {};
+    data['id'] = id;
+    data['customer_post_id'] = customerPostId;
+    data['machine_name'] = machineName;
+    data['price'] = price;
+    data['model'] = model;
+    data['condition'] = condition;
+    data['origin'] = origin;
+    data['division_id'] = divisionId;
+    data['area_id'] = areaId;
+    data['upazilla'] = upazilla;
+    data['mobile'] = mobile;
+    data['validity_date'] = validityDate?.toIso8601String();
+    data['description'] = description;
+    data['image'] = image;
+    data['images'] = images;
+    data['created_by'] = createdBy;
+    data['updated_by'] = updatedBy;
+    data['ip_address'] = ipAddress;
+    data['branch_id'] = branchId;
+    data['deleted_at'] = deletedAt;
+    data['created_at'] = createdAt?.toIso8601String();
+    data['updated_at'] = updatedAt?.toIso8601String();
+    data['name'] = name;
+    data['address'] = address;
     return data;
   }
 }
